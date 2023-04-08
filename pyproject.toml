@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "palera1n-bot"
+version = "0.0.1"
+description = "Bot for the palera1n Discord server"
+authors = ["June Park <rjp2030@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+discord.py = "^2.1.0"
+
+
+
+[tool.pdm.build]
+includes = []
+
+[tool.pdm.scripts]
+bot = "python palera1n_bot"
+start.env_file = ".env"
+
+
+
+[project]
+name = "palera1n-bot"
+version = "0.0.1"
+description = "Bot for the palera1n Discord server"
+authors = [
+    {name = "June Park", email = "rjp2030@outlook.com"},
+    {name = "June Park", email = "rjp2030@gmail.com"},
+]
+dependencies = [
+    "py-cord",
+    "sqlalchemy>=2.0.9",
+    "python-dotenv>=1.0.0",
+]
+requires-python = ">=3.11,<4.0"
+license = {text = "MIT"}
+readme = "README.md"
+
+[project.urls]
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
