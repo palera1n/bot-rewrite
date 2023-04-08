@@ -31,8 +31,8 @@ authors = [
 ]
 dependencies = [
     "py-cord",
-    "sqlalchemy>=2.0.9",
     "python-dotenv>=1.0.0",
+    "mongoengine>=0.27.0",
 ]
 requires-python = ">=3.11,<4.0"
 license = {text = "MIT"}
