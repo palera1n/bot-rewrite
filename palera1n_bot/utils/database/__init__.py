@@ -1,3 +1,3 @@
 import mongoengine
 
-mongoengine.connect("localhost:27017")
+mongoengine.connect('botty', host='localhost', port=27017)

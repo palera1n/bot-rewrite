@@ -10,7 +10,8 @@ license = "MIT"
 python = "^3.10"
 discord.py = "^2.1.0"
 
-
+[tool.pyright]
+extraPaths = ["__pypackages__/3.11/lib/"]
 
 [tool.pdm.build]
 includes = []
