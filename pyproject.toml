@@ -27,7 +27,6 @@ version = "0.0.1"
 description = "Bot for the palera1n Discord server"
 authors = [
     {name = "June Park", email = "rjp2030@outlook.com"},
-    {name = "June Park", email = "rjp2030@gmail.com"},
 ]
 dependencies = [
     "py-cord",
@@ -35,7 +34,7 @@ dependencies = [
     "mongoengine>=0.27.0",
 ]
 requires-python = ">=3.11,<4.0"
-license = {file = "LICENSE", text = "BSD-3-Clause"}
+license = {text = "BSD-3-Clause"}
 readme = "README.md"
 
 [project.urls]
