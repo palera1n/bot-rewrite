@@ -21,7 +21,7 @@ async def on_ready():
     print(f'Logged in as {bot.user.name} (ID: {bot.user.id})')
     print('------')
 
-@bot.command()
+@commands.command
 async def ping(ctx):
     """Respond with pong"""
     await ctx.send('Pong!')
