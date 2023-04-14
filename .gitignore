@@ -163,3 +163,6 @@ Pipfile.lock
 
 dbs
 
+
+#leaked my token because of this
+*.swp
