@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import os
 
+
 async def check_invokee(ctx: discord.ApplicationContext, user: discord.Member, bot: commands.Bot):
     top_role = ctx.author.roles[-1]
 
@@ -12,4 +13,3 @@ async def check_invokee(ctx: discord.ApplicationContext, user: discord.Member, b
     if user.id == bot.user.id:
         return False
     return True
-    
