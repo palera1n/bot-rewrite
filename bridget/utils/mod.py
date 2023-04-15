@@ -5,6 +5,22 @@ from typing import Optional, List, Union
 from model import *
 from utils.services import guild_service, user_service
 
+from config import cfg
+
+import asyncio
+
+def escape_markdown(text: str) -> str:
+    """Escapes markdown characters
+
+    Args:
+        text (str): Text to escape
+
+    Returns:
+        str: Escaped text
+    """
+    
+    return text.replace("*", "\*").replace("_", "\_").replace("`", "\`")
+
 def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
     """Adds kick case to user
 
@@ -51,8 +67,8 @@ async def warn(interaction: discord.Interaction, target_member: discord.Member, 
     cur_points = db_user.warn_points
 
     # TODO: Implement logging
-    # log = prepare_warn_log(mod, target_member, case)
-    # log.add_field(name="Current points", value=cur_points, inline=True)
+    log = prepare_warn_log(mod, target_member, case)
+    log.add_field(name="Current points", value=cur_points, inline=True)
 
     dmed = await notify_user_warn(interaction, target_member, mod, db_user, db_guild, cur_points, log)
     await response_log(interaction, log)
@@ -77,7 +93,7 @@ async def notify_user(target_member: discord.Member, text: str, log: discord.Emb
     
     return True
 
-async def notify_user_warn(interaction: discord.Interaction, target_member: discord.Member, mod: discord.Member, db_user, db_guild, cur_points: int, log) -> bool:
+async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, db_user, db_guild, cur_points: int, log) -> bool:
     """Notifies a specified user about a warn
 
     Args:
@@ -138,7 +154,7 @@ async def response_log(ctx, log):
         await ctx.send(embed=log, delete_after=10)
 
 
-async def submit_public_log(interaction: discord.Interaction, db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed, dmed: bool = None):
+async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed, dmed: bool = None):
     """Submits a public log
 
     Args:
