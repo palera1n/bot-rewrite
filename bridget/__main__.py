@@ -11,7 +11,7 @@ from ruamel.yaml import YAML
 from discord.ext import commands
 from platformdirs import PlatformDirs
 
-from utils import checks
+from utils import checks, cfg
 from cogs import Say, Sync, Mod
 
 
@@ -26,7 +26,7 @@ def main() -> None:
     intents.message_content = True
 
     bot = commands.Bot(
-        command_prefix="!",
+        command_prefix=cfg.prefix,
         intents=intents,
         allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True),
     )
