@@ -10,15 +10,16 @@ from utils.mod import warn
 
 class Mod(Cog):
     @app_commands.command()
-    async def warn(self, interaction: discord.Interaction, user: discord.User, points: app_commands.Range[int, 1, 10], reason: str):
+    async def warn(self, ctx: discord.Interaction, user: discord.Member, points: app_commands.Range[int, 1, 10], reason: str):
         """Warn a user
 
         Args:
-            interaction (discord.Interaction): Interaction
+            ctx (discord.ctx): Context
             user (discord.User): User to warn
             points (app_commands.Range[int, 1, 10]): Points to give
             reason (str): Reason to warn
         """
         
-        await interaction.response.defer()
-        await warn(interaction, target_member=user, mod=interaction.author, points=points, reason=reason)
+        await ctx.response.defer()
+        # user = ctx.guild.get_member(interaction.user.id)
+        await warn(ctx, target_member=user, mod=ctx.user, points=points, reason=reason)

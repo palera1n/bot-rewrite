@@ -1,8 +1,10 @@
 import discord
 
 from typing import Optional, List, Union
+from discord.utils import escape_markdown
 
 from model import *
+from utils.config import cfg
 from utils.services import guild_service, user_service
 
 def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
@@ -31,7 +33,7 @@ def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: st
 
     return prepare_kick_log(mod, target_member, case)
 
-async def warn(interaction: discord.Interaction, target_member: discord.Member, mod: discord.Member, points, reason):
+async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, points, reason):
     db_guild = guild_service.get_guild()
 
     case = Case(
@@ -50,13 +52,12 @@ async def warn(interaction: discord.Interaction, target_member: discord.Member, 
     db_user = user_service.get_user(target_member.id)
     cur_points = db_user.warn_points
 
-    # TODO: Implement logging
-    # log = prepare_warn_log(mod, target_member, case)
-    # log.add_field(name="Current points", value=cur_points, inline=True)
+    log = prepare_warn_log(mod, target_member, case)
+    log.add_field(name="Current points", value=cur_points, inline=True)
 
-    dmed = await notify_user_warn(interaction, target_member, mod, db_user, db_guild, cur_points, log)
-    await response_log(interaction, log)
-    await submit_public_log(interaction, db_guild, target_member, log, dmed)
+    dmed = await notify_user_warn(ctx, target_member, mod, db_user, db_guild, cur_points, log)
+    await response_log(ctx, log)
+    await submit_public_log(ctx, db_guild, target_member, log, dmed)
 
 async def notify_user(target_member: discord.Member, text: str, log: discord.Embed) -> bool:
     """Notifies a specified user about something
@@ -77,11 +78,11 @@ async def notify_user(target_member: discord.Member, text: str, log: discord.Emb
     
     return True
 
-async def notify_user_warn(interaction: discord.Interaction, target_member: discord.Member, mod: discord.Member, db_user, db_guild, cur_points: int, log) -> bool:
+async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, db_user, db_guild, cur_points: int, log) -> bool:
     """Notifies a specified user about a warn
 
     Args:
-        interaction (discord.Interaction): Interaction
+        ctx (discord.Interaction): Context
         target_member (discord.Member): User to notify
         mod (discord.Member): User that warned
         db_user (_type_): User DB
@@ -97,19 +98,13 @@ async def notify_user_warn(interaction: discord.Interaction, target_member: disc
     dmed = True
 
     if cur_points >= 10:
-        if cfg.ban_appeal_url is None:
-            dmed = await notify_user(target_member, f"You were banned from {ctx.guild.name} for reaching 10 or more points.", log)
-        else:
-            dmed = await notify_user(target_member, f"You were banned from {ctx.guild.name} for reaching 10 or more points.\n\nIf you would like to appeal your ban, please fill out this form: <{cfg.ban_appeal_url}>", log)
+        #if cfg.ban_appeal_url is None:
+        dmed = await notify_user(target_member, f"You were banned from {ctx.guild.name} for reaching 10 or more points.", log)
+        #else:
+        #    dmed = await notify_user(target_member, f"You were banned from {ctx.guild.name} for reaching 10 or more points.\n\nIf you would like to appeal your ban, please fill out this form: <{cfg.ban_appeal_url}>", log)
 
         log_kickban = await add_ban_case(target_member, mod, "10 or more warn points reached.", db_guild)
         await target_member.ban(reason="10 or more warn points reached.")
-
-        if isinstance(ctx, discord.Interaction):
-            ctx.client.ban_cache.ban(target_member.id)
-        else:
-            ctx.bot.ban_cache.ban(target_member.id)
-
     elif cur_points >= 8 and not db_user.was_warn_kicked and isinstance(target_member, discord.Member):
         # kick user if >= 8 points and wasn't previously kicked
         user_service.set_warn_kicked(target_member.id)
@@ -138,11 +133,11 @@ async def response_log(ctx, log):
         await ctx.send(embed=log, delete_after=10)
 
 
-async def submit_public_log(interaction: discord.Interaction, db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed, dmed: bool = None):
+async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed, dmed: bool = None):
     """Submits a public log
 
     Args:
-        interaction (discord.Interaction): Interaction
+        ctx (discord.Interaction): Context
         db_guild (Guild): Guild DB
         user (Union[discord.Member, discord.User]): User to notify
         log (discord.Embed): Embed to send
