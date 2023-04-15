@@ -6,7 +6,7 @@ from datetime import datetime
 from discord import app_commands
 from discord.utils import escape_markdown, escape_mentions
 
-from utils import Cog, send_error, send_success, cfg
+from utils import Cog, send_error, send_success, cfg, warn_autocomplete
 from utils.mod import warn, prepare_liftwarn_log, notify_user, submit_public_log
 from utils.services import guild_service, user_service
 
@@ -31,6 +31,7 @@ class Mod(Cog):
         await ctx.response.defer()
         await warn(ctx, target_member=member, mod=ctx.user, points=points, reason=reason)
     
+    @app_commands.autocomplete(case_id=warn_autocomplete)
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def liftwarn(self, ctx: discord.Interaction, member: discord.Member, case_id: str, reason: str) -> None:
