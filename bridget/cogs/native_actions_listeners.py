@@ -3,7 +3,8 @@ import discord
 from discord.ext import commands
 
 from utils import Cog
-from utils.mod import add_kick_case
+from utils.mod import add_kick_case, submit_public_log
+from utils.services import guild_service
 
 
 class NativeActionsListeners(Cog):
