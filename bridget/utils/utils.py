@@ -2,13 +2,11 @@ import discord
 
 from discord.ext import commands
 
-
 from .enums import Errors
 
 class Cog(commands.Cog):
-    def __init__(self, bot: commands.Bot, config: dict):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.config = config
 
 async def send_error(interaction: discord.Interaction, error: Errors = Errors.NO_PERMISSION) -> None:
     match error:

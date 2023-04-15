@@ -1,21 +1,19 @@
 import asyncio
 import discord
-
-from typing import Optional
-from discord import commands
 import os
 
-from utils import Cog
+from typing import Optional
+from discord.ext import commands
+
+from utils import Cog, cfg
 
 
 class Sync(Cog):
-    def __init__(self, bot: discord.Bot):
-        self.bot = bot
-
-    @commands.slash_command()
-    async def sync(self, ctx: commands.context) -> None:
+    @commands.command()
+    async def sync(self, ctx: commands.Context) -> None:
         """Sync slash commands"""
-        if ctx.author.id != os.getenv("OWNER_ID"):
+        
+        if ctx.author.id != cfg.owner_id:
             await ctx.reply(
                 embed=discord.Embed(
                     color=discord.Color.red(),
@@ -24,7 +22,7 @@ class Sync(Cog):
             )
             return
 
-        await ctx.bot.tree.sync()
+        await ctx.bot.tree.sync(guild=discord.Object(cfg.guild_id))
 
         await ctx.reply(
             embed=discord.Embed(
@@ -36,7 +34,3 @@ class Sync(Cog):
 
         await asyncio.sleep(5)
         await ctx.message.delete()
-
-
-def setup(bot):
-    bot.add_cog(Sync(bot))

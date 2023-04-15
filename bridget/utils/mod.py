@@ -1,10 +1,9 @@
 import discord
 
-from utils.services import guild_service, user_service
+from typing import Optional, List, Union
 
 from model import *
-
-from typing import Optional, List, Union
+from utils.services import guild_service, user_service
 
 def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
     """Adds kick case to user

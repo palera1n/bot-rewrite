@@ -1,18 +1,13 @@
 import discord
 
-from os import getenv
 from typing import Optional
+from discord import app_commands
 
-from discord import commands
-
-from utils import Cog, send_error, send_success, Errors
+from utils import Cog, send_error, send_success, Errors, cfg
 
 
 class Say(Cog):
-    def __init__(self, bot: discord.Bot):
-        self.bot = bot
-
-    @discord.slash_command()
+    @app_commands.command()
     async def say(self, interaction: discord.Interaction, message: str, channel: Optional[discord.TextChannel]) -> None:
         """Make the bot say something
 
@@ -20,7 +15,7 @@ class Say(Cog):
         :param channel: Channel to send to
         """
 
-        if interaction.user.id != getenv("OWNER_ID"):
+        if interaction.user.id != cfg.owner_id:
             await send_error(interaction, error=Errors.NO_PERMISSION)
             return
 
@@ -28,7 +23,3 @@ class Say(Cog):
         await channel.send(message)
 
         await send_success(interaction)
-
-
-def setup(bot):
-    bot.add_cog(Say(bot))

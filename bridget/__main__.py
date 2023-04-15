@@ -12,12 +12,11 @@ from discord.ext import commands
 from platformdirs import PlatformDirs
 
 from utils import checks
-from cogs import Say, Sync
+from cogs import Say, Sync, Mod
 
 
 def main() -> None:
     """Main function"""
-    
     
     for check in checks:
         check()
@@ -32,10 +31,10 @@ def main() -> None:
         allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True),
     )
 
-    for cog in ['cogs.say', 'cogs.mod']:
-        bot.load_extension(cog)
+    asyncio.run(bot.add_cog(Say(bot)))
+    asyncio.run(bot.add_cog(Sync(bot)))
+    asyncio.run(bot.add_cog(Mod(bot)))
     
-
     bot.run(getenv("TOKEN"))
 
 if __name__ == "__main__":
