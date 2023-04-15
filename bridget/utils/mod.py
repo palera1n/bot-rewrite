@@ -54,7 +54,7 @@ async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: dis
     cur_points = db_user.warn_points
 
     log = prepare_warn_log(mod, target_member, case)
-    log.add_field(name="Current points", value=cur_points, inline=True)
+    log.add_field(name="Current points", value=f"{cur_points}/10", inline=True)
 
     dmed = await notify_user_warn(ctx, target_member, mod, db_user, db_guild, cur_points, log)
     await response_log(ctx, log)
