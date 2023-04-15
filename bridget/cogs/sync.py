@@ -22,7 +22,8 @@ class Sync(Cog):
             )
             return
 
-        await ctx.bot.tree.sync(guild=discord.Object(cfg.guild_id))
+        async with ctx.typing():
+            await self.bot.tree.sync(guild=discord.Object(id=cfg.guild_id))
 
         await ctx.reply(
             embed=discord.Embed(
