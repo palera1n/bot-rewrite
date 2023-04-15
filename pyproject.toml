@@ -20,7 +20,7 @@ readme = "README.md"
 includes = []
 
 [tool.pdm.scripts]
-bot = "bridget.bridget:main"
+bot.cmd = "bridget.bridget:main"
 bot.env_file = ".env"
 
 [tool.pyright]
