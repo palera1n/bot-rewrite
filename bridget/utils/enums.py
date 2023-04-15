@@ -12,11 +12,6 @@ class PermissionLevel(IntEnum):
     ADMIN = 5
     OWNER = 6
 
-    # Default value
-    def __new__(cls, value):
-        obj = object.__new__(cls)
-        obj._value_ = value
-        return obj
 
     # Checks
     def __lt__(self, other):

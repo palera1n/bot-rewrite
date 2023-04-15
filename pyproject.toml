@@ -9,6 +9,8 @@ authors = [
 dependencies = [
     "py-cord",
     "mongoengine>=0.27.0",
+    "ruamel-yaml>=0.17.21",
+    "platformdirs>=3.2.0",
 ]
 requires-python = ">=3.10,<4.0"
 license = {text = "BSD-3-Clause"}
@@ -20,8 +22,10 @@ readme = "README.md"
 includes = []
 
 [tool.pdm.scripts]
-bot.cmd = "bridget.bridget:main"
+bot.cmd = "python bridget"
 bot.env_file = ".env"
+setup.cmd = "python bridget/setup.py"
+setup.env_file = ".env"
 
 [tool.pyright]
 extraPaths = ["__pypackages__/3.11/lib/"]

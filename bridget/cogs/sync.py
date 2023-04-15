@@ -3,15 +3,19 @@ import discord
 
 from typing import Optional
 from discord import commands
+import os
 
-from ..utils import Cog
+from utils import Cog
 
 
 class Sync(Cog):
-    @commands.command()
-    async def sync(self, ctx: commands.Context) -> None:
+    def __init__(self, bot: discord.Bot):
+        self.bot = bot
+
+    @commands.slash_command()
+    async def sync(self, ctx: commands.context) -> None:
         """Sync slash commands"""
-        if ctx.author.id != getenv("OWNER_ID"):
+        if ctx.author.id != os.getenv("OWNER_ID"):
             await ctx.reply(
                 embed=discord.Embed(
                     color=discord.Color.red(),
@@ -29,6 +33,10 @@ class Sync(Cog):
             ),
             delete_after=5,
         )
-        
+
         await asyncio.sleep(5)
         await ctx.message.delete()
+
+
+def setup(bot):
+    bot.add_cog(Sync(bot))

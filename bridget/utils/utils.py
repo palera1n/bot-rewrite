@@ -2,6 +2,7 @@ import discord
 
 from discord.ext import commands
 
+
 from .enums import Errors
 
 class Cog(commands.Cog):

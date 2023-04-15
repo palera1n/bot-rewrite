@@ -1,4 +1,4 @@
 import mongoengine
 
-from utils.database.user_service import *
-from utils.database.guild_service import *
+from .user_service import *
+from .guild_service import *
