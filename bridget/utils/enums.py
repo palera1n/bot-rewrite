@@ -1,27 +1,24 @@
 from enum import IntEnum, unique, auto
 
-
 @unique
 class PermissionLevel(IntEnum):
-    '''
-    A Enum to store Permission Levels.
-    '''
+    """Permission level enum"""
+    
     EVERYONE = 0
-    MEMPLUS = auto()
-    MEMPRO = auto()
-    HELPER = auto()
-    MOD = auto()
-    ADMIN = auto()
-    OWNER = auto()
+    MEMPLUS = 1
+    MEMPRO = 2
+    HELPER = 3
+    MOD = 4
+    ADMIN = 5
+    OWNER = 6
 
-    # provide a default value for the enum
+    # Default value
     def __new__(cls, value):
         obj = object.__new__(cls)
         obj._value_ = value
         return obj
 
-    # provide easy boolean checks
-
+    # Checks
     def __lt__(self, other):
         return self.value < other.value
 
@@ -36,3 +33,10 @@ class PermissionLevel(IntEnum):
 
     def __eq__(self, other):
         return self.value == other.value
+
+@unique
+class Errors(IntEnum):
+    """Error enum"""
+    
+    NO_PERMISSION = 0
+    POINTS_UNDER_ZERO = 1

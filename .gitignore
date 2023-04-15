@@ -161,8 +161,7 @@ cython_debug/
 
 Pipfile.lock
 
+# Project stuff
 dbs
-
-
-#leaked my token because of this
 *.swp
+.DS_Store

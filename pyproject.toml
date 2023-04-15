@@ -1,37 +1,13 @@
-[tool.poetry]
-name = "palera1n-bot"
-version = "0.0.1"
-description = "Bot for the palera1n Discord server"
-authors = ["June Park <rjp2030@gmail.com>"]
-readme = "README.md"
-license = "MIT"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-discord.py = "^2.1.0"
-
-[tool.pyright]
-extraPaths = ["__pypackages__/3.11/lib/"]
-
-[tool.pdm.build]
-includes = []
-
-[tool.pdm.scripts]
-bot = "python palera1n_bot"
-start.env_file = ".env"
-
-
-
 [project]
-name = "palera1n-bot"
-version = "0.0.1"
+name = "bridget"
+version = "1.0.0"
 description = "Bot for the palera1n Discord server"
 authors = [
-    {name = "June Park", email = "rjp2030@outlook.com"},
+    {name = "Nebula", email = "me@itsnebula.net"},
+    {name = "June Park", email = "rjp2030@outlook.com"}
 ]
 dependencies = [
     "py-cord",
-    "python-dotenv>=1.0.0",
     "mongoengine>=0.27.0",
 ]
 requires-python = ">=3.10,<4.0"
@@ -39,6 +15,16 @@ license = {text = "BSD-3-Clause"}
 readme = "README.md"
 
 [project.urls]
+
+[tool.pdm.build]
+includes = []
+
+[tool.pdm.scripts]
+bot = "bridget.bridget:main"
+bot.env_file = ".env"
+
+[tool.pyright]
+extraPaths = ["__pypackages__/3.11/lib/"]
 
 [build-system]
 requires = ["pdm-pep517>=1.0.0"]
