@@ -1,15 +1,13 @@
 import discord
 from discord.ext import commands
-from utils.mod import add_kick_case
+from utils.mod import add_kick_case, submit_public_log
 
 
 class NativeActionsListeners(commands.Cog):
-    def __init__(self, bot: discord.Bot):
-        self.bot = bot
-    
     @commands.Cog.listener()
-    async def on_member_remove(member: discord.Member):
+    async def on_member_remove(self, member: discord.Member):
         guild = member.guild
-        audit_logs = await guild.audit_logs(limit=1, action=discord.AuditLogAction.kick).flatten()
-        if audit_logs:
-            add_kick_case(member, audit_logs[0].user, audit_logs[0].reason)
+        audit_logs = [entry async for entry in guild.audit_logs(limit=1, action=discord.AuditLogAction.kick)]
+        if audit_logs and audit_logs[0].target.id == member.id:
+            submit_public_log(add_kick_case(member, audit_logs[0].user, audit_logs[0].reason))
+            

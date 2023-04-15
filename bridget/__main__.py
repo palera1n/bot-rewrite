@@ -12,7 +12,7 @@ from discord.ext import commands
 from platformdirs import PlatformDirs
 
 from utils import checks, cfg
-from cogs import Say, Sync, Mod
+from cogs import Say, Sync, Mod, NativeActionsListeners
 
 
 def main() -> None:
@@ -34,7 +34,8 @@ def main() -> None:
     asyncio.run(bot.add_cog(Say(bot)))
     asyncio.run(bot.add_cog(Sync(bot)))
     asyncio.run(bot.add_cog(Mod(bot)))
-    
+    asyncio.run(bot.add_cog(NativeActionsListeners(bot)))
+
     bot.run(getenv("TOKEN"))
 
 if __name__ == "__main__":
