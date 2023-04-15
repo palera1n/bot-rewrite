@@ -12,7 +12,6 @@ class PermissionLevel(IntEnum):
     ADMIN = 5
     OWNER = 6
 
-
     # Checks
     def __lt__(self, other):
         return self.value < other.value

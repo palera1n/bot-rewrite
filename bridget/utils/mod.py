@@ -1,4 +1,5 @@
 import discord
+import asyncio
 
 from typing import Optional, List, Union
 from discord.utils import escape_markdown
@@ -6,10 +7,8 @@ from discord.utils import escape_markdown
 from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
-
 from .config import cfg
 
-import asyncio
 
 def escape_markdown(text: str) -> str:
     """Escapes markdown characters
