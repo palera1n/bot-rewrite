@@ -5,7 +5,7 @@ from typing import Optional, List, Union
 from model import *
 from utils.services import guild_service, user_service
 
-from config import cfg
+from .config import cfg
 
 import asyncio
 
