@@ -9,19 +9,6 @@ from utils.config import cfg
 from utils.services import guild_service, user_service
 from .config import cfg
 
-
-def escape_markdown(text: str) -> str:
-    """Escapes markdown characters
-
-    Args:
-        text (str): Text to escape
-
-    Returns:
-        str: Escaped text
-    """
-    
-    return text.replace("*", "\*").replace("_", "\_").replace("`", "\`")
-
 def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
     """Adds kick case to user
 
@@ -164,6 +151,7 @@ async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Uni
     if public_channel:
         log.remove_author()
         log.set_thumbnail(url=user.display_avatar)
+        log.remove_field(1)
         if dmed is not None:
             await public_channel.send(user.mention if not dmed else "", embed=log)
         else:
