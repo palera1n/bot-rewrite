@@ -7,7 +7,6 @@ from discord.utils import escape_markdown
 from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
-from .config import cfg
 
 def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
     """Adds kick case to user
@@ -146,8 +145,7 @@ async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Uni
         dmed (bool, optional): If was dmed. Defaults to None.
     """
     
-    public_channel = ctx.guild.get_channel(
-        db_guild.channel_public)
+    public_channel = ctx.guild.get_channel(db_guild.channel_public)
     if public_channel:
         log.remove_author()
         log.set_thumbnail(url=user.display_avatar)

@@ -27,10 +27,3 @@ class PermissionLevel(IntEnum):
 
     def __eq__(self, other):
         return self.value == other.value
-
-@unique
-class Errors(IntEnum):
-    """Error enum"""
-    
-    NO_PERMISSION = 0
-    POINTS_UNDER_ZERO = 1

@@ -2,32 +2,32 @@ import discord
 
 from discord.ext import commands
 
-from .enums import Errors
-
 class Cog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-async def send_error(interaction: discord.Interaction, error: Errors = Errors.NO_PERMISSION) -> None:
-    match error:
-        case Errors.NO_PERMISSION:
-            description = "You are not allowed to use this command."
-        case Errors.POINTS_UNDER_ZERO:
-            description = "Points can't be lower than 1."
-    
-    await interaction.response.send_message(
+async def send_error(ctx: discord.Interaction, message: str) -> None:
+    await ctx.response.send_message(
         embed=discord.Embed(
             color=discord.Color.red(),
-            description=description,
+            description=message,
         ),
         ephemeral=True,
     )
 
-async def send_success(interaction: discord.Interaction, description: str = "Done!") -> None:
-    await interaction.response.send_message(
-        embed=discord.Embed(
-            color=discord.Color.green(),
-            description=description,
-        ),
-        ephemeral=True,
-    )
+async def send_success(ctx: discord.Interaction, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None) -> None:
+    if embed:
+        await ctx.response.send_message(
+            embed=embed,
+            ephemeral=True,
+            delete_after=delete_after
+        )
+    else:
+        await ctx.response.send_message(
+            embed=discord.Embed(
+                color=discord.Color.green(),
+                description=description,
+            ),
+            ephemeral=True,
+            delete_after=delete_after
+        )
