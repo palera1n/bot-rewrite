@@ -11,7 +11,7 @@ from discord import app_commands
 from utils import send_error
 from utils.config import cfg
 from utils.startup_checks import checks
-from cogs import Logging, Mod, NativeActionsListeners, Say, Sync, Tags, Unshorten
+from cogs import Logging, Mod, NativeActionsListeners, Say, Sync, Tags, TagsGroup, Unshorten
 
 
 for check in checks:
@@ -30,6 +30,7 @@ asyncio.run(bot.add_cog(NativeActionsListeners(bot)))
 asyncio.run(bot.add_cog(Say(bot)))
 asyncio.run(bot.add_cog(Sync(bot)))
 asyncio.run(bot.add_cog(Tags(bot)))
+asyncio.run(bot.add_cog(TagsGroup(bot)))
 asyncio.run(bot.add_cog(Unshorten(bot)))
 
 @bot.tree.error

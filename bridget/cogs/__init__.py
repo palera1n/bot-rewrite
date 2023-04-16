@@ -4,5 +4,5 @@ from .native_actions_listeners import NativeActionsListeners
 from .say import Say
 from .snipe import Snipe
 from .sync import Sync
-from .tags import Tags
+from .tags import Tags, TagsGroup
 from .unshorten import Unshorten

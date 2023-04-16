@@ -166,10 +166,10 @@ class Tags(Cog):
                     page_formatter=format_tag_page, whisper=ctx.whisper)
         await menu.start()
 
-    tags = app_commands.Group(name="tags", description="Interact with tags", guild_ids=[cfg.guild_id])
-
+class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
     @PermissionLevel.HELPER
-    @tags.command()
+    @app_commands.guilds(cfg.guild_id)
+    @app_commands.command()
     async def add(self, ctx: discord.Interaction, name: str, image: ImageAttachment = None) -> None:
         """Add a tag
 
@@ -220,8 +220,9 @@ class Tags(Cog):
         await ctx.response.send_message(f"Added new tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag) or discord.utils.MISSING, view=prepare_tag_view(tag) or discord.utils.MISSING, delete_after=5)
 
     @PermissionLevel.HELPER
+    @app_commands.guilds(cfg.guild_id)
     @app_commands.autocomplete(name=tags_autocomplete)
-    @tags.command()
+    @app_commands.command()
     async def edit(self, ctx: discord.Interaction, name: str, image: ImageAttachment = None) -> None:
         """Edit a tag
 
@@ -276,8 +277,9 @@ class Tags(Cog):
         await ctx.response.send_message(f"Edited tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag) or discord.utils.MISSING, delete_after=5)
 
     @PermissionLevel.HELPER
+    @app_commands.guilds(cfg.guild_id)
     @app_commands.autocomplete(name=tags_autocomplete)
-    @tags.command()
+    @app_commands.command()
     async def delete(self, ctx: discord.Interaction, name: str):
         """Delete a tag
 
