@@ -5,10 +5,13 @@ from discord.ext import commands
 from datetime import datetime
 from discord.utils import format_dt
 from typing import List, Union
-from io import BytesIO
+from io import BytesIO, BufferedIOBase
 
 from utils.services import guild_service, user_service
 from utils.config import cfg
+
+from PIL import Image
+
 
 class Logging(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -183,7 +186,7 @@ class Logging(commands.Cog):
         if message.channel.id in db_guild.logging_excluded_channels:
             return
 
-        channel = message.guild.get_channel(db_guild.channel_private)
+        channel: discord.Channel = message.guild.get_channel(db_guild.channel_private)
 
         embed = discord.Embed(title="Message Deleted")
         embed.color = discord.Color.red()
@@ -200,6 +203,27 @@ class Logging(commands.Cog):
         embed.set_footer(text=message.author.id)
         embed.timestamp = datetime.now()
         await channel.send(embed=embed)
+        
+        images = []
+        for attachment in message.attachments:
+            if attachment.content_type.startswith('image'):
+                images.append(Image.open((await attachment.to_file()).fp))
+                
+
+            else:
+                await channel.send(file=await attachment.to_file())
+        
+        new_img = Image.new("RGB", (200*(len(images)+1), 200), "white")
+        for idx, image in enumerate(images):
+            image = Image.open((await attachment.to_file()).fp)
+            image.thumbnail((200, 200))
+            new_img.paste(image, (idx * 200, 0))
+
+        f = BytesIO()
+
+        new_img.save(f, "png")
+
+        await channel.send(file=discord.File(f, filename="merged.png"))
 
     # @commands.Cog.listener()
     # async def on_command_error(self, ctx: GIRContext, error):
