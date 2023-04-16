@@ -16,7 +16,8 @@ class PermissionLevel(IntEnum):
     HELPER = 3
     MOD = 4
     ADMIN = 5
-    OWNER = 6
+    GUILD_OWNER = 6
+    OWNER = 7
 
 
     # Checks
@@ -35,17 +36,19 @@ class PermissionLevel(IntEnum):
     def __eq__(self, other):
 
         if isinstance(other, discord.Member):
-            if self == self.__class__.EVERYONE:
+            if self == self.EVERYONE:
                 return True
-            if self == self.__class__.OWNER:
+            if self == self.GUILD_OWNER:
+                return other.guild.owner == other
+            if self == self.OWNER:
                 return other.id == cfg.owner_id
             
             return getattr(guild_service.get_guild(), {
-                self.__class__.MEMPLUS: "role_memberplus",
-                self.__class__.MEMPRO: "role_memberpro",
-                self.__class__.HELPER: "role_helper",
-                self.__class__.MOD: "role_moderator",
-                self.__class__.ADMIN: "role_administrator",
+                self.MEMPLUS: "role_memberplus",
+                self.MEMPRO: "role_memberpro",
+                self.HELPER: "role_helper",
+                self.MOD: "role_moderator",
+                self.ADMIN: "role_administrator",
             }[self]) in list(map(lambda r: r.id, other.roles)) or self + 1 == other
             
         return self.value == other.value

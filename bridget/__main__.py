@@ -12,7 +12,7 @@ from discord.ext import commands
 from platformdirs import PlatformDirs
 
 from utils import checks, cfg
-from cogs import Say, Sync, Mod, NativeActionsListeners
+from cogs import Say, Sync, Mod, NativeActionsListeners, Logging
 
 
 def main() -> None:
@@ -35,6 +35,7 @@ def main() -> None:
     asyncio.run(bot.add_cog(Sync(bot)))
     asyncio.run(bot.add_cog(Mod(bot)))
     asyncio.run(bot.add_cog(NativeActionsListeners(bot)))
+    asyncio.run(bot.add_cog(Logging(bot)))
     
     bot.run(getenv("TOKEN"))
 

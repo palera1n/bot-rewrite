@@ -14,6 +14,7 @@ from utils.enums import PermissionLevel
 
 class Mod(Cog):
     @app_commands.checks.has_permissions(ban_members=True, kick_members=True)
+    @PermissionLevel.MOD
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def warn(self, ctx: discord.Interaction, member: discord.Member, points: app_commands.Range[int, 1, 10], reason: str):
@@ -26,12 +27,15 @@ class Mod(Cog):
             reason (str): Reason to warn
         """
         
-        
+        if member.top_role >= ctx.user.top_role:
+            await send_error(ctx, "You can't warn this member.")
+            return
         
         await ctx.response.defer()
         await warn(ctx, target_member=member, mod=ctx.user, points=points, reason=reason)
     
     @app_commands.checks.has_permissions(ban_members=True, kick_members=True)
+    @PermissionLevel.MOD
     @app_commands.autocomplete(case_id=warn_autocomplete)
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
