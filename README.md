@@ -1,6 +1,6 @@
 # Bridget
 
-If you want to help, join us at: [Discord](https://discord.gg/palera1n)
+If you want to help, join us at: [Discord](https://discord.gg/palera1n). We also have a testing server at: [Discord](https://discord.gg/55A4Xjc9RW)
 
 ## Running:
 Write an .env file
