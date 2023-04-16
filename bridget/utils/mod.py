@@ -8,7 +8,7 @@ from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
 
-def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
+async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
     case = Case(
             _id=db_guild.case_id,
             _type="UNBAN",
@@ -18,9 +18,9 @@ def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: s
         )
     guild_service.inc_caseid()
     user_service.add_case(target_member.id, case)
-    return prepare_unban_log(mod, target_member, case)
+    return create_public_log(db_guild, target_member, prepare_unban_log(mod, target_member, case))
 
-def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
+async def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
     """Adds kick case to user
 
     Args:
@@ -44,7 +44,7 @@ def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: st
     guild_service.inc_caseid()
     user_service.add_case(target_member.id, case)
 
-    return prepare_kick_log(mod, target_member, case)
+    return await create_public_log(db_guild, target_member, prepare_kick_log(mod, target_member, case))
 
 async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, points, reason):
     db_guild = guild_service.get_guild()
@@ -145,6 +145,21 @@ async def response_log(ctx, log):
     else:
         await ctx.send(embed=log, delete_after=10)
 
+def create_public_log(db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed):
+    """Submits a public log
+
+    Args:
+        ctx (discord.Interaction): Context
+        db_guild (Guild): Guild DB
+        user (Union[discord.Member, discord.User]): User to notify
+        log (discord.Embed): Embed to send
+        dmed (bool, optional): If was dmed. Defaults to None.
+    """
+    
+    log.remove_author()
+    log.set_thumbnail(url=user.display_avatar)
+    log.remove_field(1)
+    return log
 
 async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed, dmed: bool = None):
     """Submits a public log
