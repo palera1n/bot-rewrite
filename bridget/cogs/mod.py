@@ -13,7 +13,6 @@ from utils.enums import PermissionLevel
 
 
 class Mod(Cog):
-    #@app_commands.checks.has_permissions(ban_members=True, kick_members=True)
     @PermissionLevel.MOD
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
@@ -34,39 +33,37 @@ class Mod(Cog):
         await ctx.response.defer()
         await warn(ctx, target_member=member, mod=ctx.user, points=points, reason=reason)
 
-    # @app_commands.checks.has_permissions(ban_members=True)
-    # @PermissionLevel.MOD
-    # @app_commands.guilds(cfg.guild_id)
-    # @app_commands.command()
-    # async def hackban(self, ctx: discord.Interaction, user_id: int, reason: str) -> None:
-    #     """Hackban a user
+    @PermissionLevel.MOD
+    @app_commands.guilds(cfg.guild_id)
+    @app_commands.command()
+    async def hackban(self, ctx: discord.Interaction, user_id: int, reason: str) -> None:
+        """Hackban a user
 
-    #     Args:
-    #         ctx (discord.Interaction): Context
-    #         user_id (int): id of the user to hackban
-    #         reason (str): Reason to hackban
-    #     """
+        Args:
+            ctx (discord.Interaction): Context
+            user_id (int): id of the user to hackban
+            reason (str): Reason to hackban
+        """
         
-    #     reason = escape_markdown(reason)
-    #     reason = escape_mentions(reason)
+        reason = escape_markdown(reason)
+        reason = escape_mentions(reason)
 
-    #     try:
-    #         user = await self.bot.fetch_user(user_id)
-    #     except discord.NotFound:
-    #         user = None
+        try:
+            user = await self.bot.fetch_user(user_id)
+        except discord.NotFound:
+            user = None
 
-    #     if user is not None:
-    #         await send_error(ctx, f"{user} is not banned.")
-    #         return
+        if user is not None:
+            await send_error(ctx, f"{user} is not banned.")
+            return
 
-    #     await ctx.response.defer()
+        await ctx.response.defer()
 
-    #     guild = self.bot.get_guild(cfg.guild_id)
-    #     await guild.ban(discord.Object(id=user_id), reason=reason)
+        guild = self.bot.get_guild(cfg.guild_id)
+        await guild.ban(discord.Object(id=user_id), reason=reason)
 
-    #     await send_success(ctx)
+        await send_success(ctx)
     
-    #@app_commands.checks.has_permissions(ban_members=True, kick_members=True)
     @PermissionLevel.MOD
     @app_commands.autocomplete(case_id=warn_autocomplete)
     @app_commands.guilds(cfg.guild_id)
@@ -127,4 +124,3 @@ class Mod(Cog):
         if isinstance(error, app_commands.MissingPermissions):
             await send_error(ctx, "You are not allowed to use this command.")
             return
-
