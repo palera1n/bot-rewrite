@@ -8,7 +8,7 @@ from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
 
-async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
+async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
     case = Case(
             _id=db_guild.case_id,
             _type="UNBAN",
@@ -18,9 +18,11 @@ async def add_unban_case(target_member: discord.Member, mod: discord.Member, rea
         )
     guild_service.inc_caseid()
     user_service.add_case(target_member.id, case)
-    return create_public_log(db_guild, target_member, prepare_unban_log(mod, target_member, case))
+    log = prepare_unban_log(mod, target_member, case)
+    await notify_user(target_member, f"You have been unbanned in {bot.get_guild(guild_service.get_guild()._id).name}", log)
+    return create_public_log(db_guild, target_member, log)
 
-async def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
+async def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
     """Adds kick case to user
 
     Args:
@@ -43,8 +45,10 @@ async def add_kick_case(target_member: discord.Member, mod: discord.Member, reas
 
     guild_service.inc_caseid()
     user_service.add_case(target_member.id, case)
+    log = prepare_kick_log(mod, target_member, case)
+    notify_user(target_member, f"You have been kicked in {bot.get_guild(guild_service.get_guild()._id).name}", log)
 
-    return await create_public_log(db_guild, target_member, prepare_kick_log(mod, target_member, case))
+    return create_public_log(db_guild, target_member, log)
 
 async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, points, reason):
     db_guild = guild_service.get_guild()
@@ -183,7 +187,7 @@ async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Uni
             await public_channel.send(embed=log)
 
 
-async def add_ban_case(target_member: discord.Member, mod: discord.Member, reason, db_guild: Guild = None):
+async def add_ban_case(target_member: discord.Member, mod: discord.Member, reason, db_guild: Guild, bot: discord.Client):
     """_summary_
 
     Args:
@@ -207,7 +211,10 @@ async def add_ban_case(target_member: discord.Member, mod: discord.Member, reaso
 
     guild_service.inc_caseid()
     user_service.add_case(target_member.id, case)
-    return prepare_ban_log(mod, target_member, case)
+    log = prepare_ban_log(mod, target_member, case)
+    await notify_user(target_member, f"You have been banned in {bot.get_guild(guild_service.get_guild()._id).name}", log)
+
+    return create_public_log(db_guild, target_member, log) 
 
 async def delay_delete(interaction: discord.Interaction):
     await asyncio.sleep(10)
@@ -329,7 +336,7 @@ def prepare_ban_log(mod, target_member, case):
     embed.color = discord.Color.blue()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
     embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
-    # embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
+    embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date
@@ -352,7 +359,7 @@ def prepare_unban_log(mod, target_member, case):
     embed.color = discord.Color.blurple()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
     embed.add_field(name="Member", value=f'{target_member} ({target_member.id})', inline=True)
-    # embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
+    embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date
