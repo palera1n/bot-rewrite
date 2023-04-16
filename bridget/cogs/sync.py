@@ -23,6 +23,7 @@ class Sync(Cog):
             return
 
         async with ctx.typing():
+            await self.bot.tree.sync()
             await self.bot.tree.sync(guild=discord.Object(id=cfg.guild_id))
 
         await ctx.reply(

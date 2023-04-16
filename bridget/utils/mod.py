@@ -8,6 +8,18 @@ from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
 
+def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
+    case = Case(
+            _id=db_guild.case_id,
+            _type="UNBAN",
+            mod_id=mod.id,
+            mod_tag=str(mod),
+            reason=reason,
+        )
+    guild_service.inc_caseid()
+    user_service.add_case(target_member.id, case)
+    return prepare_unban_log(mod, target_member, case)
+
 def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild):
     """Adds kick case to user
 
@@ -302,7 +314,7 @@ def prepare_ban_log(mod, target_member, case):
     embed.color = discord.Color.blue()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
     embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
-    embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
+    # embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date
@@ -325,7 +337,7 @@ def prepare_unban_log(mod, target_member, case):
     embed.color = discord.Color.blurple()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
     embed.add_field(name="Member", value=f'{target_member} ({target_member.id})', inline=True)
-    embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
+    # embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date
@@ -348,7 +360,7 @@ def prepare_kick_log(mod, target_member, case):
     embed.color = discord.Color.green()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
     embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
-    embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
+    # embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=False)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date
