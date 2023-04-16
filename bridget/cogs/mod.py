@@ -12,6 +12,7 @@ from utils.services import guild_service, user_service
 
 
 class Mod(Cog):
+    @app_commands.has_any_role(guild_service.get_guild().role_moderator, guild_service.get_guild().role_admin)
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def warn(self, ctx: discord.Interaction, member: discord.Member, points: app_commands.Range[int, 1, 10], reason: str):
@@ -24,13 +25,12 @@ class Mod(Cog):
             reason (str): Reason to warn
         """
         
-        if ctx.user.id != cfg.owner_id:
-            await send_error(ctx, "You are not allowed to use this command.")
-            return
+        
         
         await ctx.response.defer()
         await warn(ctx, target_member=member, mod=ctx.user, points=points, reason=reason)
     
+    @app_commands.has_any_role(guild_service.get_guild().role_moderator, guild_service.get_guild().role_admin)
     @app_commands.autocomplete(case_id=warn_autocomplete)
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
@@ -44,9 +44,6 @@ class Mod(Cog):
             reason (str): Reason to lift warn
         """
         
-        if ctx.user.id != cfg.owner_id:
-            await send_error(ctx, "You are not allowed to use this command.")
-            return
         
         cases = user_service.get_cases(member.id)
         case = cases.cases.filter(_id=case_id).first()
@@ -81,7 +78,7 @@ class Mod(Cog):
         # remove the warn points from the user in DB
         user_service.inc_points(member.id, -1 * int(case.punishment))
         dmed = True
-        # prepare log embed, send to #public-mod-logs, user, channel where invoked
+        # prepare log embed, send to #public-logs, user, channel where invoked
         log = prepare_liftwarn_log(ctx.user, member, case)
         dmed = await notify_user(member, f"Your warn has been lifted in {ctx.guild}.", log)
 
