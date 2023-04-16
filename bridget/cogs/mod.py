@@ -12,7 +12,7 @@ from utils.services import guild_service, user_service
 
 
 class Mod(Cog):
-    @app_commands.has_any_role(guild_service.get_guild().role_moderator, guild_service.get_guild().role_admin)
+    @app_commands.has_permissions(ban_members=True, kick_members=True)
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def warn(self, ctx: discord.Interaction, member: discord.Member, points: app_commands.Range[int, 1, 10], reason: str):
@@ -30,7 +30,7 @@ class Mod(Cog):
         await ctx.response.defer()
         await warn(ctx, target_member=member, mod=ctx.user, points=points, reason=reason)
     
-    @app_commands.has_any_role(guild_service.get_guild().role_moderator, guild_service.get_guild().role_admin)
+    @app_commands.has_permissions(ban_members=True, kick_members=True)
     @app_commands.autocomplete(case_id=warn_autocomplete)
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
