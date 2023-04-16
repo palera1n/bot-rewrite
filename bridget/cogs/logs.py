@@ -206,24 +206,24 @@ class Logging(commands.Cog):
         
         images = []
         for attachment in message.attachments:
-            if attachment.content_type.startswith('image'):
-                images.append(Image.open((await attachment.to_file()).fp))
+            # if attachment.content_type.startswith('image'):
+            #     images.append(Image.open((await attachment.to_file()).fp))
                 
 
-            else:
+            # else:
                 await channel.send(file=await attachment.to_file())
         
-        new_img = Image.new("RGB", (200*(len(images)+1), 200), "white")
-        for idx, image in enumerate(images):
-            image = Image.open((await attachment.to_file()).fp)
-            image.thumbnail((200, 200))
-            new_img.paste(image, (idx * 200, 0))
+        # new_img = Image.new("RGB", (200*(len(images)+1), 200), "white")
+        # for idx, image in enumerate(images):
+        #     image = Image.open((await attachment.to_file()).fp)
+        #     image.thumbnail((200, 200))
+        #     new_img.paste(image, (idx * 200, 0))
 
-        f = BytesIO()
+        # f = BytesIO()
 
-        new_img.save(f, "png")
+        # new_img.save(f, "png")
 
-        await channel.send(file=discord.File(f, filename="merged.png"))
+        # await channel.send(file=discord.File(f, filename="merged.png"))
 
     # @commands.Cog.listener()
     # async def on_command_error(self, ctx: GIRContext, error):
