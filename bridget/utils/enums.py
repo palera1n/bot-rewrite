@@ -1,14 +1,14 @@
 import discord
+
+from enum import IntEnum, unique, auto
+
 from .services import guild_service
 from .config import cfg
 
 
-from enum import IntEnum, unique, auto
-
 @unique
 class PermissionLevel(IntEnum):
     """Permission level enum"""
-    
     
     EVERYONE = 0
     MEMPLUS = 1
@@ -18,8 +18,7 @@ class PermissionLevel(IntEnum):
     ADMIN = 5
     GUILD_OWNER = 6
     OWNER = 7
-
-
+    
     # Checks
     def __lt__(self, other):
         return self.value < other.value
@@ -34,7 +33,6 @@ class PermissionLevel(IntEnum):
         return self.value >= other.value
 
     def __eq__(self, other):
-
         if isinstance(other, discord.Member):
             if self == self.EVERYONE:
                 return True

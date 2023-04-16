@@ -1,14 +1,13 @@
 import discord
+import aiohttp
+
 from discord.ext import commands
 from datetime import datetime
 from discord.utils import format_dt
-import aiohttp
 from typing import List, Union
 from io import BytesIO
 
-
 from utils.services import guild_service, user_service
-
 from utils.config import cfg
 
 class Logging(commands.Cog):

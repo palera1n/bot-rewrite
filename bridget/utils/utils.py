@@ -31,3 +31,18 @@ async def send_success(ctx: discord.Interaction, description: str = "Done!", emb
             ephemeral=ephemeral,
             delete_after=delete_after
         )
+
+async def reply_success(message: discord.Message, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None) -> None:
+    if embed:
+        await message.reply(
+            embed=embed,
+            delete_after=delete_after
+        )
+    else:
+        await message.reply(
+            embed=discord.Embed(
+                color=discord.Color.green(),
+                description=description,
+            ),
+            delete_after=delete_after
+        )
