@@ -2,6 +2,7 @@ import asyncio
 import logging
 import discord
 import mongoengine
+import traceback
 
 from os import getenv
 mongoengine.connect('bridget', host=getenv("DB_HOST"), port=int(getenv("DB_PORT")))
@@ -11,7 +12,7 @@ from discord import app_commands
 from utils import send_error
 from utils.config import cfg
 from utils.startup_checks import checks
-from cogs import Logging, Mod, NativeActionsListeners, Say, Sync, Tags, TagsGroup, Unshorten
+from cogs import Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten
 
 
 for check in checks:
@@ -28,6 +29,7 @@ asyncio.run(bot.add_cog(Logging(bot)))
 asyncio.run(bot.add_cog(Mod(bot)))
 asyncio.run(bot.add_cog(NativeActionsListeners(bot)))
 asyncio.run(bot.add_cog(Say(bot)))
+asyncio.run(bot.add_cog(Snipe(bot)))
 asyncio.run(bot.add_cog(Sync(bot)))
 asyncio.run(bot.add_cog(Tags(bot)))
 asyncio.run(bot.add_cog(TagsGroup(bot)))
@@ -56,7 +58,7 @@ async def app_command_error(interaction: discord.Interaction, error: app_command
             raise error
         except:
             tb = traceback.format_exc()
-            logger.error(tb)
+            print(tb)
             if len(tb.split('\n')) > 8:
                 tb = '\n'.join(tb.split('\n')[-8:])
 
