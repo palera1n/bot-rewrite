@@ -1,11 +1,11 @@
-# palera1n Bot Rewrite (maybe: Bridget)
+# Bridget
 
 If you want to help, join us at: [Discord](https://discord.gg/palera1n)
 
 ## Running:
-Write an .env file (should be similar enough to GIR's .env, however the mongodb server is hardcoded to localhost:27017, need to change)
-`pdm install`
-`pdm run bot`
+Write an .env file
+```pdm install```
+```pdm run bot```
 
 ## Goals:
 1. Tries to be 99% compatible with GIR
