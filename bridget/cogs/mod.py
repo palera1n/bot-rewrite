@@ -44,7 +44,6 @@ class Mod(Cog):
             reason (str): Reason to lift warn
         """
         
-        
         cases = user_service.get_cases(member.id)
         case = cases.cases.filter(_id=case_id).first()
 
@@ -82,5 +81,5 @@ class Mod(Cog):
         log = prepare_liftwarn_log(ctx.user, member, case)
         dmed = await notify_user(member, f"Your warn has been lifted in {ctx.guild}.", log)
 
-        await send_success(ctx, embed=log, delete_after=10)
+        await send_success(ctx, embed=log, delete_after=10, ephemeral=False)
         await submit_public_log(ctx, guild_service.get_guild(), member, log, dmed)

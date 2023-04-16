@@ -15,11 +15,11 @@ async def send_error(ctx: discord.Interaction, message: str) -> None:
         ephemeral=True,
     )
 
-async def send_success(ctx: discord.Interaction, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None) -> None:
+async def send_success(ctx: discord.Interaction, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None, ephemeral: bool = True) -> None:
     if embed:
         await ctx.response.send_message(
             embed=embed,
-            ephemeral=True,
+            ephemeral=ephemeral,
             delete_after=delete_after
         )
     else:
@@ -28,6 +28,6 @@ async def send_success(ctx: discord.Interaction, description: str = "Done!", emb
                 color=discord.Color.green(),
                 description=description,
             ),
-            ephemeral=True,
+            ephemeral=ephemeral,
             delete_after=delete_after
         )
