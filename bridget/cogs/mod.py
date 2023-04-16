@@ -6,7 +6,9 @@ from datetime import datetime
 from discord import app_commands
 from discord.utils import escape_markdown, escape_mentions
 
-from utils import Cog, send_error, send_success, cfg, warn_autocomplete
+from utils import Cog, send_error, send_success
+from utils.autocomplete import warn_autocomplete
+from utils.config import cfg
 from utils.mod import warn, prepare_liftwarn_log, notify_user, submit_public_log
 from utils.services import guild_service, user_service
 from utils.enums import PermissionLevel

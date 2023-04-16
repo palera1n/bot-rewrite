@@ -15,3 +15,8 @@ async def warn_autocomplete(ctx: discord.Interaction, current: str) -> List[app_
     cases.sort(key=lambda x: x._id, reverse=True)
 
     return [app_commands.Choice(name=f"#{case._id} - {case.punishment} points - {case.reason}", value=str(case._id)) for case in cases if (not current or str(case._id).startswith(str(current)))][:25]
+
+async def tags_autocomplete(_: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+    tags = [tag.name.lower() for tag in guild_service.get_guild().tags]
+    tags.sort()
+    return [app_commands.Choice(name=tag, value=tag) for tag in tags if current.lower() in tag.lower()][:25]

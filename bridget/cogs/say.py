@@ -3,7 +3,8 @@ import discord
 from typing import Optional
 from discord import app_commands
 
-from utils import Cog, send_error, send_success, cfg
+from utils import Cog, send_error, send_success
+from utils.config import cfg
 
 
 class Say(Cog):
@@ -21,10 +22,3 @@ class Say(Cog):
         await channel.send(message)
 
         await send_success(ctx)
-
-    @say.error
-    async def say_error(self, ctx: discord.Interaction, error: Exception) -> None:
-        if isinstance(error, app_commands.MissingPermissions):
-            await send_error(ctx, "You are not allowed to use this command.")
-        else:
-            raise error

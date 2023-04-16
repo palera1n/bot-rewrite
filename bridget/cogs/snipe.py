@@ -1,4 +1,5 @@
 import discord
+
 from discord.ext import commands
 
 class Snipe(commands.Cog):
@@ -33,7 +34,6 @@ class Snipe(commands.Cog):
                 self.cache.pop(0)
             self.cache.append(exectution.action.message)
 
-    
     @commands.command()
     async def snipe(self, ctx: commands.Context) -> None:
         """Snipe a message"""

@@ -2,6 +2,7 @@ import re
 import aiohttp
 import discord
 
+from discord.utils import get
 from discord.ext import commands
 
 from utils import Cog, reply_success
@@ -13,7 +14,7 @@ class Unshorten(Cog):
         if message.author.bot:
             return
         
-        emoji = discord.utils.get(message.guild.emojis, name="loading")
+        emoji = get(message.guild.emojis, name="loading")
         regex = r"\b(?:https?:\/\/(?:t\.co|bit\.ly|goo\.gl|fb\.me|tinyurl\.com|j\.mp|is\.gd|v\.gd|git\.io)\/[\w-]+)\b"
 
         async with aiohttp.ClientSession() as session:

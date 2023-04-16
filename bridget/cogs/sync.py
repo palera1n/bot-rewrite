@@ -5,7 +5,8 @@ import os
 from typing import Optional
 from discord.ext import commands
 
-from utils import Cog, cfg
+from utils import Cog
+from utils.config import cfg
 
 
 class Sync(Cog):
@@ -23,7 +24,6 @@ class Sync(Cog):
             return
 
         async with ctx.typing():
-            await self.bot.tree.sync()
             await self.bot.tree.sync(guild=discord.Object(id=cfg.guild_id))
 
         await ctx.reply(
