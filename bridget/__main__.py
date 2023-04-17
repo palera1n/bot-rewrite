@@ -29,7 +29,7 @@ bot = commands.Bot(
 bot.remove_command("help")
 
 # Apps
-@bot.tree.context_menu(guild=discord.Object(id=cfg.guild_id), name="Meowcrypt Decrypt")
+@bot.tree.context_menu(name="Meowcrypt Decrypt")
 async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.Message) -> None:
     if "nya>.<" not in message.content:
         await send_error(interaction, "The selected message is not encrypted by Meowcrypt.")
@@ -64,7 +64,7 @@ asyncio.run(bot.add_cog(Say(bot)))
 asyncio.run(bot.add_cog(Snipe(bot)))
 asyncio.run(bot.add_cog(Sync(bot)))
 asyncio.run(bot.add_cog(Tags(bot)))
-asyncio.run(bot.add_cog(TagsGroup(bot)))
+#asyncio.run(bot.add_cog(TagsGroup(bot)))
 asyncio.run(bot.add_cog(Unshorten(bot)))
 
 # Error handler
