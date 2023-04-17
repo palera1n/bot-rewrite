@@ -34,7 +34,6 @@ class Snipe(Cog):
             self.cached_message = message
     
     @PermissionLevel.MOD
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def snipe(self, ctx: discord.Interaction) -> None:
         """Snipe a message

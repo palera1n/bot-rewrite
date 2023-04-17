@@ -8,7 +8,6 @@ from utils.config import cfg
 
 
 class Say(Cog):
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     @app_commands.checks.has_permissions(manage_messages=True)
     async def say(self, ctx: discord.Interaction, message: str, channel: Optional[discord.TextChannel]) -> None:

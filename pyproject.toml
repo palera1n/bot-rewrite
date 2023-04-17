@@ -11,6 +11,7 @@ dependencies = [
     "discord-py>=2.2.2",
     "Pillow>=9.5.0",
     "pycryptodome>=3.17",
+    "chatgpt @ git+https://github.com/0xallie/chatgpt",
 ]
 requires-python = ">=3.10,<4.0"
 license = {text = "BSD-3-Clause"}

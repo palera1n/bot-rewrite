@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 from utils import send_error, send_success
 from utils.config import cfg
 from utils.startup_checks import checks
-from cogs import Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten
+from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten
 
 
 for check in checks:
@@ -56,6 +56,7 @@ async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.M
     await send_success(interaction, embed=embed, ephemeral=True)
 
 # Cogs
+asyncio.run(bot.add_cog(ChatGPT(bot)))
 asyncio.run(bot.add_cog(Logging(bot)))
 asyncio.run(bot.add_cog(Mod(bot)))
 asyncio.run(bot.add_cog(NativeActionsListeners(bot)))

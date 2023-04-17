@@ -16,7 +16,6 @@ from utils.enums import PermissionLevel
 
 class Mod(Cog):
     @PermissionLevel.MOD
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def warn(self, ctx: discord.Interaction, member: discord.Member, points: app_commands.Range[int, 1, 10], reason: str):
         """Warn a member
@@ -37,7 +36,6 @@ class Mod(Cog):
     
     @PermissionLevel.MOD
     @app_commands.autocomplete(case_id=warn_autocomplete)
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def liftwarn(self, ctx: discord.Interaction, member: discord.Member, case_id: str, reason: str) -> None:
         """Lift a member's warn

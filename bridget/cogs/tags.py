@@ -3,6 +3,7 @@ import discord
 from discord.utils import get
 from discord import app_commands
 from discord.ext import commands
+from datetime import datetime
 
 from model.tag import Tag
 from utils import Cog, send_error, send_success, format_number
@@ -11,8 +12,6 @@ from utils.enums import PermissionLevel
 from utils.services import guild_service
 from utils.autocomplete import tags_autocomplete
 from utils.transformers import ImageAttachment
-
-from datetime import datetime
 
 
 def format_tag_page(_, entries, current_page, all_pages):
@@ -73,7 +72,6 @@ def prepare_tag_view(tag: Tag):
     return view
 
 class Tags(Cog):
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.autocomplete(name=tags_autocomplete)
     @app_commands.command()
     async def tag(self, ctx: discord.Interaction, name: str, user_to_mention: discord.Member = None):
@@ -150,7 +148,6 @@ class Tags(Cog):
         else:
             await ctx.message.reply(embed=prepare_tag_embed(tag), view=prepare_tag_view(tag), file=_file, mention_author=False)
 
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def taglist(self, ctx: discord.Interaction):
         """List all tags
@@ -168,9 +165,8 @@ class Tags(Cog):
                     page_formatter=format_tag_page, whisper=ctx.whisper)
         await menu.start()
 
-class TagsGroup(commands.GroupCog, group_name="tags"):
+class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
     @PermissionLevel.HELPER
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def add(self, ctx: discord.Interaction, name: str, image: ImageAttachment = None) -> None:
         """Add a tag
@@ -222,7 +218,6 @@ class TagsGroup(commands.GroupCog, group_name="tags"):
         await ctx.response.send_message(f"Added new tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag) or discord.utils.MISSING, view=prepare_tag_view(tag) or discord.utils.MISSING, delete_after=5)
 
     @PermissionLevel.HELPER
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.autocomplete(name=tags_autocomplete)
     @app_commands.command()
     async def edit(self, ctx: discord.Interaction, name: str, image: ImageAttachment = None) -> None:
@@ -279,7 +274,6 @@ class TagsGroup(commands.GroupCog, group_name="tags"):
         await ctx.response.send_message(f"Edited tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag) or discord.utils.MISSING, delete_after=5)
 
     @PermissionLevel.HELPER
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.autocomplete(name=tags_autocomplete)
     @app_commands.command()
     async def delete(self, ctx: discord.Interaction, name: str):
