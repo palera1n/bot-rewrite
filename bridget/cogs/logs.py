@@ -6,6 +6,7 @@ from datetime import datetime
 from discord.utils import format_dt
 from typing import List, Union
 from io import BytesIO, BufferedIOBase
+import os
 
 from utils.services import guild_service, user_service
 from utils.config import cfg
@@ -179,8 +180,7 @@ class Logging(commands.Cog):
             return
         if message.author.bot:
             return
-        if message.content == "" or not message.content:
-            return
+            
 
         db_guild = guild_service.get_guild()
         if message.channel.id in db_guild.logging_excluded_channels:
@@ -188,42 +188,77 @@ class Logging(commands.Cog):
 
         channel: discord.Channel = message.guild.get_channel(db_guild.channel_private)
 
-        embed = discord.Embed(title="Message Deleted")
-        embed.color = discord.Color.red()
-        embed.set_thumbnail(url=message.author.display_avatar)
-        embed.add_field(
-            name="User", value=f'{message.author} ({message.author.mention})', inline=True)
-        embed.add_field(
-            name="Channel", value=message.channel.mention, inline=True)
-        content = message.content
-        if len(message.content) > 400:
-            content = content[0:400] + "..."
-        embed.add_field(name="Message", value=content +
-                        f"\n\n[Link to message]({message.jump_url})", inline=False)
-        embed.set_footer(text=message.author.id)
-        embed.timestamp = datetime.now()
-        await channel.send(embed=embed)
-        
-        images = []
-        for attachment in message.attachments:
-            # if attachment.content_type.startswith('image'):
-            #     images.append(Image.open((await attachment.to_file()).fp))
+        if not (message.content == "" or not message.content):
+            embed = discord.Embed(title="Message Deleted")
+            embed.color = discord.Color.red()
+            embed.set_thumbnail(url=message.author.display_avatar)
+            embed.add_field(
+                name="User", value=f'{message.author} ({message.author.mention})', inline=True)
+            embed.add_field(
+                name="Channel", value=message.channel.mention, inline=True)
+            content = message.content
+            if len(message.content) > 400:
+                content = content[0:400] + "..."
+            embed.add_field(name="Message", value=content +
+                            f"\n\n[Link to message]({message.jump_url})", inline=False)
+            embed.set_footer(text=message.author.id)
+            embed.timestamp = datetime.now()
+            await channel.send(embed=embed)
+
+        if message.attachments:
+            embed = discord.Embed(title="Attachment Deleted")
+            embed.color = discord.Color.red()
+            embed.set_thumbnail(url=message.author.display_avatar)
+            embed.add_field(
+                name="User", value=f'{message.author} ({message.author.mention})', inline=True)
+            embed.add_field(
+                name="Channel", value=message.channel.mention, inline=True)
+            embed.set_footer(text=message.author.id)
+            embed.timestamp = datetime.now()
+            images = []
+            print(len(message.attachments))
+            print()
+            non_image = []
+            for idx, attachment in enumerate(message.attachments):
+                try:
+                    embed.add_field(name=f"Attachment #{idx}", value=f"[{attachment.filename}]({attachment.url})", inline=False)
+                    if attachment.content_type.startswith('image'):
+                        images.append(Image.open((await attachment.to_file()).fp))
+                    else:
+                        non_image.append(await attachment.to_file())
+                except:
+                    await channel.send(file=await attachment.to_file())
+
                 
+            
+            # print(len(images))
 
-            # else:
-                await channel.send(file=await attachment.to_file())
-        
-        # new_img = Image.new("RGB", (200*(len(images)+1), 200), "white")
-        # for idx, image in enumerate(images):
-        #     image = Image.open((await attachment.to_file()).fp)
-        #     image.thumbnail((200, 200))
-        #     new_img.paste(image, (idx * 200, 0))
+            if images != []:
+                new_img = Image.new("RGBA", (sum([i.width for i in images]), max([i.height for i in images])), (255, 255, 255, 0))
+                widthsum = 0
+                for idx, image in enumerate(images):
+                    # image.thumbnail((200, 200), resample=Image.Resampling.LANCZOS)
+                    new_img.paste(image, (widthsum, 0))
+                    widthsum += image.width
 
-        # f = BytesIO()
+                with open('/tmp/merged.png', 'wb') as f:
+                    new_img.save(f, format="PNG")
+                
+                file = discord.File('/tmp/merged.png', filename="merged.png")
 
-        # new_img.save(f, "png")
+                embed.set_image(url="attachment://merged.png")
 
-        # await channel.send(file=discord.File(f, filename="merged.png"))
+            # embed.add_field(name="Attachments Original URLs", value="\n".join(urls), inline=False)
+
+            #await channel.send(file=file)
+            if images:
+                await channel.send(file=file, embed=embed)
+                os.remove('/tmp/merged.png')
+            else:
+                await channel.send(embed=embed)
+
+            for file in non_image:
+                await channel.send(file=file)
 
     # @commands.Cog.listener()
     # async def on_command_error(self, ctx: GIRContext, error):

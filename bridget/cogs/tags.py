@@ -12,6 +12,8 @@ from utils.services import guild_service
 from utils.autocomplete import tags_autocomplete
 from utils.transformers import ImageAttachment
 
+from datetime import datetime
+
 
 def format_tag_page(_, entries, current_page, all_pages):
     embed = discord.Embed(
@@ -166,7 +168,7 @@ class Tags(Cog):
                     page_formatter=format_tag_page, whisper=ctx.whisper)
         await menu.start()
 
-class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
+class TagsGroup(commands.GroupCog, group_name="tags"):
     @PermissionLevel.HELPER
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
