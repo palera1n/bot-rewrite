@@ -11,7 +11,7 @@ from utils.services import guild_service
 class NativeActionsListeners(Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__(bot)
-        self.check_mutes.start()
+
         
 
     @commands.Cog.listener()
@@ -41,7 +41,7 @@ class NativeActionsListeners(Cog):
         if not before.is_timed_out() and after.is_timed_out():
             channel = self.bot.get_channel(guild_service.get_guild().channel_public)
             await channel.send(embed=await add_mute_case(after, after, "No reason.", guild_service.get_guild(), self.bot))
-                
+
     @commands.Cog.listener()
     async def on_automod_action(self, ctx: discord.AutoModAction):
         await ctx.channel.send(f"{ctx.member.name} sent `{ctx.content}` and triggered automod!")
