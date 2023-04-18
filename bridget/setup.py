@@ -15,7 +15,7 @@ async def setup():
 
     # If you're re-running this script to update a value, set case_id
     # to the last unused case ID or else it will start over from 1!
-    guild.case_id = 69
+    guild.case_id = 71
 
     guild.role_administrator = 1096623117780140072
     guild.role_moderator = 1096623117763354713
@@ -39,7 +39,7 @@ async def setup():
     guild.channel_general = 1096623119009071243
     guild.channel_development = 1096623119214579813
     guild.channel_botspam = 1096623119214579812
-    guild.channel_chatgpt = 1096623119470436356
+    guild.channel_chatgpt = 1097876598428008528
     guild.channel_msg_logs = 1097434149649924107
 
     guild.logging_excluded_channels = []
