@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 from utils import send_error, send_success
 from utils.config import cfg
 from utils.startup_checks import checks
-from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones
+from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
 
 #logging.basicConfig(level=logging.INFO)
 
@@ -68,6 +68,7 @@ asyncio.run(bot.add_cog(Tags(bot)))
 #asyncio.run(bot.add_cog(TagsGroup(bot)))
 asyncio.run(bot.add_cog(Unshorten(bot)))
 asyncio.run(bot.add_cog(Timezones(bot)))
+asyncio.run(bot.add_cog(Helper(bot)))
 
 # Error handler
 @bot.tree.error

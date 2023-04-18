@@ -8,3 +8,4 @@ from .sync import Sync
 from .tags import Tags, TagsGroup
 from .unshorten import Unshorten
 from .timezones import *
+from .helper import Helper
