@@ -64,7 +64,7 @@ asyncio.run(bot.add_cog(Say(bot)))
 asyncio.run(bot.add_cog(Snipe(bot)))
 asyncio.run(bot.add_cog(Sync(bot)))
 asyncio.run(bot.add_cog(Tags(bot)))
-#asyncio.run(bot.add_cog(TagsGroup(bot)))
+asyncio.run(bot.add_cog(TagsGroup(bot)))
 asyncio.run(bot.add_cog(Unshorten(bot)))
 
 # Error handler
@@ -99,6 +99,6 @@ async def app_command_error(interaction: discord.Interaction, error: app_command
             if len(tb_formatted) > 1000:
                 tb_formatted = "...\n" + tb_formatted[-1000:]
 
-            await send_error(interaction, f"`{error}`\n```{tb_formatted}```", delete_after=5)
+            await send_error(interaction, f"`{error}`\n```{tb_formatted}```")
 
 bot.run(getenv("TOKEN"))

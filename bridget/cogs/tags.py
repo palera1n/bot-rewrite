@@ -1,4 +1,6 @@
 import discord
+import re
+import asyncio
 
 from discord.utils import get
 from discord import app_commands
@@ -9,6 +11,8 @@ from model.tag import Tag
 from utils import Cog, send_error, send_success, format_number
 from utils.config import cfg
 from utils.enums import PermissionLevel
+from utils.menus import Menu
+from utils.modals import TagModal, EditTagModal
 from utils.services import guild_service
 from utils.autocomplete import tags_autocomplete
 from utils.transformers import ImageAttachment
@@ -90,11 +94,11 @@ class Tags(Cog):
             raise commands.BadArgument("That tag does not exist.")
 
         # run cooldown so tag can't be spammed
-        bucket = self.tag_cooldown.get_bucket(tag.name)
-        current = datetime.now().timestamp()
+        #bucket = self.tag_cooldown.get_bucket(tag.name)
+        #current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.user, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.user.roles):
-            raise commands.BadArgument("That tag is on cooldown.")
+        #if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.user, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.user.roles):
+        #    raise commands.BadArgument("That tag is on cooldown.")
 
         # if the Tag has an image, add it to the embed
         _file = tag.image.read()
@@ -128,11 +132,11 @@ class Tags(Cog):
             raise commands.BadArgument("That tag does not exist.")
 
         # run cooldown so tag can't be spammed
-        bucket = self.tag_cooldown.get_bucket(tag.name)
-        current = datetime.now().timestamp()
+        #bucket = self.tag_cooldown.get_bucket(tag.name)
+        #current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.author, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.author.roles):
-            raise commands.BadArgument("That tag is on cooldown.")
+        #if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.author, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.author.roles):
+        #    raise commands.BadArgument("That tag is on cooldown.")
 
         # if the Tag has an image, add it to the embed
         _file = tag.image.read()
@@ -161,20 +165,19 @@ class Tags(Cog):
         if len(_tags) == 0:
             raise commands.BadArgument("There are no tags defined.")
 
-        menu = Menu(ctx, _tags, per_page=12,
-                    page_formatter=format_tag_page, whisper=ctx.whisper)
+        menu = Menu(ctx, _tags, per_page=12, page_formatter=format_tag_page, whisper=True)
         await menu.start()
 
 class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
     @PermissionLevel.HELPER
     @app_commands.command()
-    async def add(self, ctx: discord.Interaction, name: str, image: ImageAttachment = None) -> None:
+    async def add(self, ctx: discord.Interaction, name: str, image: discord.Attachment = None) -> None:
         """Add a tag
 
         Args:
             ctx (discord.Interaction): Context
             name (str): Name of the tag
-            image (ImageAttachment, optional): Tag image. Defaults to None.
+            image (discord.Attachment, optional): Tag image. Defaults to None.
         """
         
         if not name.isalnum():
@@ -190,12 +193,15 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
         content_type = None
         if image is not None:
             content_type = image.content_type
+            if content_type not in ["image/png", "image/jpeg", "image/gif", "image/webp"]:
+                raise commands.BadArgument("Attached file was not an image!")
+            
             if image.size > 8_000_000:
                 raise commands.BadArgument("That image is too big!")
 
             image = await image.read()
 
-        modal = TagModal(bot=self.bot, tag_name=name, author=ctx.author)
+        modal = TagModal(bot=self.bot, tag_name=name, author=ctx.user)
         await ctx.response.send_modal(modal)
         await modal.wait()
 
@@ -214,19 +220,21 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
         if _file is not None:
             _file = discord.File(BytesIO(
                 _file), filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
-
-        await ctx.response.send_message(f"Added new tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag) or discord.utils.MISSING, view=prepare_tag_view(tag) or discord.utils.MISSING, delete_after=5)
+        
+        followup = await ctx.followup.send(f"Added new tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag) or discord.utils.MISSING, view=prepare_tag_view(tag) or discord.utils.MISSING)
+        await asyncio.sleep(5)
+        await followup.delete()
 
     @PermissionLevel.HELPER
     @app_commands.autocomplete(name=tags_autocomplete)
     @app_commands.command()
-    async def edit(self, ctx: discord.Interaction, name: str, image: ImageAttachment = None) -> None:
+    async def edit(self, ctx: discord.Interaction, name: str, image: discord.Attachment = None) -> None:
         """Edit a tag
 
         Args:
             ctx (discord.Interaction): Context
             name (str): Name of the tag
-            image (ImageAttachment, optional): Tag image. Defaults to None.
+            image (discord.Attachment, optional): Tag image. Defaults to None.
         """
         
         if len(name.split()) > 1:
@@ -254,7 +262,7 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
         else:
             tag.image.delete()
 
-        modal = EditTagModal(tag=tag, author=ctx.author)
+        modal = EditTagModal(tag=tag, author=ctx.user)
         await ctx.response.send_modal(modal)
         await modal.wait()
 
@@ -271,7 +279,9 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
         if _file is not None:
             _file = discord.File(BytesIO(_file), filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
 
-        await ctx.response.send_message(f"Edited tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag) or discord.utils.MISSING, delete_after=5)
+        followup = await ctx.followup.send(f"Edited tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag) or discord.utils.MISSING)
+        await asyncio.sleep(5)
+        await followup.delete()
 
     @PermissionLevel.HELPER
     @app_commands.autocomplete(name=tags_autocomplete)
