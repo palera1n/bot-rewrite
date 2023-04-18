@@ -26,6 +26,7 @@ class Guild(mongoengine.Document):
     channel_general = mongoengine.IntField()
     channel_support = mongoengine.IntField()
     channel_private = mongoengine.IntField()
+    channel_msg_logs = mongoengine.IntField(default=0)
     channel_public = mongoengine.IntField()
     channel_rules = mongoengine.IntField()
     channel_reaction_roles = mongoengine.IntField()

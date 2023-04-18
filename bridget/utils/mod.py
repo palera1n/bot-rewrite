@@ -8,6 +8,8 @@ from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
 
+
+
 async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
     case = Case(
             _id=db_guild.case_id,
@@ -20,6 +22,34 @@ async def add_unban_case(target_member: discord.Member, mod: discord.Member, rea
     user_service.add_case(target_member.id, case)
     log = prepare_unban_log(mod, target_member, case)
     await notify_user(target_member, f"You have been unbanned in {bot.get_guild(guild_service.get_guild()._id).name}", log)
+    return create_public_log(db_guild, target_member, log)
+
+async def add_mute_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
+    case = Case(
+            _id=db_guild.case_id,
+            _type="MUTE",
+            mod_id=mod.id,
+            mod_tag=str(mod),
+            reason=reason,
+        )
+    guild_service.inc_caseid()
+    user_service.add_case(target_member.id, case)
+    log = prepare_mute_log(mod, target_member, case)
+    await notify_user(target_member, f"You have been muted in {bot.get_guild(guild_service.get_guild()._id).name}", log)
+    return create_public_log(db_guild, target_member, log)
+
+async def add_unmute_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
+    case = Case(
+            _id=db_guild.case_id,
+            _type="UNMUTE",
+            mod_id=mod.id,
+            mod_tag=str(mod),
+            reason=reason,
+        )
+    guild_service.inc_caseid()
+    user_service.add_case(target_member.id, case)
+    log = prepare_unmute_log(mod, target_member, case)
+    await notify_user(target_member, f"You have been unmuted in {bot.get_guild(guild_service.get_guild()._id).name}", log)
     return create_public_log(db_guild, target_member, log)
 
 async def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
@@ -46,7 +76,7 @@ async def add_kick_case(target_member: discord.Member, mod: discord.Member, reas
     guild_service.inc_caseid()
     user_service.add_case(target_member.id, case)
     log = prepare_kick_log(mod, target_member, case)
-    notify_user(target_member, f"You have been kicked in {bot.get_guild(guild_service.get_guild()._id).name}", log)
+    await notify_user(target_member, f"You have been kicked in {bot.get_guild(guild_service.get_guild()._id).name}", log)
 
     return create_public_log(db_guild, target_member, log)
 

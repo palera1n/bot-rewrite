@@ -186,7 +186,7 @@ class Logging(commands.Cog):
         if message.channel.id in db_guild.logging_excluded_channels:
             return
 
-        channel: discord.Channel = message.guild.get_channel(db_guild.channel_private)
+        channel: discord.Channel = message.guild.get_channel(db_guild.channel_msg if db_guild.channel_msg_logs else db_guild.channel_private)
 
         if not (message.content == "" or not message.content):
             embed = discord.Embed(title="Message Deleted")
