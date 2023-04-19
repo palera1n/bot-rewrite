@@ -58,8 +58,15 @@ class Helper(Cog):
         if channel is None:
             channel = ctx.channel
 
+        # check if the user has permission to send to that channel
+        perms = channel.permissions_for(ctx.user)
+        if not perms.send_messages:
+            await send_error(ctx, "You can't send messages in that channel!", delete_after=1)
+            return
+
         # create the embed, add the image and color if specified
-        embed = discord.Embed(title=title)
+        embed = discord.Embed(title=title, timestamp=datetime.now())
+        embed.set_footer(text=f"Posted by {ctx.user.name}#{ctx.user.discriminator}")
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:
@@ -95,6 +102,12 @@ class Helper(Cog):
         # the interaction was ran in
         if channel is None:
             channel = ctx.channel
+
+        # check if the user has permission to send to that channel
+        perms = channel.permissions_for(ctx.user)
+        if not perms.send_messages:
+            await send_error(ctx, "You can't send messages in that channel!", delete_after=1)
+            return
 
         # create the embed, add the image and color if specified
         embed = discord.Embed(
