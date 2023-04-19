@@ -40,6 +40,7 @@ async def setup():
     guild.channel_botspam = 1096623119214579812
     guild.channel_chatgpt = 1097876598428008528
     guild.channel_msg_logs = 1097434149649924107
+    guild.channel_support = 1097617990515691532
 
     guild.logging_excluded_channels = []
     guild.filter_excluded_channels = []

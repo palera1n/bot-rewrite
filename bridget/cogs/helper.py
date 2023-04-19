@@ -5,6 +5,7 @@ import random
 from discord import ChannelType, app_commands
 
 from utils import Cog, send_error, send_success
+from utils.modals import PostEmbedModal
 from utils.services import guild_service
 from utils.enums import PermissionLevel
 
@@ -78,9 +79,13 @@ class Helper(Cog):
                 color = color[0] * 2 + color[1] * 2 + color[2] * 2
             embed.color = int(color, 16)
 
+        modal = PostEmbedModal(bot=self.bot, channel=channel, author=ctx.user)
+        await ctx.response.send_modal(modal)
+        await modal.wait()
+        embed.description = modal.description
+
         # send the embed
         await channel.send(embed=embed)
-        await send_success(ctx, "Embed sent!", delete_after=1)
 
     @PermissionLevel.HELPER
     @app_commands.command()
