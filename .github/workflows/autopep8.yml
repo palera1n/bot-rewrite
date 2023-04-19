@@ -1,6 +1,9 @@
 name: Format python code
 on:
     push:
+      paths:
+        - bridget/**
+        - .github/workflows/autopep8.yml
     workflow_dispatch:
 
 jobs:
