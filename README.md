@@ -1,5 +1,5 @@
 # Bridget
-[![CodeQL](https://github.com/palera1n/bot-rewrite/actions/workflows/codeql.yml/badge.svg)](https://github.com/palera1n/bot-rewrite/actions/workflows/codeql.yml) [![Format python code](https://github.com/palera1n/bot-rewrite/actions/workflows/autopep8.yml/badge.svg)](https://github.com/palera1n/bot-rewrite/actions/workflows/autopep8.yml)
+[![CodeQL](https://github.com/palera1n/bot-rewrite/actions/workflows/codeql.yml/badge.svg)](https://github.com/palera1n/bot-rewrite/actions/workflows/codeql.yml) [![Lint script](https://github.com/palera1n/bot-rewrite/actions/workflows/lint.yml/badge.svg)](https://github.com/palera1n/bot-rewrite/actions/workflows/lint.yml)
 
 If you want to help, join us at: [Discord](https://discord.gg/palera1n). We also have a testing server at: [Discord](https://discord.gg/55A4Xjc9RW)
 
