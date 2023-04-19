@@ -1,10 +1,3 @@
-from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
-from utils.startup_checks import checks
-from utils.config import cfg
-from utils import send_error, send_success
-from Crypto.Cipher import AES
-from discord import app_commands
-from discord.ext import commands
 import asyncio
 import logging
 import discord
@@ -12,6 +5,15 @@ import mongoengine
 import traceback
 import base64
 import hashlib
+
+from Crypto.Cipher import AES
+from discord import app_commands
+from discord.ext import commands
+
+from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
+from utils.startup_checks import checks
+from utils.config import cfg
+from utils import send_error, send_success
 
 from os import getenv
 mongoengine.connect(
@@ -37,8 +39,6 @@ bot = commands.Bot(
 bot.remove_command("help")
 
 # Apps
-
-
 @bot.tree.context_menu(name="Meowcrypt Decrypt")
 async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.Message) -> None:
     if "nya>.<" not in message.content:
