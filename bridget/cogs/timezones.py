@@ -39,17 +39,13 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
             ctx (discord.Interaction): Context
             zone (str): The timezone to set
         """
-        
+
         if zone not in pytz.common_timezones_set:
             raise commands.BadArgument("Timezone was not found!")
 
         db_user = user_service.get_user(ctx.user.id)
         db_user.timezone = zone
         db_user.save()
-
-        footer = None
-        if self.timezone_country.get(zone) is None:
-            footer = "Tip: this timezone is not a city. Pick a major city near you to show what country you're in! See /timezone list for more."
 
         await send_success(ctx, f"We set your timezone to `{zone}`! It can now be viewed with `/timezone view`.")
 
@@ -60,12 +56,12 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
         Args:
             ctx (discord.Interaction): Context
         """
-        
+
         db_user = user_service.get_user(ctx.user.id)
         db_user.timezone = None
         db_user.save()
 
-        await send_success(ctx, f"We have removed your timezone from the database.")
+        await send_success(ctx, "We have removed your timezone from the database.")
 
     @app_commands.command()
     @app_commands.describe(member="Member to view time of")
@@ -76,7 +72,7 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
             ctx (discord.Interaction): Context
             member (discord.Member): Member to view time of
         """
-        
+
         db_user = user_service.get_user(member.id)
         if db_user.timezone is None:
             raise commands.BadArgument(

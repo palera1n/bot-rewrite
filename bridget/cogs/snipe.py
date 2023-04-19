@@ -5,7 +5,6 @@ from discord import app_commands
 from discord.ext import commands
 
 from utils import Cog
-from utils.config import cfg
 from utils.enums import PermissionLevel
 
 
@@ -28,12 +27,6 @@ class Snipe(Cog):
             return
 
         self.cached_message = message
-
-    @commands.Cog.listener()
-    async def on_automod_action(self, exectution: discord.AutoModAction) -> None:
-        if isinstance(exectution.action.type,
-                      discord.AutoModRuleActionType.block_message):
-            self.cached_message = message
 
     @PermissionLevel.MOD
     @app_commands.command()

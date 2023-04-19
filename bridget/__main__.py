@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import discord
 import mongoengine
 import traceback
@@ -84,7 +83,7 @@ async def app_command_error(interaction: discord.Interaction, error: app_command
         error = error.original
 
     if isinstance(error, discord.errors.NotFound):
-        await ctx.channel.send(embed=discord.Embed(color=discord.Color.red(), description=f"Sorry {interaction.user.mention}, it looks like I took too long to respond to you! If I didn't do what you wanted in time, please try again."), delete_after=5)
+        await interaction.channel.send(embed=discord.Embed(color=discord.Color.red(), description=f"Sorry {interaction.user.mention}, it looks like I took too long to respond to you! If I didn't do what you wanted in time, please try again."), delete_after=5)
         return
 
     if (isinstance(error, commands.MissingRequiredArgument)
