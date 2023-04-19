@@ -1,6 +1,5 @@
 import asyncio
 import os
-
 import mongoengine
 
 from model.guild import Guild

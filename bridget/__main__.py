@@ -78,8 +78,6 @@ asyncio.run(bot.add_cog(Timezones(bot)))
 asyncio.run(bot.add_cog(Helper(bot)))
 
 # Error handler
-
-
 @bot.tree.error
 async def app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.CommandInvokeError):

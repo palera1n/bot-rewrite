@@ -1,13 +1,14 @@
-from discord.ext import commands
 import discord
-from discord import app_commands
 import flag
-from utils.services import user_service
 import datetime
-from utils import send_success
-from typing import List
 import pytz
-from utils import Cog
+
+from discord.ext import commands
+from discord import app_commands
+from typing import List
+
+from utils import Cog, send_success
+from utils.services import user_service
 
 
 async def timezone_autocomplete(_: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
@@ -29,11 +30,16 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
         except ValueError:
             return ""
 
-    @app_commands.command(name="set",
-                          description="Set your timezone so that others can view it")
-    @app_commands.describe(zone="The timezone to set")
+    @app_commands.command()
     @app_commands.autocomplete(zone=timezone_autocomplete)
-    async def _set(self, ctx: discord.Interaction, zone: str) -> None:
+    async def set(self, ctx: discord.Interaction, zone: str) -> None:
+        """Set your timezone so that others can view it
+
+        Args:
+            ctx (discord.Interaction): Context
+            zone (str): The timezone to set
+        """
+        
         if zone not in pytz.common_timezones_set:
             raise commands.BadArgument("Timezone was not found!")
 
@@ -47,18 +53,30 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
 
         await send_success(ctx, f"We set your timezone to `{zone}`! It can now be viewed with `/timezone view`.")
 
-    @app_commands.command(name="remove",
-                          description="Remove your timezone from the database")
+    @app_commands.command()
     async def remove(self, ctx: discord.Interaction) -> None:
+        """Remove your timezone from the database
+
+        Args:
+            ctx (discord.Interaction): Context
+        """
+        
         db_user = user_service.get_user(ctx.user.id)
         db_user.timezone = None
         db_user.save()
 
         await send_success(ctx, f"We have removed your timezone from the database.")
 
-    @app_commands.command(name="view", description="Get a timezone of an user")
+    @app_commands.command()
     @app_commands.describe(member="Member to view time of")
-    async def timezones(self, ctx: discord.Interaction, member: discord.Member) -> None:
+    async def view(self, ctx: discord.Interaction, member: discord.Member) -> None:
+        """Get a timezone of an user
+
+        Args:
+            ctx (discord.Interaction): Context
+            member (discord.Member): Member to view time of
+        """
+        
         db_user = user_service.get_user(member.id)
         if db_user.timezone is None:
             raise commands.BadArgument(
