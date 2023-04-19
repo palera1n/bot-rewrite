@@ -10,11 +10,6 @@ from Crypto.Cipher import AES
 from discord import app_commands
 from discord.ext import commands
 
-from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
-from utils.startup_checks import checks
-from utils.config import cfg
-from utils import send_error, send_success
-
 from os import getenv
 mongoengine.connect(
     'bridget',
@@ -22,8 +17,10 @@ mongoengine.connect(
     port=int(
         getenv("DB_PORT")))
 
-
-# logging.basicConfig(level=logging.INFO)
+from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
+from utils.startup_checks import checks
+from utils.config import cfg
+from utils import send_error, send_success
 
 for check in checks:
     check()
