@@ -69,7 +69,7 @@ class Snipe(Cog):
             name=self.cached_messages[ctx.channel_id].author,
             icon_url=self.cached_messages[ctx.channel_id].author.avatar.url)
         embed.set_footer(text=f"Sent in #{self.cached_messages[ctx.channel_id].channel.name}")
-        
+
         try:
             if self.cached_messages[ctx.channel_id].attachments[0].type.startswith("image"):
                 embed.set_image(url=self.cached_messages[ctx.channel_id].attachments[0].url)
