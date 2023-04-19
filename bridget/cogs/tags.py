@@ -16,15 +16,13 @@ from utils.autocomplete import tags_autocomplete
 
 
 def format_tag_page(_, entries, current_page, all_pages):
-    embed = discord.Embed(
-        title='All tags', color=discord.Color.blurple())
+    embed = discord.Embed(title='All tags', color=discord.Color.blurple())
     for tag in entries:
         desc = f"Added by: {tag.added_by_tag}\nUsed {format_number(tag.use_count)} times"
         if tag.image.read() is not None:
             desc += "\nHas image attachment"
         embed.add_field(name=tag.name, value=desc)
-    embed.set_footer(
-        text=f"Page {current_page} of {len(all_pages)}")
+    embed.set_footer(text=f"Page {current_page} of {len(all_pages)}")
     return embed
 
 
@@ -47,10 +45,13 @@ def prepare_tag_embed(tag):
     embed.color = discord.Color.blue()
 
     if tag.image.read() is not None:
-        embed.set_image(url="attachment://image.gif" if tag.image.content_type ==
-                        "image/gif" else "attachment://image.png")
+        embed.set_image(
+            url="attachment://image.gif" if tag.image.content_type ==
+            "image/gif" else "attachment://image.png")
     embed.set_footer(
-        text=f"Added by {tag.added_by_tag} | Used {format_number(tag.use_count)} times")
+        text=
+        f"Added by {tag.added_by_tag} | Used {format_number(tag.use_count)} times"
+    )
     return embed
 
 
@@ -70,19 +71,22 @@ def prepare_tag_view(tag: Tag):
         else:
             emoji = None
         view.add_item(
-            discord.ui.Button(
-                style=discord.ButtonStyle.link,
-                label=label,
-                url=link,
-                emoji=emoji))
+            discord.ui.Button(style=discord.ButtonStyle.link,
+                              label=label,
+                              url=link,
+                              emoji=emoji))
 
     return view
 
 
 class Tags(Cog):
+
     @app_commands.autocomplete(name=tags_autocomplete)
     @app_commands.command()
-    async def tag(self, ctx: discord.Interaction, name: str, user_to_mention: discord.Member = None):
+    async def tag(self,
+                  ctx: discord.Interaction,
+                  name: str,
+                  user_to_mention: discord.Member = None):
         """Send a tag
 
         Args:
@@ -107,9 +111,9 @@ class Tags(Cog):
         # if the Tag has an image, add it to the embed
         _file = tag.image.read()
         if _file is not None:
-            _file = discord.File(
-                BytesIO(_file),
-                filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
+            _file = discord.File(BytesIO(_file),
+                                 filename="image.gif" if tag.image.content_type
+                                 == "image/gif" else "image.png")
         else:
             _file = discord.utils.MISSING
 
@@ -118,7 +122,10 @@ class Tags(Cog):
         else:
             title = None
 
-        await ctx.response.send_message(content=title, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag), file=_file)
+        await ctx.response.send_message(content=title,
+                                        embed=prepare_tag_embed(tag),
+                                        view=prepare_tag_view(tag),
+                                        file=_file)
 
     @commands.guild_only()
     @commands.command(name="tag", aliases=["t"])
@@ -146,17 +153,23 @@ class Tags(Cog):
         # if the Tag has an image, add it to the embed
         _file = tag.image.read()
         if _file is not None:
-            _file = discord.File(
-                BytesIO(_file),
-                filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
+            _file = discord.File(BytesIO(_file),
+                                 filename="image.gif" if tag.image.content_type
+                                 == "image/gif" else "image.png")
         else:
             _file = discord.utils.MISSING
 
         if ctx.message.reference is not None:
             title = f"Hey {ctx.message.reference.resolved.author.mention}, have a look at this!"
-            await ctx.send(content=title, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag), file=_file)
+            await ctx.send(content=title,
+                           embed=prepare_tag_embed(tag),
+                           view=prepare_tag_view(tag),
+                           file=_file)
         else:
-            await ctx.message.reply(embed=prepare_tag_embed(tag), view=prepare_tag_view(tag), file=_file, mention_author=False)
+            await ctx.message.reply(embed=prepare_tag_embed(tag),
+                                    view=prepare_tag_view(tag),
+                                    file=_file,
+                                    mention_author=False)
 
     @app_commands.command()
     async def taglist(self, ctx: discord.Interaction):
@@ -166,26 +179,28 @@ class Tags(Cog):
             ctx (discord.Interaction): Context
         """
 
-        _tags = sorted(
-            guild_service.get_guild().tags,
-            key=lambda tag: tag.name)
+        _tags = sorted(guild_service.get_guild().tags,
+                       key=lambda tag: tag.name)
 
         if len(_tags) == 0:
             raise commands.BadArgument("There are no tags defined.")
 
-        menu = Menu(
-            ctx,
-            _tags,
-            per_page=12,
-            page_formatter=format_tag_page,
-            whisper=True)
+        menu = Menu(ctx,
+                    _tags,
+                    per_page=12,
+                    page_formatter=format_tag_page,
+                    whisper=True)
         await menu.start()
 
 
 class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
+
     @PermissionLevel.HELPER
     @app_commands.command()
-    async def add(self, ctx: discord.Interaction, name: str, image: discord.Attachment = None) -> None:
+    async def add(self,
+                  ctx: discord.Interaction,
+                  name: str,
+                  image: discord.Attachment = None) -> None:
         """Add a tag
 
         Args:
@@ -208,10 +223,8 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
         if image is not None:
             content_type = image.content_type
             if content_type not in [
-                "image/png",
-                "image/jpeg",
-                "image/gif",
-                    "image/webp"]:
+                    "image/png", "image/jpeg", "image/gif", "image/webp"
+            ]:
                 raise commands.BadArgument("Attached file was not an image!")
 
             if image.size > 8_000_000:
@@ -236,18 +249,26 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
 
         _file = tag.image.read()
         if _file is not None:
-            _file = discord.File(
-                BytesIO(_file),
-                filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
+            _file = discord.File(BytesIO(_file),
+                                 filename="image.gif" if tag.image.content_type
+                                 == "image/gif" else "image.png")
 
-        followup = await ctx.followup.send("Added new tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag) or discord.utils.MISSING, view=prepare_tag_view(tag) or discord.utils.MISSING)
+        followup = await ctx.followup.send("Added new tag!",
+                                           file=_file or discord.utils.MISSING,
+                                           embed=prepare_tag_embed(tag)
+                                           or discord.utils.MISSING,
+                                           view=prepare_tag_view(tag)
+                                           or discord.utils.MISSING)
         await asyncio.sleep(5)
         await followup.delete()
 
     @PermissionLevel.HELPER
     @app_commands.autocomplete(name=tags_autocomplete)
     @app_commands.command()
-    async def edit(self, ctx: discord.Interaction, name: str, image: discord.Attachment = None) -> None:
+    async def edit(self,
+                   ctx: discord.Interaction,
+                   name: str,
+                   image: discord.Attachment = None) -> None:
         """Edit a tag
 
         Args:
@@ -297,11 +318,15 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
 
         _file = tag.image.read()
         if _file is not None:
-            _file = discord.File(
-                BytesIO(_file),
-                filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
+            _file = discord.File(BytesIO(_file),
+                                 filename="image.gif" if tag.image.content_type
+                                 == "image/gif" else "image.png")
 
-        followup = await ctx.followup.send("Edited tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag) or discord.utils.MISSING)
+        followup = await ctx.followup.send("Edited tag!",
+                                           file=_file or discord.utils.MISSING,
+                                           embed=prepare_tag_embed(tag),
+                                           view=prepare_tag_view(tag)
+                                           or discord.utils.MISSING)
         await asyncio.sleep(5)
         await followup.delete()
 

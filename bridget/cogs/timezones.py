@@ -11,9 +11,14 @@ from utils import Cog, send_success
 from utils.services import user_service
 
 
-async def timezone_autocomplete(_: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    return [app_commands.Choice(name=tz, value=tz) for tz in pytz.common_timezones_set if current.lower(
-    ) in tz.lower() or current.lower() in tz.replace("_", " ").lower()][:25]
+async def timezone_autocomplete(
+        _: discord.Interaction,
+        current: str) -> List[app_commands.Choice[str]]:
+    return [
+        app_commands.Choice(name=tz, value=tz)
+        for tz in pytz.common_timezones_set if current.lower() in tz.lower()
+        or current.lower() in tz.replace("_", " ").lower()
+    ][:25]
 
 
 @app_commands.guild_only()
@@ -47,7 +52,10 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
         db_user.timezone = zone
         db_user.save()
 
-        await send_success(ctx, f"We set your timezone to `{zone}`! It can now be viewed with `/timezone view`.")
+        await send_success(
+            ctx,
+            f"We set your timezone to `{zone}`! It can now be viewed with `/timezone view`."
+        )
 
     @app_commands.command()
     async def remove(self, ctx: discord.Interaction) -> None:
@@ -61,11 +69,13 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
         db_user.timezone = None
         db_user.save()
 
-        await send_success(ctx, "We have removed your timezone from the database.")
+        await send_success(ctx,
+                           "We have removed your timezone from the database.")
 
     @app_commands.command()
     @app_commands.describe(member="Member to view time of")
-    async def view(self, ctx: discord.Interaction, member: discord.Member) -> None:
+    async def view(self, ctx: discord.Interaction,
+                   member: discord.Member) -> None:
         """Get a timezone of an user
 
         Args:
@@ -83,4 +93,7 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
         if country_code is not None:
             flaggy = self.country_code_to_emoji(country_code)
 
-        await send_success(ctx, f"{member.mention}'s timezone is `{db_user.timezone}` {flaggy}\nIt is currently `{datetime.datetime.now(pytz.timezone(db_user.timezone)).strftime('%I:%M %p %Z')}`", ephemeral=False)
+        await send_success(
+            ctx,
+            f"{member.mention}'s timezone is `{db_user.timezone}` {flaggy}\nIt is currently `{datetime.datetime.now(pytz.timezone(db_user.timezone)).strftime('%I:%M %p %Z')}`",
+            ephemeral=False)

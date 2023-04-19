@@ -12,9 +12,11 @@ from utils.enums import PermissionLevel
 
 
 class Mod(Cog):
+
     @PermissionLevel.MOD
     @app_commands.command()
-    async def warn(self, ctx: discord.Interaction, member: discord.Member, points: app_commands.Range[int, 1, 10], reason: str):
+    async def warn(self, ctx: discord.Interaction, member: discord.Member,
+                   points: app_commands.Range[int, 1, 10], reason: str):
         """Warn a member
 
         Args:
@@ -29,12 +31,17 @@ class Mod(Cog):
             return
 
         await ctx.response.defer()
-        await warn(ctx, target_member=member, mod=ctx.user, points=points, reason=reason)
+        await warn(ctx,
+                   target_member=member,
+                   mod=ctx.user,
+                   points=points,
+                   reason=reason)
 
     @PermissionLevel.MOD
     @app_commands.autocomplete(case_id=warn_autocomplete)
     @app_commands.command()
-    async def liftwarn(self, ctx: discord.Interaction, member: discord.Member, case_id: str, reason: str) -> None:
+    async def liftwarn(self, ctx: discord.Interaction, member: discord.Member,
+                       case_id: str, reason: str) -> None:
         """Lift a member's warn
 
         Args:
@@ -55,7 +62,8 @@ class Mod(Cog):
             await send_error(ctx, f"{member} has no case with ID {case_id}")
             return
         elif case._type != "WARN":
-            await send_error(ctx, f"{member}'s case with ID {case_id} is not a warn case.")
+            await send_error(
+                ctx, f"{member}'s case with ID {case_id} is not a warn case.")
             return
         elif case.lifted:
             await send_error(ctx, f"Case with ID {case_id} already lifted.")
@@ -63,7 +71,10 @@ class Mod(Cog):
 
         u = user_service.get_user(id=member.id)
         if u.warn_points - int(case.punishment) < 0:
-            await send_error(ctx, f"Can't lift Case #{case_id} because it would make {member.mention}'s points negative.")
+            await send_error(
+                ctx,
+                f"Can't lift Case #{case_id} because it would make {member.mention}'s points negative."
+            )
             return
 
         # passed sanity checks, so update the case in DB
@@ -79,10 +90,13 @@ class Mod(Cog):
         dmed = True
         # prepare log embed, send to #public-logs, user, channel where invoked
         log = prepare_liftwarn_log(ctx.user, member, case)
-        dmed = await notify_user(member, f"Your warn has been lifted in {ctx.guild}.", log)
+        dmed = await notify_user(member,
+                                 f"Your warn has been lifted in {ctx.guild}.",
+                                 log)
 
         await send_success(ctx, embed=log, delete_after=10, ephemeral=False)
-        await submit_public_log(ctx, guild_service.get_guild(), member, log, dmed)
+        await submit_public_log(ctx, guild_service.get_guild(), member, log,
+                                dmed)
 
     @warn.error
     @liftwarn.error
