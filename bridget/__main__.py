@@ -16,7 +16,7 @@ mongoengine.connect(
     port=int(
         getenv("DB_PORT")))
 
-from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
+from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper, FiltersGroup
 from utils.startup_checks import checks
 from utils.config import cfg
 from utils import send_error, send_success
@@ -75,6 +75,7 @@ asyncio.run(bot.add_cog(TagsGroup(bot)))
 asyncio.run(bot.add_cog(Unshorten(bot)))
 asyncio.run(bot.add_cog(Timezones(bot)))
 asyncio.run(bot.add_cog(Helper(bot)))
+asyncio.run(bot.add_cog(FiltersGroup(bot)))
 
 # Error handler
 @bot.tree.error

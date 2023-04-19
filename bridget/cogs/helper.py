@@ -1,8 +1,8 @@
-from datetime import datetime
 import discord
 import random
 
 from discord import ChannelType, app_commands
+from datetime import datetime
 
 from utils import Cog, send_error, send_success
 from utils.modals import PostEmbedModal
@@ -12,7 +12,7 @@ from utils.enums import PermissionLevel
 
 class Helper(Cog):
     @app_commands.command()
-    async def solved(self, ctx: discord.Interaction):
+    async def solved(self, ctx: discord.Interaction) -> None:
         """Close a support thread, usable by OP and Helpers
 
         Args:
@@ -20,7 +20,10 @@ class Helper(Cog):
         """
 
         # error if channel is not a support thread
-        if ctx.channel.type != ChannelType.public_thread or ctx.channel.type != ChannelType.forum or ctx.channel.parent_id != guild_service.get_guild().channel_support:
+        if (ctx.channel.type != ChannelType.public_thread
+            or ctx.channel.parent.type != ChannelType.forum
+            or ctx.channel.parent_id != guild_service.get_guild().channel_support
+        ):
             await send_error(ctx, "You can't mark this channel as solved")
             return
 
@@ -40,7 +43,7 @@ class Helper(Cog):
 
     @PermissionLevel.HELPER
     @app_commands.command()
-    async def postembed(self, ctx: discord.Interaction, title: str, channel: discord.TextChannel = None, image: discord.Attachment = None, color: str = None):
+    async def postembed(self, ctx: discord.Interaction, title: str, channel: discord.TextChannel = None, image: discord.Attachment = None, color: str = None) -> None:
         """Sends an embed
 
         Args:
@@ -89,7 +92,7 @@ class Helper(Cog):
 
     @PermissionLevel.HELPER
     @app_commands.command()
-    async def poll(self, ctx: discord.Interaction, question: str, channel: discord.TextChannel = None, image: discord.Attachment = None, color: str = None):
+    async def poll(self, ctx: discord.Interaction, question: str, channel: discord.TextChannel = None, image: discord.Attachment = None, color: str = None) -> None:
         """Start a poll
 
         Args:
@@ -140,7 +143,7 @@ class Helper(Cog):
     @solved.error
     @postembed.error
     @poll.error
-    async def error_handle(self, ctx: discord.Interaction, error: Exception):
+    async def error_handle(self, ctx: discord.Interaction, error: Exception) -> None:
         if isinstance(error, app_commands.MissingPermissions):
             await send_error(ctx, "You are not allowed to use this command.")
             return
