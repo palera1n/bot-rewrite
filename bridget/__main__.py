@@ -7,15 +7,6 @@ import hashlib
 
 from Crypto.Cipher import AES
 from discord import app_commands
-import asyncio
-import discord
-import mongoengine
-import traceback
-import base64
-import hashlib
-
-from Crypto.Cipher import AES
-from discord import app_commands
 from discord.ext import commands
 
 from os import getenv
