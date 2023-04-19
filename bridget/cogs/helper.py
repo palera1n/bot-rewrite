@@ -66,7 +66,8 @@ class Helper(Cog):
             return
 
         # create the embed, add the image and color if specified
-        embed = discord.Embed(title=title)
+        embed = discord.Embed(title=title, timestamp=datetime.now())
+        embed.set_footer(text=f"Posted by {ctx.user.name}#{ctx.user.discriminator}")
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:
