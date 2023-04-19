@@ -1,16 +1,13 @@
-from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
-from utils.config import cfg
-from utils import send_error, send_success
-from Crypto.Cipher import AES
-from discord import app_commands
-from discord.ext import commands
 import asyncio
-import logging
 import discord
 import mongoengine
 import traceback
 import base64
 import hashlib
+
+from Crypto.Cipher import AES
+from discord import app_commands
+from discord.ext import commands
 
 from os import getenv
 mongoengine.connect(
@@ -19,10 +16,10 @@ mongoengine.connect(
     port=int(
         getenv("DB_PORT")))
 
-# I moved this down because it only works if the DB is connnected for me -Jan
+from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
 from utils.startup_checks import checks
-
-# logging.basicConfig(level=logging.INFO)
+from utils.config import cfg
+from utils import send_error, send_success
 
 for check in checks:
     check()
@@ -38,8 +35,6 @@ bot = commands.Bot(
 bot.remove_command("help")
 
 # Apps
-
-
 @bot.tree.context_menu(name="Meowcrypt Decrypt")
 async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.Message) -> None:
     if "nya>.<" not in message.content:
@@ -82,15 +77,13 @@ asyncio.run(bot.add_cog(Timezones(bot)))
 asyncio.run(bot.add_cog(Helper(bot)))
 
 # Error handler
-
-
 @bot.tree.error
 async def app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.CommandInvokeError):
         error = error.original
 
     if isinstance(error, discord.errors.NotFound):
-        await ctx.channel.send(embed=discord.Embed(color=discord.Color.red(), description=f"Sorry {interaction.user.mention}, it looks like I took too long to respond to you! If I didn't do what you wanted in time, please try again."), delete_after=5)
+        await interaction.channel.send(embed=discord.Embed(color=discord.Color.red(), description=f"Sorry {interaction.user.mention}, it looks like I took too long to respond to you! If I didn't do what you wanted in time, please try again."), delete_after=5)
         return
 
     if (isinstance(error, commands.MissingRequiredArgument)

@@ -76,8 +76,10 @@ dependencies = [
 
 [[package]]
 name = "discord-py"
-version = "2.2.2"
+version = "2.3.0a4809+gbee2db80"
 requires_python = ">=3.8.0"
+git = "https://github.com/Rapptz/discord.py"
+revision = "bee2db805d33456eada62c61cdf11a4c9a01a43d"
 summary = "A Python wrapper for the Discord API"
 dependencies = [
     "aiohttp<4,>=3.7.4",
@@ -100,6 +102,12 @@ name = "frozenlist"
 version = "1.3.3"
 requires_python = ">=3.7"
 summary = "A list-like structure which implements collections.abc.MutableSequence"
+
+[[package]]
+name = "humanize"
+version = "4.6.0"
+requires_python = ">=3.7"
+summary = "Python humanize utilities"
 
 [[package]]
 name = "idna"
@@ -263,7 +271,7 @@ dependencies = [
 [metadata]
 lock_version = "4.2"
 groups = ["default"]
-content_hash = "sha256:361e2af44f0c22ddb0367de980e74ea7b5cfae078f9b45c0231495a9b582344b"
+content_hash = "sha256:e936e65ded3ed8c16a0c5edc9685e4ef56c6e7ca7336acd0b465432543192920"
 
 [metadata.files]
 "aiohttp 3.8.4" = [
@@ -452,10 +460,6 @@ content_hash = "sha256:361e2af44f0c22ddb0367de980e74ea7b5cfae078f9b45c0231495a9b
     {url = "https://files.pythonhosted.org/packages/fa/8e/2e5c742c3082bce3eea2ddd5b331d08050cda458bc362d71c48e07a44719/charset_normalizer-3.1.0-cp37-cp37m-musllinux_1_1_ppc64le.whl", hash = "sha256:04afa6387e2b282cf78ff3dbce20f0cc071c12dc8f685bd40960cc68644cfea6"},
     {url = "https://files.pythonhosted.org/packages/ff/d7/8d757f8bd45be079d76309248845a04f09619a7b17d6dfc8c9ff6433cac2/charset-normalizer-3.1.0.tar.gz", hash = "sha256:34e0a2f9c370eb95597aae63bf85eb5e96826d81e3dcf88b8886012906f509b5"},
 ]
-"discord-py 2.2.2" = [
-    {url = "https://files.pythonhosted.org/packages/38/0f/ceea1cd9f27c1a8a457946cfd6b7b33de75e4e43a4a81679ea1ea81f41f5/discord.py-2.2.2.tar.gz", hash = "sha256:b9944056bcb5711b2d04088848fd004466cf117c15c84fa798bf55470f28275f"},
-    {url = "https://files.pythonhosted.org/packages/92/e5/291c0312640b568fbe1d276e41d94f377d21255117b47a8da39c339790fb/discord.py-2.2.2-py3-none-any.whl", hash = "sha256:38fc52a784727b8e5e5749267089400035b187a009028eddfabeb182abcc6d52"},
-]
 "dnspython 2.3.0" = [
     {url = "https://files.pythonhosted.org/packages/12/86/d305e87555430ff4630d729420d97dece3b16efcbf2b7d7e974d11b0d86c/dnspython-2.3.0-py3-none-any.whl", hash = "sha256:89141536394f909066cabd112e3e1a37e4e654db00a25308b0f130bc3152eb46"},
     {url = "https://files.pythonhosted.org/packages/91/8b/522301c50ca1f78b09c2ca116ffb0fd797eadf6a76085d376c01f9dd3429/dnspython-2.3.0.tar.gz", hash = "sha256:224e32b03eb46be70e12ef6d64e0be123a64e621ab4c0822ff6d450d52a540b9"},
@@ -539,6 +543,10 @@ content_hash = "sha256:361e2af44f0c22ddb0367de980e74ea7b5cfae078f9b45c0231495a9b
     {url = "https://files.pythonhosted.org/packages/fa/3f/b25527623101da07f47fa071affb4a3e89d0f8ae2faf13266f62235f7175/frozenlist-1.3.3-cp39-cp39-musllinux_1_1_ppc64le.whl", hash = "sha256:8bae29d60768bfa8fb92244b74502b18fae55a80eac13c88eb0b496d4268fd2d"},
     {url = "https://files.pythonhosted.org/packages/fa/a1/d0822eb2f827f209c8fcf19ff1c9eb30ae08e25b710cf432b1013ea23429/frozenlist-1.3.3-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:9309869032abb23d196cb4e4db574232abe8b8be1339026f489eeb34a4acfd91"},
     {url = "https://files.pythonhosted.org/packages/fd/b8/9ed4ed37b2c3269660a86a10a09b2fe49dbbd6973ac684804ece7b51b63f/frozenlist-1.3.3-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:924620eef691990dfb56dc4709f280f40baee568c794b5c1885800c3ecc69816"},
+]
+"humanize 4.6.0" = [
+    {url = "https://files.pythonhosted.org/packages/06/b1/9e491df2ee1c919d67ee328d8bc9f17b7a9af68e4077f3f5fac83a4488c9/humanize-4.6.0.tar.gz", hash = "sha256:5f1f22bc65911eb1a6ffe7659bd6598e33dcfeeb904eb16ee1e705a09bf75916"},
+    {url = "https://files.pythonhosted.org/packages/22/2b/30e8725481b071ca53984742a443f944f9c74fb72f509a40b746912645e1/humanize-4.6.0-py3-none-any.whl", hash = "sha256:401201aca462749773f02920139f302450cb548b70489b9b4b92be39fe3c3c50"},
 ]
 "idna 3.4" = [
     {url = "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},

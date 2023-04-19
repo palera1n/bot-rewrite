@@ -2,25 +2,22 @@ import discord
 import re
 import asyncio
 
-from discord.utils import get
+from io import BytesIO
 from discord import app_commands
 from discord.ext import commands
-from datetime import datetime
 
 from model.tag import Tag
 from utils import Cog, send_error, send_success, format_number
-from utils.config import cfg
 from utils.enums import PermissionLevel
 from utils.menus import Menu
 from utils.modals import TagModal, EditTagModal
 from utils.services import guild_service
 from utils.autocomplete import tags_autocomplete
-from utils.transformers import ImageAttachment
 
 
 def format_tag_page(_, entries, current_page, all_pages):
     embed = discord.Embed(
-        title=f'All tags', color=discord.Color.blurple())
+        title='All tags', color=discord.Color.blurple())
     for tag in entries:
         desc = f"Added by: {tag.added_by_tag}\nUsed {format_number(tag.use_count)} times"
         if tag.image.read() is not None:
@@ -243,7 +240,7 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
                 BytesIO(_file),
                 filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
 
-        followup = await ctx.followup.send(f"Added new tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag) or discord.utils.MISSING, view=prepare_tag_view(tag) or discord.utils.MISSING)
+        followup = await ctx.followup.send("Added new tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag) or discord.utils.MISSING, view=prepare_tag_view(tag) or discord.utils.MISSING)
         await asyncio.sleep(5)
         await followup.delete()
 
@@ -304,7 +301,7 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
                 BytesIO(_file),
                 filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
 
-        followup = await ctx.followup.send(f"Edited tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag) or discord.utils.MISSING)
+        followup = await ctx.followup.send("Edited tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag) or discord.utils.MISSING)
         await asyncio.sleep(5)
         await followup.delete()
 
