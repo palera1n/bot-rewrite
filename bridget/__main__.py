@@ -1,5 +1,4 @@
 from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
-from utils.startup_checks import checks
 from utils.config import cfg
 from utils import send_error, send_success
 from Crypto.Cipher import AES
@@ -20,6 +19,8 @@ mongoengine.connect(
     port=int(
         getenv("DB_PORT")))
 
+# I moved this down because it only works if the DB is connnected for me -Jan
+from utils.startup_checks import checks
 
 # logging.basicConfig(level=logging.INFO)
 

@@ -190,3 +190,45 @@ class EditTagModal(discord.ui.Modal):
             description=error,
             color=discord.Color.red())
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+class PostEmbedModal(discord.ui.Modal):
+    def __init__(self, bot, channel: discord.TextChannel, author: discord.Member) -> None:
+        self.bot = bot
+        self.channel = channel
+        self.author = author
+        self.description = None
+
+        super().__init__(title=f"Post Embed to #{self.channel.name}")
+
+        self.add_item(
+            discord.ui.TextInput(
+                label="Description of the embed",
+                placeholder="Enter the description of the embed",
+                style=discord.TextStyle.long,
+            )
+        )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        if interaction.user != self.author:
+            return
+
+
+        description = self.children[0].value
+        if not description:
+            await self.send_error(interaction, "Description is missing!")
+            return
+
+        self.description = description
+        self.stop()
+        try:
+            await interaction.response.send_message()
+        except BaseException:
+            pass
+
+    async def send_error(self, interaction: discord.Interaction, error: str):
+        embed = discord.Embed(
+            title="An error occurred",
+            description=error,
+            color=discord.Color.red())
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
