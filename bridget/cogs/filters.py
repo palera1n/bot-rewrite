@@ -5,19 +5,20 @@ from discord.ext import commands
 from typing import List, Optional
 
 from utils import Cog, send_error, send_success
-from utils.autocomplete import filter_phrase_autocomplete, filter_regex_autocomplete, filter_whitelist_autocomplete
+from utils.autocomplete import filter_bypass_autocomplete, filter_phrase_autocomplete, filter_regex_autocomplete, filter_whitelist_autocomplete
 from utils.enums import FilterBypassLevel, PermissionLevel
 
 
 class FiltersGroup(Cog, commands.GroupCog, group_name="filter"):
     @PermissionLevel.HELPER
+    @app_commands.autocomplete(bypass=filter_bypass_autocomplete)
     @app_commands.command()
-    async def add(self, ctx: discord.Interaction, bypass: FilterBypassLevel, phrase: str = None, regex: str = None, whitelist: str = None) -> None:
+    async def add(self, ctx: discord.Interaction, bypass: int, phrase: str = None, regex: str = None, whitelist: str = None) -> None:
         """Add a new filtered word
 
         Args:
             ctx (discord.ctx): Context
-            bypass (FilterBypassLevel): The level required to bypass the filter
+            bypass (int): The level required to bypass the filter
             phrase (str): The word or phrase to filter
             regex (str): The regular expression to filter
             whitelist (str): The word or phrase to whitelist
@@ -25,7 +26,7 @@ class FiltersGroup(Cog, commands.GroupCog, group_name="filter"):
 
         # fetch rule
         rules = await ctx.guild.fetch_automod_rules()
-        rule = bypass.find_rule_for_bypass(rules)
+        rule = FilterBypassLevel(bypass).find_rule_for_bypass(rules)
 
         if rule is None:
             await send_error(ctx, "AutoMod rule not found!", delete_after=3)
@@ -72,14 +73,14 @@ class FiltersGroup(Cog, commands.GroupCog, group_name="filter"):
         await send_success(ctx, embed=embed)
 
     @PermissionLevel.HELPER
-    @app_commands.autocomplete(phrase=filter_phrase_autocomplete, regex=filter_regex_autocomplete, whitelist=filter_whitelist_autocomplete)
+    @app_commands.autocomplete(bypass=filter_bypass_autocomplete, phrase=filter_phrase_autocomplete, regex=filter_regex_autocomplete, whitelist=filter_whitelist_autocomplete)
     @app_commands.command()
-    async def remove(self, ctx: discord.Interaction, bypass: FilterBypassLevel, phrase: str = None, regex: str = None, whitelist: str = None) -> None:
+    async def remove(self, ctx: discord.Interaction, bypass: int, phrase: str = None, regex: str = None, whitelist: str = None) -> None:
         """Remove a filtred word
 
         Args:
             ctx (discord.ctx): Context
-            bypass (FilterBypassLevel): The level required to bypass the filter
+            bypass (int): The level required to bypass the filter
             phrase (str): The word or phrase to un-filter
             regex (str): The regular expression to un-filter
             whitelist (str): The word or phrase to un-whitelist
@@ -87,7 +88,7 @@ class FiltersGroup(Cog, commands.GroupCog, group_name="filter"):
 
         # fetch rule
         rules = await ctx.guild.fetch_automod_rules()
-        rule = bypass.find_rule_for_bypass(rules)
+        rule = FilterBypassLevel(bypass).find_rule_for_bypass(rules)
 
         if rule is None:
             await send_error(ctx, "AutoMod rule not found!", delete_after=3)

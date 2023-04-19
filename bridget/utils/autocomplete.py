@@ -4,7 +4,7 @@ from typing import List
 from discord import app_commands
 
 from utils.config import cfg
-from utils.enums import FilterBypassLevel, PermissionLevel
+from utils.enums import FilterBypassLevel
 from utils.services import guild_service, user_service
 
 
@@ -24,6 +24,17 @@ async def tags_autocomplete(_: discord.Interaction, current: str) -> List[app_co
     tags = sorted([tag.name.lower() for tag in guild_service.get_guild().tags])
     return [app_commands.Choice(name=tag, value=tag)
             for tag in tags if current.lower() in tag.lower()][:25]
+
+async def filter_bypass_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[int]]:
+    # TODO: Real permission check for mod+
+    if ctx.user.id != cfg.owner_id:
+        return []
+
+    levels = [ FilterBypassLevel.HELPER, FilterBypassLevel.MOD, FilterBypassLevel.RAID ]
+    return [
+        app_commands.Choice(name=str(level), value=int(level))
+        for level in levels if current.lower() in str(level).lower()
+    ]
 
 async def filter_phrase_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
     # TODO: Real permission check for mod+

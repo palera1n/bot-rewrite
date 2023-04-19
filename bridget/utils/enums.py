@@ -8,6 +8,12 @@ from .services import guild_service
 from .config import cfg
 
 
+def rule_has_timeout(rule: AutoModRule) -> bool:
+    for act in rule.actions:
+        if act.type == discord.AutoModRuleActionType.timeout:
+            return True
+    return False
+
 @unique
 class PermissionLevel(IntEnum):
     """Permission level enum"""
@@ -79,25 +85,34 @@ class FilterBypassLevel(IntEnum):
 
     HELPER = 0
     MOD = 1
+    RAID = 2
 
     def __str__(self):
         return {
                 self.HELPER: "Helper and up",
                 self.MOD: "Moderator and up",
+                self.RAID: "Raid phrases"
         }[self] 
 
     def find_rule_for_bypass(self, rules: List[AutoModRule]) -> Optional[AutoModRule]:
         if self == FilterBypassLevel.HELPER:
             # find the rule that has Helper exempt
             for rule in rules:
-                if guild_service.get_guild().role_helper in rule.exempt_role_ids:
+                if guild_service.get_guild().role_helper in rule.exempt_role_ids and not rule_has_timeout(rule):
                     return rule
             return None
         elif self == FilterBypassLevel.MOD:
             for rule in rules:
                 # find the rule that doesnt have Helper exempt
-                if guild_service.get_guild().role_helper not in rule.exempt_role_ids:
+                if guild_service.get_guild().role_helper not in rule.exempt_role_ids and not rule_has_timeout(rule):
                     return rule
             return None
+        elif self == FilterBypassLevel.RAID:
+            for rule in rules:
+                # find the rule that times out the member
+                if rule_has_timeout(rule):
+                    return rule
+            return None
+
         return None
 
