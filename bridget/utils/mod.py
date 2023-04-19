@@ -1,14 +1,14 @@
 import discord
 import asyncio
+import humanize
 
 from typing import Optional, List, Union
 from discord.utils import escape_markdown
+from datetime import timezone
 
 from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
-import humanize
-from datetime import timezone
 
 
 async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
