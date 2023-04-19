@@ -2,7 +2,7 @@ import inspect
 import discord
 
 from discord import ui
-from typing import Callable, Union
+from typing import Callable
 
 
 class Menu(ui.View):

@@ -3,13 +3,13 @@ import discord
 from typing import Optional
 from discord import app_commands
 
-from utils import Cog, send_error, send_success
-from utils.config import cfg
+from utils import Cog, send_success
+from utils.enums import PermissionLevel
 
 
 class Say(Cog):
+    @PermissionLevel.MOD
     @app_commands.command()
-    @app_commands.checks.has_permissions(manage_messages=True)
     async def say(self, ctx: discord.Interaction, message: str, channel: Optional[discord.TextChannel]) -> None:
         """Make the bot say something
 

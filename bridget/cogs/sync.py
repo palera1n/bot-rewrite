@@ -1,8 +1,6 @@
 import asyncio
 import discord
-import os
 
-from typing import Optional
 from discord.ext import commands
 
 from utils import Cog
