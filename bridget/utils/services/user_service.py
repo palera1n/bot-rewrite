@@ -22,7 +22,8 @@ def get_user(id: int) -> User:
     """
 
     user = User.objects(_id=id).first()
-    # first we ensure this user has a User document in the database before continuing
+    # first we ensure this user has a User document in the database before
+    # continuing
     if not user:
         user = User()
         user._id = id
@@ -31,7 +32,8 @@ def get_user(id: int) -> User:
 
 
 def leaderboard() -> list:
-    return User.objects[0:130].only('_id', 'xp').order_by('-xp', '-_id').select_related()
+    return User.objects[0:130].only('_id', 'xp').order_by(
+        '-xp', '-_id').select_related()
 
 
 def leaderboard_rank(xp):
@@ -53,7 +55,8 @@ def inc_points(_id: int, points: int) -> None:
         The amount of points to increment the field by, can be negative to remove points
     """
 
-    # first we ensure this user has a User document in the database before continuing
+    # first we ensure this user has a User document in the database before
+    # continuing
     get_user(_id)
     User.objects(_id=_id).update_one(inc__warn_points=points)
 
@@ -92,7 +95,8 @@ def get_cases(id: int) -> Cases:
     """
 
     cases = Cases.objects(_id=id).first()
-    # first we ensure this user has a Cases document in the database before continuing
+    # first we ensure this user has a Cases document in the database before
+    # continuing
     if cases is None:
         cases = Cases()
         cases._id = id
@@ -114,7 +118,8 @@ def add_case(_id: int, case: Case) -> None:
         The case we want to add to the user.
     """
 
-    # ensure this user has a cases document before we try to append the new case
+    # ensure this user has a cases document before we try to append the new
+    # case
     get_cases(_id)
     Cases.objects(_id=_id).update_one(push__cases=case)
 
@@ -130,7 +135,8 @@ def set_warn_kicked(_id: int) -> None:
         The user's ID who we want to set `was_warn_kicked` for.
     """
 
-    # first we ensure this user has a User document in the database before continuing
+    # first we ensure this user has a User document in the database before
+    # continuing
     get_user(_id)
     User.objects(_id=_id).update_one(set__was_warn_kicked=True)
 
@@ -151,7 +157,8 @@ def rundown(id: int) -> list:
     """
 
     cases = Cases.objects(_id=id).first()
-    # first we ensure this user has a Cases document in the database before continuing
+    # first we ensure this user has a Cases document in the database before
+    # continuing
     if cases is None:
         cases = Cases()
         cases._id = id
@@ -222,8 +229,10 @@ def fetch_cases_by_mod(_id):
         string = reason.lower()
         return ''.join(e for e in string if e.isalnum() or e == " ").strip()
 
-    case_reasons = [get_case_reason(case.reason) for case in final_cases if get_case_reason(
-        case.reason) != "temporary mute expired"]
+    case_reasons = [
+        get_case_reason(
+            case.reason) for case in final_cases if get_case_reason(
+            case.reason) != "temporary mute expired"]
     values["counts"] = sorted(
         Counter(case_reasons).items(), key=lambda item: item[1])
     values["counts"].reverse()

@@ -3,9 +3,11 @@ import asyncio
 
 from discord.ext import commands
 
+
 class Cog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+
 
 async def send_error(ctx: discord.Interaction, description: str, embed: discord.Embed = None, delete_after: int = None) -> None:
     try:
@@ -40,10 +42,11 @@ async def send_error(ctx: discord.Interaction, description: str, embed: discord.
                 ),
                 ephemeral=True
             )
-            
+
         if delete_after:
             await asyncio.sleep(delete_after)
             await followup.delete()
+
 
 async def send_success(ctx: discord.Interaction, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None, ephemeral: bool = True) -> None:
     if embed:
@@ -62,6 +65,7 @@ async def send_success(ctx: discord.Interaction, description: str = "Done!", emb
             delete_after=delete_after
         )
 
+
 async def reply_success(message: discord.Message, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None) -> None:
     if embed:
         await message.reply(
@@ -76,6 +80,7 @@ async def reply_success(message: discord.Message, description: str = "Done!", em
             ),
             delete_after=delete_after
         )
+
 
 def format_number(number):
     return f"{number:,}"

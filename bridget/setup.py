@@ -52,8 +52,14 @@ async def setup():
 if __name__ == "__main__":
     if os.environ.get("DB_CONNECTION_STRING") is None:
         mongoengine.register_connection(
-            host=os.environ.get("DB_HOST"), port=int(os.environ.get("DB_PORT")), alias="default", name="bridget")
+            host=os.environ.get("DB_HOST"),
+            port=int(
+                os.environ.get("DB_PORT")),
+            alias="default",
+            name="bridget")
     else:
         mongoengine.register_connection(
-            host=os.environ.get("DB_CONNECTION_STRING"), alias="default", name="bridget")
+            host=os.environ.get("DB_CONNECTION_STRING"),
+            alias="default",
+            name="bridget")
     res = asyncio.get_event_loop().run_until_complete(setup())

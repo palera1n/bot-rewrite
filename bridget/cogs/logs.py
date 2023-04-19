@@ -42,9 +42,13 @@ class Logging(commands.Cog):
         embed.add_field(name="Warnpoints",
                         value=db_user.warn_points, inline=True)
         embed.add_field(
-            name="Join date", value=f"{format_dt(member.joined_at, style='F')} ({format_dt(member.joined_at, style='R')})", inline=True)
-        embed.add_field(name="Created",
-                        value=f"{format_dt(member.created_at, style='F')} ({format_dt(member.created_at, style='R')})", inline=True)
+            name="Join date",
+            value=f"{format_dt(member.joined_at, style='F')} ({format_dt(member.joined_at, style='R')})",
+            inline=True)
+        embed.add_field(
+            name="Created",
+            value=f"{format_dt(member.created_at, style='F')} ({format_dt(member.created_at, style='R')})",
+            inline=True)
         embed.timestamp = datetime.now()
         embed.set_footer(text=member.id)
 
@@ -145,7 +149,9 @@ class Logging(commands.Cog):
         embed.color = discord.Color.orange()
         embed.set_thumbnail(url=before.author.display_avatar)
         embed.add_field(
-            name="User", value=f'{before.author} ({before.author.mention})', inline=False)
+            name="User",
+            value=f'{before.author} ({before.author.mention})',
+            inline=False)
 
         before_content = before.content
         if len(before.content) > 400:
@@ -158,7 +164,10 @@ class Logging(commands.Cog):
         embed.add_field(name="Old message", value=before_content, inline=False)
         embed.add_field(name="New message", value=after_content, inline=False)
         embed.add_field(
-            name="Channel", value=before.channel.mention + f"\n\n[Link to message]({before.jump_url})", inline=False)
+            name="Channel",
+            value=before.channel.mention +
+            f"\n\n[Link to message]({before.jump_url})",
+            inline=False)
         embed.timestamp = datetime.now()
         embed.set_footer(text=before.author.id)
         await channel.send(embed=embed)
@@ -180,27 +189,32 @@ class Logging(commands.Cog):
             return
         if message.author.bot:
             return
-            
 
         db_guild = guild_service.get_guild()
         if message.channel.id in db_guild.logging_excluded_channels:
             return
 
-        channel: discord.Channel = message.guild.get_channel(db_guild.channel_msg_logs if db_guild.channel_msg_logs else db_guild.channel_private)
+        channel: discord.Channel = message.guild.get_channel(
+            db_guild.channel_msg_logs if db_guild.channel_msg_logs else db_guild.channel_private)
 
         if not (message.content == "" or not message.content):
             embed = discord.Embed(title="Message Deleted")
             embed.color = discord.Color.red()
             embed.set_thumbnail(url=message.author.display_avatar)
             embed.add_field(
-                name="User", value=f'{message.author} ({message.author.mention})', inline=True)
+                name="User",
+                value=f'{message.author} ({message.author.mention})',
+                inline=True)
             embed.add_field(
                 name="Channel", value=message.channel.mention, inline=True)
             content = message.content
             if len(message.content) > 400:
                 content = content[0:400] + "..."
-            embed.add_field(name="Message", value=content +
-                            f"\n\n[Link to message]({message.jump_url})", inline=False)
+            embed.add_field(
+                name="Message",
+                value=content +
+                f"\n\n[Link to message]({message.jump_url})",
+                inline=False)
             embed.set_footer(text=message.author.id)
             embed.timestamp = datetime.now()
             await channel.send(embed=embed)
@@ -210,7 +224,9 @@ class Logging(commands.Cog):
             embed.color = discord.Color.red()
             embed.set_thumbnail(url=message.author.display_avatar)
             embed.add_field(
-                name="User", value=f'{message.author} ({message.author.mention})', inline=True)
+                name="User",
+                value=f'{message.author} ({message.author.mention})',
+                inline=True)
             embed.add_field(
                 name="Channel", value=message.channel.mention, inline=True)
             embed.set_footer(text=message.author.id)
@@ -221,20 +237,22 @@ class Logging(commands.Cog):
             non_image = []
             for idx, attachment in enumerate(message.attachments):
                 try:
-                    embed.add_field(name=f"Attachment #{idx}", value=f"[{attachment.filename}]({attachment.url})", inline=False)
+                    embed.add_field(
+                        name=f"Attachment #{idx}",
+                        value=f"[{attachment.filename}]({attachment.url})",
+                        inline=False)
                     if attachment.content_type.startswith('image'):
                         images.append(Image.open((await attachment.to_file()).fp))
                     else:
                         non_image.append(await attachment.to_file())
-                except:
+                except BaseException:
                     await channel.send(file=await attachment.to_file())
 
-                
-            
             # print(len(images))
 
             if images != []:
-                new_img = Image.new("RGBA", (sum([i.width for i in images]), max([i.height for i in images])), (255, 255, 255, 0))
+                new_img = Image.new("RGBA", (sum([i.width for i in images]), max(
+                    [i.height for i in images])), (255, 255, 255, 0))
                 widthsum = 0
                 for idx, image in enumerate(images):
                     # image.thumbnail((200, 200), resample=Image.Resampling.LANCZOS)
@@ -243,14 +261,14 @@ class Logging(commands.Cog):
 
                 with open('/tmp/merged.png', 'wb') as f:
                     new_img.save(f, format="PNG")
-                
+
                 file = discord.File('/tmp/merged.png', filename="merged.png")
 
                 embed.set_image(url="attachment://merged.png")
 
             # embed.add_field(name="Attachments Original URLs", value="\n".join(urls), inline=False)
 
-            #await channel.send(file=file)
+            # await channel.send(file=file)
             if images:
                 await channel.send(file=file, embed=embed)
                 os.remove('/tmp/merged.png')
@@ -310,7 +328,9 @@ class Logging(commands.Cog):
         embed = discord.Embed(title="Bulk Message Deleted")
         embed.color = discord.Color.red()
         embed.add_field(
-            name="Users", value=f'This batch included {len(messages)} messages from {member_string}', inline=True)
+            name="Users",
+            value=f'This batch included {len(messages)} messages from {member_string}',
+            inline=True)
         embed.add_field(
             name="Channel", value=message.channel.mention, inline=True)
         embed.timestamp = datetime.now()
@@ -337,7 +357,9 @@ class Logging(commands.Cog):
                 embed.title = "Member Left"
                 embed.color = discord.Color.purple()
                 embed.add_field(
-                    name="Banned by", value=f'{action.user} ({action.user.mention})', inline=True)
+                    name="Banned by",
+                    value=f'{action.user} ({action.user.mention})',
+                    inline=True)
                 await channel.send(embed=embed)
                 return
 
@@ -361,7 +383,9 @@ class Logging(commands.Cog):
         async for action in guild.audit_logs(limit=1, action=discord.AuditLogAction.unban):
             if action.target.id == user.id:
                 embed.add_field(
-                    name="Unbanned by", value=f'{action.user} ({action.user.mention})', inline=True)
+                    name="Unbanned by",
+                    value=f'{action.user} ({action.user.mention})',
+                    inline=True)
                 await channel.send(embed=embed)
                 return
 
@@ -371,9 +395,13 @@ class Logging(commands.Cog):
         embed = discord.Embed(title="Member Left")
         embed.color = discord.Color.purple()
         embed.add_field(
-            name="User", value=f'{action.target} ({action.target.mention})', inline=True)
+            name="User",
+            value=f'{action.target} ({action.target.mention})',
+            inline=True)
         embed.add_field(
-            name="Kicked by", value=f'{action.user} ({action.user.mention})', inline=True)
+            name="Kicked by",
+            value=f'{action.user} ({action.user.mention})',
+            inline=True)
         embed.timestamp = datetime.now()
         embed.set_footer(text=action.user.id)
         await channel.send(embed=embed)
@@ -460,7 +488,9 @@ class Logging(commands.Cog):
         async for action in member.guild.audit_logs(limit=1, action=discord.AuditLogAction.member_role_update):
             if action.target.id == member.id:
                 embed.add_field(
-                    name="Updated by", value=f'{action.user} ({action.user.mention})', inline=False)
+                    name="Updated by",
+                    value=f'{action.user} ({action.user.mention})',
+                    inline=False)
 
         db_guild = guild_service.get_guild()
         private = member.guild.get_channel(db_guild.channel_private)
@@ -518,11 +548,18 @@ class Logging(commands.Cog):
                               color=discord.Color.dark_teal())
         embed.set_thumbnail(url=interaction.user.display_avatar)
         embed.add_field(
-            name="Member", value=f'{interaction.user} ({interaction.user.mention})', inline=True)
+            name="Member",
+            value=f'{interaction.user} ({interaction.user.mention})',
+            inline=True)
         if interaction.channel is not None:
-            embed.add_field(name="Channel", value=interaction.channel.mention, inline=True)
+            embed.add_field(
+                name="Channel",
+                value=interaction.channel.mention,
+                inline=True)
         embed.add_field(
-            name="Command", value=f'`/{data.get("name")}{" " + message_content.strip() if message_content else ""}`', inline=False)
+            name="Command",
+            value=f'`/{data.get("name")}{" " + message_content.strip() if message_content else ""}`',
+            inline=False)
         embed.timestamp = datetime.now()
         embed.set_footer(text=interaction.user.id)
 
@@ -542,14 +579,26 @@ class Logging(commands.Cog):
 
         if before.channel is None and member in after.channel.members:
             embed.title = "Member VC Joined"
-            embed.add_field(name="Joined", value=after.channel.mention, inline=True)
+            embed.add_field(
+                name="Joined",
+                value=after.channel.mention,
+                inline=True)
         elif before.channel is not None and after.channel is None:
             embed.title = "Member VC Left"
-            embed.add_field(name="Left", value=before.channel.mention, inline=True)
+            embed.add_field(
+                name="Left",
+                value=before.channel.mention,
+                inline=True)
         elif before.channel.id != after.channel.id:
             embed.title = "Member VC Moved"
-            embed.add_field(name="Left", value=before.channel.mention, inline=True)
-            embed.add_field(name="Joined", value=after.channel.mention, inline=True)
+            embed.add_field(
+                name="Left",
+                value=before.channel.mention,
+                inline=True)
+            embed.add_field(
+                name="Joined",
+                value=after.channel.mention,
+                inline=True)
         else:
             return
 

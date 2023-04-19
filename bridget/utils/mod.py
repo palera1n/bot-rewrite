@@ -9,48 +9,50 @@ from utils.config import cfg
 from utils.services import guild_service, user_service
 
 
-
 async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
     case = Case(
-            _id=db_guild.case_id,
-            _type="UNBAN",
-            mod_id=mod.id,
-            mod_tag=str(mod),
-            reason=reason,
-        )
+        _id=db_guild.case_id,
+        _type="UNBAN",
+        mod_id=mod.id,
+        mod_tag=str(mod),
+        reason=reason,
+    )
     guild_service.inc_caseid()
     user_service.add_case(target_member.id, case)
     log = prepare_unban_log(mod, target_member, case)
     await notify_user(target_member, f"You have been unbanned in {bot.get_guild(guild_service.get_guild()._id).name}", log)
     return create_public_log(db_guild, target_member, log)
 
+
 async def add_mute_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
     case = Case(
-            _id=db_guild.case_id,
-            _type="MUTE",
-            mod_id=mod.id,
-            mod_tag=str(mod),
-            reason=reason,
-        )
+        _id=db_guild.case_id,
+        _type="MUTE",
+        mod_id=mod.id,
+        mod_tag=str(mod),
+        reason=reason,
+    )
     guild_service.inc_caseid()
     user_service.add_case(target_member.id, case)
     log = prepare_mute_log(mod, target_member, case)
     await notify_user(target_member, f"You have been muted in {bot.get_guild(guild_service.get_guild()._id).name}", log)
     return create_public_log(db_guild, target_member, log)
 
+
 async def add_unmute_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
     case = Case(
-            _id=db_guild.case_id,
-            _type="UNMUTE",
-            mod_id=mod.id,
-            mod_tag=str(mod),
-            reason=reason,
-        )
+        _id=db_guild.case_id,
+        _type="UNMUTE",
+        mod_id=mod.id,
+        mod_tag=str(mod),
+        reason=reason,
+    )
     guild_service.inc_caseid()
     user_service.add_case(target_member.id, case)
     log = prepare_unmute_log(mod, target_member, case)
     await notify_user(target_member, f"You have been unmuted in {bot.get_guild(guild_service.get_guild()._id).name}", log)
     return create_public_log(db_guild, target_member, log)
+
 
 async def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
     """Adds kick case to user
@@ -64,7 +66,7 @@ async def add_kick_case(target_member: discord.Member, mod: discord.Member, reas
     Returns:
         _type_: _description_
     """
-    
+
     case = Case(
         _id=db_guild.case_id,
         _type="KICK",
@@ -79,6 +81,7 @@ async def add_kick_case(target_member: discord.Member, mod: discord.Member, reas
     await notify_user(target_member, f"You have been kicked in {bot.get_guild(guild_service.get_guild()._id).name}", log)
 
     return create_public_log(db_guild, target_member, log)
+
 
 async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, points, reason):
     db_guild = guild_service.get_guild()
@@ -106,6 +109,7 @@ async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: dis
     await response_log(ctx, log)
     await submit_public_log(ctx, db_guild, target_member, log, dmed)
 
+
 async def notify_user(target_member: discord.Member, text: str, log: discord.Embed) -> bool:
     """Notifies a specified user about something
 
@@ -117,13 +121,14 @@ async def notify_user(target_member: discord.Member, text: str, log: discord.Emb
     Returns:
         bool: If notify succeeded
     """
-    
+
     try:
         await target_member.send(text, embed=log)
     except Exception:
         return False
-    
+
     return True
+
 
 async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, db_user, db_guild, cur_points: int, log) -> bool:
     """Notifies a specified user about a warn
@@ -140,15 +145,18 @@ async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Memb
     Returns:
         bool: If notify succeeded
     """
-    
+
     log_kickban = None
     dmed = True
 
     if cur_points >= 10:
-        #if cfg.ban_appeal_url is None:
+        # if cfg.ban_appeal_url is None:
         dmed = await notify_user(target_member, f"You were banned from {ctx.guild.name} for reaching 10 or more points.", log)
-        #else:
-        #    dmed = await notify_user(target_member, f"You were banned from {ctx.guild.name} for reaching 10 or more points.\n\nIf you would like to appeal your ban, please fill out this form: <{cfg.ban_appeal_url}>", log)
+        # else:
+        # dmed = await notify_user(target_member, f"You were banned from
+        # {ctx.guild.name} for reaching 10 or more points.\n\nIf you would like
+        # to appeal your ban, please fill out this form:
+        # <{cfg.ban_appeal_url}>", log)
 
         log_kickban = await add_ban_case(target_member, mod, "10 or more warn points reached.", db_guild)
         await target_member.ban(reason="10 or more warn points reached.")
@@ -157,7 +165,11 @@ async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Memb
         user_service.set_warn_kicked(target_member.id)
 
         dmed = await notify_user(target_member, f"You were kicked from {ctx.guild.name} for reaching 8 or more points. Please note that you will be banned at 10 points.", log)
-        log_kickban = add_kick_case(target_member, mod, "8 or more warn points reached.", db_guild)
+        log_kickban = add_kick_case(
+            target_member,
+            mod,
+            "8 or more warn points reached.",
+            db_guild)
         await target_member.kick(reason="8 or more warn points reached.")
     else:
         if isinstance(target_member, discord.Member):
@@ -167,6 +179,7 @@ async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Memb
         await submit_public_log(ctx, db_guild, target_member, log_kickban)
 
     return dmed
+
 
 async def response_log(ctx, log):
     if isinstance(ctx, discord.Interaction):
@@ -179,7 +192,11 @@ async def response_log(ctx, log):
     else:
         await ctx.send(embed=log, delete_after=10)
 
-def create_public_log(db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed):
+
+def create_public_log(db_guild: Guild,
+                      user: Union[discord.Member,
+                                  discord.User],
+                      log: discord.Embed):
     """Submits a public log
 
     Args:
@@ -189,11 +206,12 @@ def create_public_log(db_guild: Guild, user: Union[discord.Member, discord.User]
         log (discord.Embed): Embed to send
         dmed (bool, optional): If was dmed. Defaults to None.
     """
-    
+
     log.remove_author()
     log.set_thumbnail(url=user.display_avatar)
     log.remove_field(1)
     return log
+
 
 async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed, dmed: bool = None):
     """Submits a public log
@@ -205,7 +223,7 @@ async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Uni
         log (discord.Embed): Embed to send
         dmed (bool, optional): If was dmed. Defaults to None.
     """
-    
+
     public_channel = ctx.guild.get_channel(db_guild.channel_public)
     if public_channel:
         log.remove_author()
@@ -229,7 +247,7 @@ async def add_ban_case(target_member: discord.Member, mod: discord.Member, reaso
     Returns:
         _type_: _description_
     """
-    
+
     case = Case(
         _id=db_guild.case_id,
         _type="BAN",
@@ -244,16 +262,19 @@ async def add_ban_case(target_member: discord.Member, mod: discord.Member, reaso
     log = prepare_ban_log(mod, target_member, case)
     await notify_user(target_member, f"You have been banned in {bot.get_guild(guild_service.get_guild()._id).name}", log)
 
-    return create_public_log(db_guild, target_member, log) 
+    return create_public_log(db_guild, target_member, log)
+
 
 async def delay_delete(interaction: discord.Interaction):
     await asyncio.sleep(10)
     await interaction.delete_original_message()
 
 # TODO: Fix all of this
+
+
 def prepare_warn_log(mod, target_member, case):
     """Prepares warn log
-    
+
     Parameters
     ----------
     mod : discord.Member
@@ -262,12 +283,15 @@ def prepare_warn_log(mod, target_member, case):
         "Member who was warned"
     case
         "Case object"
-        
+
     """
     embed = discord.Embed(title="Member Warned")
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
     embed.color = discord.Color.orange()
-    embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
+    embed.add_field(
+        name="Member",
+        value=f'{target_member} ({target_member.mention})',
+        inline=True)
     embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Increase", value=case.punishment, inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
@@ -275,9 +299,10 @@ def prepare_warn_log(mod, target_member, case):
     embed.timestamp = case.date
     return embed
 
+
 def prepare_liftwarn_log(mod, target_member, case):
     """Prepares liftwarn log
-    
+
     Parameters
     ----------
     mod : discord.Member
@@ -286,12 +311,15 @@ def prepare_liftwarn_log(mod, target_member, case):
         "Member who's warn was lifted"
     case
         "Case object"
-        
+
     """
     embed = discord.Embed(title="Member Warn Lifted")
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
     embed.color = discord.Color.blurple()
-    embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
+    embed.add_field(
+        name="Member",
+        value=f'{target_member} ({target_member.mention})',
+        inline=True)
     embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Decrease", value=case.punishment, inline=True)
     embed.add_field(name="Reason", value=case.lifted_reason, inline=True)
@@ -299,9 +327,10 @@ def prepare_liftwarn_log(mod, target_member, case):
     embed.timestamp = case.lifted_date
     return embed
 
+
 def prepare_editreason_log(mod, target_member, case, old_reason):
     """Prepares log for reason edits
-    
+
     Parameters
     ----------
     mod : discord.Member
@@ -312,12 +341,15 @@ def prepare_editreason_log(mod, target_member, case, old_reason):
         "Case object"
     old_reason : str
         "Old case reason"
-        
+
     """
     embed = discord.Embed(title="Member Case Updated")
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
     embed.color = discord.Color.blurple()
-    embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
+    embed.add_field(
+        name="Member",
+        value=f'{target_member} ({target_member.mention})',
+        inline=True)
     embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Old reason", value=old_reason, inline=False)
     embed.add_field(name="New Reason", value=case.reason, inline=False)
@@ -325,9 +357,10 @@ def prepare_editreason_log(mod, target_member, case, old_reason):
     embed.timestamp = case.date
     return embed
 
+
 def prepare_removepoints_log(mod, target_member, case):
     """Prepares log for point removal
-    
+
     Parameters
     ----------
     mod : discord.Member
@@ -336,12 +369,15 @@ def prepare_removepoints_log(mod, target_member, case):
         "Member whose points were removed"
     case
         "Case object"
-        
+
     """
     embed = discord.Embed(title="Member Points Removed")
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
     embed.color = discord.Color.blurple()
-    embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
+    embed.add_field(
+        name="Member",
+        value=f'{target_member} ({target_member.mention})',
+        inline=True)
     embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Decrease", value=case.punishment, inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
@@ -349,9 +385,10 @@ def prepare_removepoints_log(mod, target_member, case):
     embed.timestamp = case.date
     return embed
 
+
 def prepare_ban_log(mod, target_member, case):
     """Prepares ban log
-    
+
     Parameters
     ----------
     mod : discord.Member
@@ -360,21 +397,25 @@ def prepare_ban_log(mod, target_member, case):
         "Member who was banned"
     case
         "Case object"
-        
+
     """
     embed = discord.Embed(title="Member Banned")
     embed.color = discord.Color.blue()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
-    embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
+    embed.add_field(
+        name="Member",
+        value=f'{target_member} ({target_member.mention})',
+        inline=True)
     embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date
     return embed
 
+
 def prepare_unban_log(mod, target_member, case):
     """Prepares unban log
-    
+
     Parameters
     ----------
     mod : discord.Member
@@ -383,21 +424,25 @@ def prepare_unban_log(mod, target_member, case):
         "Member who was unbanned"
     case
         "Case object"
-        
+
     """
     embed = discord.Embed(title="Member Unbanned")
     embed.color = discord.Color.blurple()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
-    embed.add_field(name="Member", value=f'{target_member} ({target_member.id})', inline=True)
+    embed.add_field(
+        name="Member",
+        value=f'{target_member} ({target_member.id})',
+        inline=True)
     embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date
     return embed
 
+
 def prepare_kick_log(mod, target_member, case):
     """Prepares kick log
-    
+
     Parameters
     ----------
     mod : discord.Member
@@ -406,21 +451,25 @@ def prepare_kick_log(mod, target_member, case):
         "Member who was kicked"
     case
         "Case object"
-        
+
     """
     embed = discord.Embed(title="Member Kicked")
     embed.color = discord.Color.green()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
-    embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
+    embed.add_field(
+        name="Member",
+        value=f'{target_member} ({target_member.mention})',
+        inline=True)
     # embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=False)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date
     return embed
 
+
 def prepare_mute_log(mod, target_member, case):
     """Prepares mute log
-    
+
     Parameters
     ----------
     mod : discord.Member
@@ -429,12 +478,15 @@ def prepare_mute_log(mod, target_member, case):
         "Member who was muted"
     case
         "Case object"
-        
+
     """
     embed = discord.Embed(title="Member Muted")
     embed.color = discord.Color.red()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
-    embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
+    embed.add_field(
+        name="Member",
+        value=f'{target_member} ({target_member.mention})',
+        inline=True)
     embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Duration", value=case.punishment, inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
@@ -442,9 +494,10 @@ def prepare_mute_log(mod, target_member, case):
     embed.timestamp = case.date
     return embed
 
+
 def prepare_unmute_log(mod, target_member, case):
     """Prepares unmute log
-    
+
     Parameters
     ----------
     mod : discord.Member
@@ -453,12 +506,15 @@ def prepare_unmute_log(mod, target_member, case):
         "Member who was unmuted"
     case
         "Case object"
-        
+
     """
     embed = discord.Embed(title="Member Unmuted")
     embed.color = discord.Color.green()
     embed.set_author(name=target_member, icon_url=target_member.display_avatar)
-    embed.add_field(name="Member", value=f'{target_member} ({target_member.mention})', inline=True)
+    embed.add_field(
+        name="Member",
+        value=f'{target_member} ({target_member.mention})',
+        inline=True)
     embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=True)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
