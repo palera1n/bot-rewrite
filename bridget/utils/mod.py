@@ -7,6 +7,8 @@ from discord.utils import escape_markdown
 from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
+import humanize
+from datetime import timezone
 
 
 async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
@@ -25,11 +27,16 @@ async def add_unban_case(target_member: discord.Member, mod: discord.Member, rea
 
 
 async def add_mute_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
+    now = datetime.now(tz=timezone.utc)
+
+    
     case = Case(
         _id=db_guild.case_id,
         _type="MUTE",
         mod_id=mod.id,
         mod_tag=str(mod),
+        punishment=humanize.naturaldelta(
+            target_member.timed_out_until - now, minimum_unit="seconds"),
         reason=reason,
     )
     guild_service.inc_caseid()
@@ -158,7 +165,7 @@ async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Memb
         # to appeal your ban, please fill out this form:
         # <{cfg.ban_appeal_url}>", log)
 
-        log_kickban = await add_ban_case(target_member, mod, "10 or more warn points reached.", db_guild)
+        log_kickban = await add_ban_case(target_member, mod, "10 or more warn points reached.", db_guild, ctx.client)
         await target_member.ban(reason="10 or more warn points reached.")
     elif cur_points >= 8 and not db_user.was_warn_kicked and isinstance(target_member, discord.Member):
         # kick user if >= 8 points and wasn't previously kicked
@@ -169,7 +176,7 @@ async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Memb
             target_member,
             mod,
             "8 or more warn points reached.",
-            db_guild)
+            db_guild, bot=ctx.client)
         await target_member.kick(reason="8 or more warn points reached.")
     else:
         if isinstance(target_member, discord.Member):
