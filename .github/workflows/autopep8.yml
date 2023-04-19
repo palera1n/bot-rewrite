@@ -12,13 +12,10 @@ jobs:
         uses: peter-evans/autopep8@v2
         with:
           args: --recursive --in-place --aggressive --aggressive .
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
-        with:
-          author: GitHub <noreply@github.com>
-          commit-message: autopep8 action fixes
-          title: Fixes by autopep8 action
-          body: This is an auto-generated PR with fixes by autopep8.
-          labels: autopep8, automated
-          reviewers: junepark678
-          branch: autopep8-patches
+      - name: Commit autopep8 changes
+        if: steps.autopep8.outputs.exit-code == 2
+        run: |
+          git config --global user.name 'autopep8 actions'
+          git config --global user.email 'rjp2030@outlook.com'
+          git commit -am "Automated autopep8 fixes"
+          git push
