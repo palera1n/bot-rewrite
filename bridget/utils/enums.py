@@ -1,6 +1,8 @@
 import discord
 
-from enum import IntEnum, unique, auto
+from enum import IntEnum, unique
+from discord.automod import AutoModRule
+from typing import List, Optional
 
 from .services import guild_service
 from .config import cfg
@@ -69,3 +71,33 @@ class PermissionLevel(IntEnum):
 
     def __hash__(self):
         return hash(self.value)
+
+
+@unique
+class FilterBypassLevel(IntEnum):
+    """Filter bypass level enum"""
+
+    HELPER = 0
+    MOD = 1
+
+    def __str__(self):
+        return {
+                self.HELPER: "Helper and up",
+                self.MOD: "Moderator and up",
+        }[self] 
+
+    def find_rule_for_bypass(self, rules: List[AutoModRule]) -> Optional[AutoModRule]:
+        if self == FilterBypassLevel.HELPER:
+            # find the rule that has Helper exempt
+            for rule in rules:
+                if guild_service.get_guild().role_helper in rule.exempt_role_ids:
+                    return rule
+            return None
+        elif self == FilterBypassLevel.MOD:
+            for rule in rules:
+                # find the rule that doesnt have Helper exempt
+                if guild_service.get_guild().role_helper not in rule.exempt_role_ids:
+                    return rule
+            return None
+        return None
+
