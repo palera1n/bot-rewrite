@@ -30,6 +30,7 @@ bot.cmd = "python bridget"
 bot.env_file = ".env"
 setup.cmd = "python bridget/setup.py"
 setup.env_file = ".env"
+lint.cmd = "flake8 --config=.flake8"
 
 [tool.pyright]
 extraPaths = ["__pypackages__/3.11/lib/"]
