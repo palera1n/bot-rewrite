@@ -16,12 +16,15 @@ class User(mongoengine.Document):
     level = mongoengine.IntField(default=0, required=True)
     warn_points = mongoengine.IntField(default=0, required=True)
 
-    offline_report_ping = mongoengine.BooleanField(default=False,
-                                                   required=True)
+    offline_report_ping = mongoengine.BooleanField(
+        default=False, required=True)
 
     timezone = mongoengine.StringField(default=None)
     birthday = mongoengine.ListField(default=[])
     sticky_roles = mongoengine.ListField(default=[])
     command_bans = mongoengine.DictField(default={})
 
-    meta = {'db_alias': 'default', 'collection': 'users'}
+    meta = {
+        'db_alias': 'default',
+        'collection': 'users'
+    }

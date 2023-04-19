@@ -10,10 +10,11 @@ from discord import app_commands
 from discord.ext import commands
 
 from os import getenv
-
-mongoengine.connect('bridget',
-                    host=getenv("DB_HOST"),
-                    port=int(getenv("DB_PORT")))
+mongoengine.connect(
+    'bridget',
+    host=getenv("DB_HOST"),
+    port=int(
+        getenv("DB_PORT")))
 
 from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
 from utils.startup_checks import checks
@@ -26,20 +27,18 @@ for check in checks:
 bot = commands.Bot(
     command_prefix=cfg.prefix,
     intents=discord.Intents.all(),
-    allowed_mentions=discord.AllowedMentions(everyone=False,
-                                             roles=False,
-                                             users=True),
+    allowed_mentions=discord.AllowedMentions(
+        everyone=False,
+        roles=False,
+        users=True),
 )
 bot.remove_command("help")
 
-
 # Apps
 @bot.tree.context_menu(name="Meowcrypt Decrypt")
-async def meowcrypt_decrypt(interaction: discord.Interaction,
-                            message: discord.Message) -> None:
+async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.Message) -> None:
     if "nya>.<" not in message.content:
-        await send_error(
-            interaction, "The selected message is not encrypted by Meowcrypt.")
+        await send_error(interaction, "The selected message is not encrypted by Meowcrypt.")
 
     spl = message.content.split(">.<")
     one = base64.b64decode(spl[1])
@@ -52,15 +51,16 @@ async def meowcrypt_decrypt(interaction: discord.Interaction,
     key = hashlib.pbkdf2_hmac('sha512', pass_bytes, one, 50000, dklen=32)
 
     cipher = AES.new(key, AES.MODE_GCM, nonce=two)
-    plaintext = cipher.decrypt_and_verify(three[:-16],
-                                          three[-16:]).decode('utf-8')
+    plaintext = cipher.decrypt_and_verify(
+        three[:-16], three[-16:]).decode('utf-8')
 
-    embed = discord.Embed(title="Decrypted text",
-                          description=f"```{plaintext}```",
-                          color=discord.Color.green())
+    embed = discord.Embed(
+        title="Decrypted text",
+        description=f"```{plaintext}```",
+        color=discord.Color.green()
+    )
     embed.set_author(name=message.author, icon_url=message.author.avatar.url)
     await send_success(interaction, embed=embed, ephemeral=True)
-
 
 # Cogs
 asyncio.run(bot.add_cog(ChatGPT(bot)))
@@ -76,21 +76,14 @@ asyncio.run(bot.add_cog(Unshorten(bot)))
 asyncio.run(bot.add_cog(Timezones(bot)))
 asyncio.run(bot.add_cog(Helper(bot)))
 
-
 # Error handler
 @bot.tree.error
-async def app_command_error(interaction: discord.Interaction,
-                            error: app_commands.AppCommandError):
+async def app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.CommandInvokeError):
         error = error.original
 
     if isinstance(error, discord.errors.NotFound):
-        await interaction.channel.send(embed=discord.Embed(
-            color=discord.Color.red(),
-            description=
-            f"Sorry {interaction.user.mention}, it looks like I took too long to respond to you! If I didn't do what you wanted in time, please try again."
-        ),
-                                       delete_after=5)
+        await interaction.channel.send(embed=discord.Embed(color=discord.Color.red(), description=f"Sorry {interaction.user.mention}, it looks like I took too long to respond to you! If I didn't do what you wanted in time, please try again."), delete_after=5)
         return
 
     if (isinstance(error, commands.MissingRequiredArgument)
@@ -116,6 +109,5 @@ async def app_command_error(interaction: discord.Interaction,
                 tb_formatted = "...\n" + tb_formatted[-1000:]
 
             await send_error(interaction, f"`{error}`\n```{tb_formatted}```")
-
 
 bot.run(getenv("TOKEN"))

@@ -9,15 +9,13 @@ from utils.enums import PermissionLevel
 
 
 class Snipe(Cog):
-
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
 
         self.cached_messages: Dict[discord.Message] = {}
 
     @commands.Cog.listener()
-    async def on_message_edit(self, message: discord.Message,
-                              new_message: discord.Message) -> None:
+    async def on_message_edit(self, message: discord.Message, new_message: discord.Message) -> None:
         if message.author.bot:
             return
 
@@ -31,8 +29,7 @@ class Snipe(Cog):
         self.cached_messages[message.channel.id] = message
 
     @commands.Cog.listener()
-    async def on_automod_action(self,
-                                execution: discord.AutoModAction) -> None:
+    async def on_automod_action(self, execution: discord.AutoModAction) -> None:
         if isinstance(execution.action.type,
                       discord.AutoModRuleActionType.block_message):
             self.cached_messages[execution.channel_id] = execution.message
@@ -47,16 +44,20 @@ class Snipe(Cog):
         """
         try:
             if not self.cached_messages[ctx.channel_id]:
-                await ctx.response.send_message(embed=discord.Embed(
-                    color=discord.Color.red(),
-                    description="No messages to snipe.",
-                ), )
+                await ctx.response.send_message(
+                    embed=discord.Embed(
+                        color=discord.Color.red(),
+                        description="No messages to snipe.",
+                    ),
+                )
                 return
         except KeyError:
-            await ctx.response.send_message(embed=discord.Embed(
-                color=discord.Color.red(),
-                description="No messages to snipe.",
-            ), )
+            await ctx.response.send_message(
+                embed=discord.Embed(
+                    color=discord.Color.red(),
+                    description="No messages to snipe.",
+                ),
+            )
             return
 
         embed = discord.Embed(
@@ -70,14 +71,11 @@ class Snipe(Cog):
         embed.set_footer(text=f"Sent in #{self.cached_messages[ctx.channel_id].channel.name}")
         
         try:
-            if self.cached_messages[
-                    ctx.channel_id].attachments[0].type.startswith("image"):
-                embed.set_image(url=self.cached_messages[
-                    ctx.channel_id].attachments[0].url)
+            if self.cached_messages[ctx.channel_id].attachments[0].type.startswith("image"):
+                embed.set_image(url=self.cached_messages[ctx.channel_id].attachments[0].url)
         except:
             pass
 
-        embed.set_thumbnail(
-            url=self.cached_messages[ctx.channel_id].author.avatar.url)
+        embed.set_thumbnail(url=self.cached_messages[ctx.channel_id].author.avatar.url)
 
         await ctx.response.send_message(embed=embed)

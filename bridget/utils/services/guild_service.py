@@ -21,13 +21,17 @@ def add_tag(tag: Tag) -> None:
 
 
 def remove_tag(tag: str):
-    return Guild.objects(_id=guild_id).update_one(pull__tags__name=Tag(
-        name=tag).name)
+    return Guild.objects(
+        _id=guild_id).update_one(
+        pull__tags__name=Tag(
+            name=tag).name)
 
 
 def edit_tag(tag):
-    return Guild.objects(_id=guild_id,
-                         tags__name=tag.name).update_one(set__tags__S=tag)
+    return Guild.objects(
+        _id=guild_id,
+        tags__name=tag.name).update_one(
+        set__tags__S=tag)
 
 
 def get_tag(name: str):
@@ -44,13 +48,17 @@ def add_meme(meme: Tag) -> None:
 
 
 def remove_meme(meme: str):
-    return Guild.objects(_id=guild_id).update_one(pull__memes__name=Tag(
-        name=meme).name)
+    return Guild.objects(
+        _id=guild_id).update_one(
+        pull__memes__name=Tag(
+            name=meme).name)
 
 
 def edit_meme(meme):
-    return Guild.objects(_id=guild_id,
-                         memes__name=meme.name).update_one(set__memes__S=meme)
+    return Guild.objects(
+        _id=guild_id,
+        memes__name=meme.name).update_one(
+        set__memes__S=meme)
 
 
 def get_meme(name: str):
@@ -125,13 +133,14 @@ def get_giveaway(_id: int) -> Giveaway:
     return giveaway
 
 
-def add_giveaway(id: int,
-                 channel: int,
-                 name: str,
-                 entries: list,
-                 winners: int,
-                 ended: bool = False,
-                 prev_winners=[]) -> None:
+def add_giveaway(
+        id: int,
+        channel: int,
+        name: str,
+        entries: list,
+        winners: int,
+        ended: bool = False,
+        prev_winners=[]) -> None:
     """
     Add a giveaway to the database.
     Parameters
@@ -168,8 +177,8 @@ def add_raid_phrase(phrase: str) -> bool:
 
 
 def remove_raid_phrase(phrase: str):
-    Guild.objects(_id=guild_id).update_one(pull__raid_phrases__word=FilterWord(
-        word=phrase).word)
+    Guild.objects(_id=guild_id).update_one(
+        pull__raid_phrases__word=FilterWord(word=phrase).word)
 
 
 def set_spam_mode(mode) -> None:
@@ -186,14 +195,17 @@ def add_filtered_word(fw: FilterWord) -> None:
 
 
 def remove_filtered_word(word: str):
-    return Guild.objects(_id=guild_id).update_one(
-        pull__filter_words__word=FilterWord(word=word).word)
+    return Guild.objects(
+        _id=guild_id).update_one(
+        pull__filter_words__word=FilterWord(
+            word=word).word)
 
 
 def update_filtered_word(word: FilterWord):
     return Guild.objects(
         _id=guild_id,
-        filter_words__word=word.word).update_one(set__filter_words__S=word)
+        filter_words__word=word.word).update_one(
+        set__filter_words__S=word)
 
 
 def add_whitelisted_guild(id: int):
