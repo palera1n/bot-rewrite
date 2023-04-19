@@ -8,6 +8,7 @@ from utils import Cog, send_error, send_success
 from utils.services import guild_service
 from utils.enums import PermissionLevel
 
+
 class Helper(Cog):
     @app_commands.command()
     async def solved(self, ctx: discord.Interaction):
@@ -96,8 +97,11 @@ class Helper(Cog):
             channel = ctx.channel
 
         # create the embed, add the image and color if specified
-        embed = discord.Embed(description=question, color=random.randint(0, 16777215), timestamp=datetime.now())
-        embed.set_footer(text=f"Poll started by {ctx.user.name}#{ctx.user.discriminator}")
+        embed = discord.Embed(
+            description=question, color=random.randint(
+                0, 16777215), timestamp=datetime.now())
+        embed.set_footer(
+            text=f"Poll started by {ctx.user.name}#{ctx.user.discriminator}")
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:

@@ -13,7 +13,7 @@ class Unshorten(Cog):
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot:
             return
-        
+
         emoji = get(message.guild.emojis, name="loading")
         regex = r"\b(?:https?:\/\/(?:t\.co|bit\.ly|goo\.gl|fb\.me|tinyurl\.com|j\.mp|is\.gd|v\.gd|git\.io)\/[\w-]+)\b"
 

@@ -30,6 +30,7 @@ def format_tag_page(_, entries, current_page, all_pages):
         text=f"Page {current_page} of {len(all_pages)}")
     return embed
 
+
 def prepare_tag_embed(tag):
     """Given a tag object, prepare the appropriate embed for it
 
@@ -55,6 +56,7 @@ def prepare_tag_embed(tag):
         text=f"Added by {tag.added_by_tag} | Used {format_number(tag.use_count)} times")
     return embed
 
+
 def prepare_tag_view(tag: Tag):
     if not tag.button_links or tag.button_links is None:
         return discord.utils.MISSING
@@ -70,10 +72,15 @@ def prepare_tag_view(tag: Tag):
             label = label.strip()
         else:
             emoji = None
-        view.add_item(discord.ui.Button(
-            style=discord.ButtonStyle.link, label=label, url=link, emoji=emoji))
+        view.add_item(
+            discord.ui.Button(
+                style=discord.ButtonStyle.link,
+                label=label,
+                url=link,
+                emoji=emoji))
 
     return view
+
 
 class Tags(Cog):
     @app_commands.autocomplete(name=tags_autocomplete)
@@ -86,7 +93,7 @@ class Tags(Cog):
             name (str): Name of the tag
             user_to_mention (discord.Member, optional): User to mention. Defaults to None.
         """
-        
+
         name = name.lower()
         tag = guild_service.get_tag(name)
 
@@ -94,17 +101,18 @@ class Tags(Cog):
             raise commands.BadArgument("That tag does not exist.")
 
         # run cooldown so tag can't be spammed
-        #bucket = self.tag_cooldown.get_bucket(tag.name)
-        #current = datetime.now().timestamp()
+        # bucket = self.tag_cooldown.get_bucket(tag.name)
+        # current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        #if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.user, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.user.roles):
+        # if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.user, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.user.roles):
         #    raise commands.BadArgument("That tag is on cooldown.")
 
         # if the Tag has an image, add it to the embed
         _file = tag.image.read()
         if _file is not None:
-            _file = discord.File(BytesIO(
-                _file), filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
+            _file = discord.File(
+                BytesIO(_file),
+                filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
         else:
             _file = discord.utils.MISSING
 
@@ -124,7 +132,7 @@ class Tags(Cog):
             ctx (commands.Context): Context
             name (str): Name of the tag
         """
-        
+
         name = name.lower()
         tag = guild_service.get_tag(name)
 
@@ -132,17 +140,18 @@ class Tags(Cog):
             raise commands.BadArgument("That tag does not exist.")
 
         # run cooldown so tag can't be spammed
-        #bucket = self.tag_cooldown.get_bucket(tag.name)
-        #current = datetime.now().timestamp()
+        # bucket = self.tag_cooldown.get_bucket(tag.name)
+        # current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        #if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.author, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.author.roles):
+        # if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.author, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.author.roles):
         #    raise commands.BadArgument("That tag is on cooldown.")
 
         # if the Tag has an image, add it to the embed
         _file = tag.image.read()
         if _file is not None:
-            _file = discord.File(BytesIO(
-                _file), filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
+            _file = discord.File(
+                BytesIO(_file),
+                filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
         else:
             _file = discord.utils.MISSING
 
@@ -159,14 +168,22 @@ class Tags(Cog):
         Args:
             ctx (discord.Interaction): Context
         """
-        
-        _tags = sorted(guild_service.get_guild().tags, key=lambda tag: tag.name)
+
+        _tags = sorted(
+            guild_service.get_guild().tags,
+            key=lambda tag: tag.name)
 
         if len(_tags) == 0:
             raise commands.BadArgument("There are no tags defined.")
 
-        menu = Menu(ctx, _tags, per_page=12, page_formatter=format_tag_page, whisper=True)
+        menu = Menu(
+            ctx,
+            _tags,
+            per_page=12,
+            page_formatter=format_tag_page,
+            whisper=True)
         await menu.start()
+
 
 class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
     @PermissionLevel.HELPER
@@ -179,7 +196,7 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
             name (str): Name of the tag
             image (discord.Attachment, optional): Tag image. Defaults to None.
         """
-        
+
         if not name.isalnum():
             raise commands.BadArgument("Tag name must be alphanumeric.")
 
@@ -193,9 +210,13 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
         content_type = None
         if image is not None:
             content_type = image.content_type
-            if content_type not in ["image/png", "image/jpeg", "image/gif", "image/webp"]:
+            if content_type not in [
+                "image/png",
+                "image/jpeg",
+                "image/gif",
+                    "image/webp"]:
                 raise commands.BadArgument("Attached file was not an image!")
-            
+
             if image.size > 8_000_000:
                 raise commands.BadArgument("That image is too big!")
 
@@ -218,9 +239,10 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
 
         _file = tag.image.read()
         if _file is not None:
-            _file = discord.File(BytesIO(
-                _file), filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
-        
+            _file = discord.File(
+                BytesIO(_file),
+                filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
+
         followup = await ctx.followup.send(f"Added new tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag) or discord.utils.MISSING, view=prepare_tag_view(tag) or discord.utils.MISSING)
         await asyncio.sleep(5)
         await followup.delete()
@@ -236,9 +258,10 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
             name (str): Name of the tag
             image (discord.Attachment, optional): Tag image. Defaults to None.
         """
-        
+
         if len(name.split()) > 1:
-            raise commands.BadArgument("Tag names can't be longer than 1 word.")
+            raise commands.BadArgument(
+                "Tag names can't be longer than 1 word.")
 
         name = name.lower()
         tag = guild_service.get_tag(name)
@@ -277,7 +300,9 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
 
         _file = tag.image.read()
         if _file is not None:
-            _file = discord.File(BytesIO(_file), filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
+            _file = discord.File(
+                BytesIO(_file),
+                filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
 
         followup = await ctx.followup.send(f"Edited tag!", file=_file or discord.utils.MISSING, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag) or discord.utils.MISSING)
         await asyncio.sleep(5)
@@ -293,7 +318,7 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
             ctx (discord.Interaction): Context
             name (str): Name of the tag
         """
-        
+
         name = name.lower()
 
         tag = guild_service.get_tag(name)

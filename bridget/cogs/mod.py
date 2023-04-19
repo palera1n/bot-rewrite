@@ -26,14 +26,14 @@ class Mod(Cog):
             points (app_commands.Range[int, 1, 10]): Points to give
             reason (str): Reason to warn
         """
-        
+
         if member.top_role >= ctx.user.top_role:
             await send_error(ctx, "You can't warn this member.")
             return
-        
+
         await ctx.response.defer()
         await warn(ctx, target_member=member, mod=ctx.user, points=points, reason=reason)
-    
+
     @PermissionLevel.MOD
     @app_commands.autocomplete(case_id=warn_autocomplete)
     @app_commands.command()
@@ -46,7 +46,7 @@ class Mod(Cog):
             case_id (str): Id of the warn's case
             reason (str): Reason to lift warn
         """
-        
+
         cases = user_service.get_cases(member.id)
         case = cases.cases.filter(_id=case_id).first()
 

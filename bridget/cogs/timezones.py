@@ -9,8 +9,10 @@ from typing import List
 import pytz
 from utils import Cog
 
+
 async def timezone_autocomplete(_: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    return [app_commands.Choice(name=tz, value=tz) for tz in pytz.common_timezones_set if current.lower() in tz.lower() or current.lower() in tz.replace("_", " ").lower()][:25]
+    return [app_commands.Choice(name=tz, value=tz) for tz in pytz.common_timezones_set if current.lower(
+    ) in tz.lower() or current.lower() in tz.replace("_", " ").lower()][:25]
 
 
 @app_commands.guild_only()
@@ -26,8 +28,9 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
             return " " + flag.flag(country_code)
         except ValueError:
             return ""
-    
-    @app_commands.command(name="set", description="Set your timezone so that others can view it")
+
+    @app_commands.command(name="set",
+                          description="Set your timezone so that others can view it")
     @app_commands.describe(zone="The timezone to set")
     @app_commands.autocomplete(zone=timezone_autocomplete)
     async def _set(self, ctx: discord.Interaction, zone: str) -> None:
@@ -44,21 +47,22 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
 
         await send_success(ctx, f"We set your timezone to `{zone}`! It can now be viewed with `/timezone view`.")
 
-
-    @app_commands.command(name="remove", description="Remove your timezone from the database")
+    @app_commands.command(name="remove",
+                          description="Remove your timezone from the database")
     async def remove(self, ctx: discord.Interaction) -> None:
         db_user = user_service.get_user(ctx.user.id)
         db_user.timezone = None
         db_user.save()
 
         await send_success(ctx, f"We have removed your timezone from the database.")
-    
+
     @app_commands.command(name="view", description="Get a timezone of an user")
     @app_commands.describe(member="Member to view time of")
     async def timezones(self, ctx: discord.Interaction, member: discord.Member) -> None:
         db_user = user_service.get_user(member.id)
         if db_user.timezone is None:
-            raise commands.BadArgument(f"{member.mention} has not set a timezone!")
+            raise commands.BadArgument(
+                f"{member.mention} has not set a timezone!")
 
         country_code = self.timezone_country.get(db_user.timezone)
         flaggy = ""

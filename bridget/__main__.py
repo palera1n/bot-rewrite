@@ -1,3 +1,10 @@
+from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
+from utils.startup_checks import checks
+from utils.config import cfg
+from utils import send_error, send_success
+from Crypto.Cipher import AES
+from discord import app_commands
+from discord.ext import commands
 import asyncio
 import logging
 import discord
@@ -7,17 +14,14 @@ import base64
 import hashlib
 
 from os import getenv
-mongoengine.connect('bridget', host=getenv("DB_HOST"), port=int(getenv("DB_PORT")))
-from discord.ext import commands
-from discord import app_commands
-from Crypto.Cipher import AES
+mongoengine.connect(
+    'bridget',
+    host=getenv("DB_HOST"),
+    port=int(
+        getenv("DB_PORT")))
 
-from utils import send_error, send_success
-from utils.config import cfg
-from utils.startup_checks import checks
-from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper
 
-#logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 for check in checks:
     check()
@@ -25,16 +29,21 @@ for check in checks:
 bot = commands.Bot(
     command_prefix=cfg.prefix,
     intents=discord.Intents.all(),
-    allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True),
+    allowed_mentions=discord.AllowedMentions(
+        everyone=False,
+        roles=False,
+        users=True),
 )
 bot.remove_command("help")
 
 # Apps
+
+
 @bot.tree.context_menu(name="Meowcrypt Decrypt")
 async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.Message) -> None:
     if "nya>.<" not in message.content:
         await send_error(interaction, "The selected message is not encrypted by Meowcrypt.")
-        
+
     spl = message.content.split(">.<")
     one = base64.b64decode(spl[1])
     two = base64.b64decode(spl[2])
@@ -46,8 +55,9 @@ async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.M
     key = hashlib.pbkdf2_hmac('sha512', pass_bytes, one, 50000, dklen=32)
 
     cipher = AES.new(key, AES.MODE_GCM, nonce=two)
-    plaintext = cipher.decrypt_and_verify(three[:-16], three[-16:]).decode('utf-8')
-    
+    plaintext = cipher.decrypt_and_verify(
+        three[:-16], three[-16:]).decode('utf-8')
+
     embed = discord.Embed(
         title="Decrypted text",
         description=f"```{plaintext}```",
@@ -71,6 +81,8 @@ asyncio.run(bot.add_cog(Timezones(bot)))
 asyncio.run(bot.add_cog(Helper(bot)))
 
 # Error handler
+
+
 @bot.tree.error
 async def app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.CommandInvokeError):
@@ -92,7 +104,7 @@ async def app_command_error(interaction: discord.Interaction, error: app_command
     else:
         try:
             raise error
-        except:
+        except BaseException:
             tb = traceback.format_exc()
             print(tb)
             if len(tb.split('\n')) > 8:

@@ -9,7 +9,7 @@ from .config import cfg
 @unique
 class PermissionLevel(IntEnum):
     """Permission level enum"""
-    
+
     EVERYONE = 0
     MEMPLUS = 1
     MEMPRO = 2
@@ -18,7 +18,7 @@ class PermissionLevel(IntEnum):
     ADMIN = 5
     GUILD_OWNER = 6
     OWNER = 7
-    
+
     # Checks
     def __lt__(self, other):
         return self.value < other.value
@@ -40,7 +40,7 @@ class PermissionLevel(IntEnum):
                 return other.guild.owner == other
             if self == self.OWNER:
                 return other.id == cfg.owner_id
-            
+
             return getattr(guild_service.get_guild(), {
                 self.MEMPLUS: "role_memberplus",
                 self.MEMPRO: "role_memberpro",
@@ -48,17 +48,18 @@ class PermissionLevel(IntEnum):
                 self.MOD: "role_moderator",
                 self.ADMIN: "role_administrator",
             }[self]) in list(map(lambda r: r.id, other.roles)) or self + 1 == other
-            
+
         return self.value == other.value
-    
+
     def __add__(self, other):
         return self.__class__(self.value + other)
-    
+
     def check(self, ctx: discord.Interaction):
         if not self == ctx.user:
-            raise discord.app_commands.MissingPermissions("You don't have permission to use this command.")
+            raise discord.app_commands.MissingPermissions(
+                "You don't have permission to use this command.")
         return True
-    
+
     def __call__(self, command: discord.app_commands.Command):
         command.checks.append(self.check)
         return command

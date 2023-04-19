@@ -13,7 +13,7 @@ class Sync(Cog):
     @commands.command()
     async def sync(self, ctx: commands.Context) -> None:
         """Sync slash commands"""
-        
+
         if ctx.author.id != cfg.owner_id:
             await ctx.reply(
                 embed=discord.Embed(
