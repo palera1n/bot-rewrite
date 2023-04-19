@@ -38,7 +38,7 @@ class TagModal(discord.ui.Modal):
                 )
             )
 
-    async def on_submit(self, interaction: discord.Interaction):
+    async def on_submit(self, interaction: discord.Interaction) -> None:
         if interaction.user != self.author:
             return
 
@@ -91,7 +91,7 @@ class TagModal(discord.ui.Modal):
         except BaseException:
             pass
 
-    async def send_error(self, interaction: discord.Interaction, error: str):
+    async def send_error(self, interaction: discord.Interaction, error: str) -> None:
         embed = discord.Embed(
             title="An error occurred",
             description=error,
