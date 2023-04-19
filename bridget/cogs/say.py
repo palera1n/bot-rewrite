@@ -8,9 +8,11 @@ from utils.enums import PermissionLevel
 
 
 class Say(Cog):
+
     @PermissionLevel.MOD
     @app_commands.command()
-    async def say(self, ctx: discord.Interaction, message: str, channel: Optional[discord.TextChannel]) -> None:
+    async def say(self, ctx: discord.Interaction, message: str,
+                  channel: Optional[discord.TextChannel]) -> None:
         """Make the bot say something
 
         :param message: Message to send

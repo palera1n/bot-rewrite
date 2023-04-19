@@ -32,8 +32,9 @@ def get_user(id: int) -> User:
 
 
 def leaderboard() -> list:
-    return User.objects[0:130].only('_id', 'xp').order_by(
-        '-xp', '-_id').select_related()
+    return User.objects[0:130].only('_id',
+                                    'xp').order_by('-xp',
+                                                   '-_id').select_related()
 
 
 def leaderboard_rank(xp):
@@ -230,11 +231,11 @@ def fetch_cases_by_mod(_id):
         return ''.join(e for e in string if e.isalnum() or e == " ").strip()
 
     case_reasons = [
-        get_case_reason(
-            case.reason) for case in final_cases if get_case_reason(
-            case.reason) != "temporary mute expired"]
-    values["counts"] = sorted(
-        Counter(case_reasons).items(), key=lambda item: item[1])
+        get_case_reason(case.reason) for case in final_cases
+        if get_case_reason(case.reason) != "temporary mute expired"
+    ]
+    values["counts"] = sorted(Counter(case_reasons).items(),
+                              key=lambda item: item[1])
     values["counts"].reverse()
     return values
 
@@ -253,8 +254,8 @@ def fetch_cases_by_keyword(keyword):
                 final_cases.append(case)
 
     case_mods = [case.mod_tag for case in final_cases]
-    values["counts"] = sorted(
-        Counter(case_mods).items(), key=lambda item: item[1])
+    values["counts"] = sorted(Counter(case_mods).items(),
+                              key=lambda item: item[1])
     values["counts"].reverse()
     return values
 

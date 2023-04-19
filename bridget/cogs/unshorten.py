@@ -9,6 +9,7 @@ from utils import Cog, reply_success
 
 
 class Unshorten(Cog):
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot:
@@ -21,5 +22,9 @@ class Unshorten(Cog):
             for link in re.findall(regex, message.content):
                 await message.add_reaction(emoji)
                 async with session.head(link, allow_redirects=True) as res:
-                    await reply_success(message, description=f"Hey, here's where this short link actually goes to!\n{res.url}")
+                    await reply_success(
+                        message,
+                        description=
+                        f"Hey, here's where this short link actually goes to!\n{res.url}"
+                    )
                     await message.remove_reaction(emoji, self.bot.user)

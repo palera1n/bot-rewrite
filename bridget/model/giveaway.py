@@ -8,12 +8,9 @@ class Giveaway(mongoengine.Document):
     channel = mongoengine.IntField()
     name = mongoengine.StringField()
     entries = mongoengine.ListField(mongoengine.IntField(), default=[])
-    previous_winners = mongoengine.ListField(
-        mongoengine.IntField(), default=[])
+    previous_winners = mongoengine.ListField(mongoengine.IntField(),
+                                             default=[])
     sponsor = mongoengine.IntField()
     winners = mongoengine.IntField()
 
-    meta = {
-        'db_alias': 'default',
-        'collection': 'giveaways'
-    }
+    meta = {'db_alias': 'default', 'collection': 'giveaways'}

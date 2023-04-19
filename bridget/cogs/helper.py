@@ -11,6 +11,7 @@ from utils.enums import PermissionLevel
 
 
 class Helper(Cog):
+
     @app_commands.command()
     async def solved(self, ctx: discord.Interaction):
         """Close a support thread, usable by OP and Helpers
@@ -20,7 +21,8 @@ class Helper(Cog):
         """
 
         # error if channel is not a support thread
-        if ctx.channel.type != ChannelType.public_thread or ctx.channel.type != ChannelType.forum or ctx.channel.parent_id != guild_service.get_guild().channel_support:
+        if ctx.channel.type != ChannelType.public_thread or ctx.channel.type != ChannelType.forum or ctx.channel.parent_id != guild_service.get_guild(
+        ).channel_support:
             await send_error(ctx, "You can't mark this channel as solved")
             return
 
@@ -36,11 +38,19 @@ class Helper(Cog):
             await ctx.channel.remove_user(member)
 
         # lock and archive thread
-        await ctx.channel.edit(archived=True, locked=True, reason=f"Thread marked as solved by {str(ctx.user)}")
+        await ctx.channel.edit(
+            archived=True,
+            locked=True,
+            reason=f"Thread marked as solved by {str(ctx.user)}")
 
     @PermissionLevel.HELPER
     @app_commands.command()
-    async def postembed(self, ctx: discord.Interaction, title: str, channel: discord.TextChannel = None, image: discord.Attachment = None, color: str = None):
+    async def postembed(self,
+                        ctx: discord.Interaction,
+                        title: str,
+                        channel: discord.TextChannel = None,
+                        image: discord.Attachment = None,
+                        color: str = None):
         """Sends an embed
 
         Args:
@@ -62,12 +72,15 @@ class Helper(Cog):
         # check if the user has permission to send to that channel
         perms = channel.permissions_for(ctx.user)
         if not perms.send_messages:
-            await send_error(ctx, "You can't send messages in that channel!", delete_after=1)
+            await send_error(ctx,
+                             "You can't send messages in that channel!",
+                             delete_after=1)
             return
 
         # create the embed, add the image and color if specified
         embed = discord.Embed(title=title, timestamp=datetime.now())
-        embed.set_footer(text=f"Posted by {ctx.user.name}#{ctx.user.discriminator}")
+        embed.set_footer(
+            text=f"Posted by {ctx.user.name}#{ctx.user.discriminator}")
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:
@@ -89,7 +102,12 @@ class Helper(Cog):
 
     @PermissionLevel.HELPER
     @app_commands.command()
-    async def poll(self, ctx: discord.Interaction, question: str, channel: discord.TextChannel = None, image: discord.Attachment = None, color: str = None):
+    async def poll(self,
+                   ctx: discord.Interaction,
+                   question: str,
+                   channel: discord.TextChannel = None,
+                   image: discord.Attachment = None,
+                   color: str = None):
         """Start a poll
 
         Args:
@@ -111,13 +129,15 @@ class Helper(Cog):
         # check if the user has permission to send to that channel
         perms = channel.permissions_for(ctx.user)
         if not perms.send_messages:
-            await send_error(ctx, "You can't send messages in that channel!", delete_after=1)
+            await send_error(ctx,
+                             "You can't send messages in that channel!",
+                             delete_after=1)
             return
 
         # create the embed, add the image and color if specified
-        embed = discord.Embed(
-            description=question, color=random.randint(
-                0, 16777215), timestamp=datetime.now())
+        embed = discord.Embed(description=question,
+                              color=random.randint(0, 16777215),
+                              timestamp=datetime.now())
         embed.set_footer(
             text=f"Poll started by {ctx.user.name}#{ctx.user.discriminator}")
         if image is not None:

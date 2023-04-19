@@ -49,14 +49,13 @@ async def setup():
     guild.save()
     print("DONE")
 
+
 if __name__ == "__main__":
     if os.environ.get("DB_CONNECTION_STRING") is None:
-        mongoengine.register_connection(
-            host=os.environ.get("DB_HOST"),
-            port=int(
-                os.environ.get("DB_PORT")),
-            alias="default",
-            name="bridget")
+        mongoengine.register_connection(host=os.environ.get("DB_HOST"),
+                                        port=int(os.environ.get("DB_PORT")),
+                                        alias="default",
+                                        name="bridget")
     else:
         mongoengine.register_connection(
             host=os.environ.get("DB_CONNECTION_STRING"),
