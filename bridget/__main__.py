@@ -11,6 +11,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from os import getenv
+logging.basicConfig(level=logging.DEBUG)
+print("Connecting!")
+logging.log(logging.DEBUG, "Connecting!")
 mongoengine.connect(
     'bridget',
     host=getenv("DB_HOST"),

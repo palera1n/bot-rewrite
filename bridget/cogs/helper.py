@@ -19,7 +19,7 @@ class Helper(Cog):
         """
 
         # error if channel is not a support thread
-        if ctx.channel.type != ChannelType.public_thread or ctx.channel.parent_id != guild_service.get_guild().channel_support:
+        if ctx.channel.type != ChannelType.public_thread or ctx.channel.type != ChannelType.forum or ctx.channel.parent_id != guild_service.get_guild().channel_support:
             await send_error(ctx, "You can't mark this channel as solved")
             return
 
@@ -35,7 +35,7 @@ class Helper(Cog):
             await ctx.channel.remove_user(member)
 
         # lock and archive thread
-        await ctx.channel.edit(archived=True, locked=True, reason="Thread marked as solved by ")
+        await ctx.channel.edit(archived=True, locked=True, reason=f"Thread marked as solved by {str(ctx.user)}")
 
     @PermissionLevel.HELPER
     @app_commands.command()

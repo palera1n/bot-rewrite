@@ -16,6 +16,7 @@ from utils.modals import TagModal, EditTagModal
 from utils.services import guild_service
 from utils.autocomplete import tags_autocomplete
 from utils.transformers import ImageAttachment
+from io import BytesIO
 
 
 def format_tag_page(_, entries, current_page, all_pages):
