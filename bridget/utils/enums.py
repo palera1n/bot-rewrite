@@ -50,7 +50,7 @@ class PermissionLevel(IntEnum):
             if self == self.OWNER:
                 return other.id == cfg.owner_id
 
-            return getattr(guild_service.get_guild(), self) in list(map(lambda r: r.id, other.roles)) or self + 1 == other
+            return getattr(guild_service.get_guild(), str(self)) in list(map(lambda r: r.id, other.roles)) or self + 1 == other
 
         return self.value == other.value
 

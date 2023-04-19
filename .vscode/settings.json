@@ -1,8 +1,0 @@
-{
-    "python.linting.flake8Args": [
-        "--config=.flake8"
-    ],
-    "flake8.args": [
-        "--config=.flake8"
-    ]
-}
