@@ -47,7 +47,6 @@ class NativeActionsListeners(Cog):
             if audit_logs and audit_logs[0].target == after:
                 await channel.send(embed=await add_mute_case(after, audit_logs[0].user, "No reason." if audit_logs[0].reason is None else audit_logs[0].reason, guild_service.get_guild(), self.bot))
 
-
     @commands.Cog.listener()
     async def on_automod_action(self, ctx: discord.AutoModAction):
         await ctx.channel.send(f"{ctx.member.name} sent `{ctx.content}` and triggered automod!")

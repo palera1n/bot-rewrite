@@ -82,5 +82,5 @@ async def reply_success(message: discord.Message, description: str = "Done!", em
         )
 
 
-def format_number(number):
+def format_number(number: int) -> str:
     return f"{number:,}"
