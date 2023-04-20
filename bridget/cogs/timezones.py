@@ -24,7 +24,7 @@ class Timezones(Cog, commands.GroupCog, group_name="timezones"):
         for timezone in timezones:
             timezone_country[timezone] = countrycode
 
-    def country_code_to_emoji(self, country_code: str):
+    def country_code_to_emoji(self, country_code: str) -> str:
         try:
             return " " + flag.flag(country_code)
         except ValueError:

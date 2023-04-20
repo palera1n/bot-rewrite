@@ -2,8 +2,9 @@ import mongoengine
 import discord
 from discord.ext import commands
 import os
-from typing import Counter
+from typing import Any, Dict, Tuple, Counter
 from model import User, Case, Cases
+from model.user import User
 
 
 def get_user(id: int) -> User:
@@ -61,7 +62,7 @@ def inc_points(_id: int, points: int) -> None:
     User.objects(_id=_id).update_one(inc__warn_points=points)
 
 
-def inc_xp(id, xp):
+def inc_xp(id: int, xp) -> Tuple[int, int]:
     """Increments user xp.
     """
 
@@ -71,7 +72,7 @@ def inc_xp(id, xp):
     return (u.xp, u.level)
 
 
-def inc_level(id) -> None:
+def inc_level(id: int) -> None:
     """Increments user level.
     """
 
@@ -176,7 +177,7 @@ def retrieve_birthdays(date):
     return User.objects(birthday=date)
 
 
-def transfer_profile(oldmember, newmember):
+def transfer_profile(oldmember: int, newmember) -> Tuple[User, int]:
     u = get_user(oldmember)
     u._id = newmember
     u.save()
@@ -197,7 +198,7 @@ def transfer_profile(oldmember, newmember):
     return u, len(cases.cases)
 
 
-def fetch_raids():
+def fetch_raids() -> Dict[str, Any]:
     values = {}
     values["Join spam"] = Cases.objects(
         cases__reason__contains="Join spam detected").count()

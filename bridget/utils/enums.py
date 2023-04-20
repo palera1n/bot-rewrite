@@ -2,7 +2,7 @@ import discord
 
 from enum import IntEnum, unique
 from discord.automod import AutoModRule
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from .services import guild_service
 from .config import cfg
@@ -28,16 +28,16 @@ class PermissionLevel(IntEnum):
     OWNER = 7
 
     # Checks
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: int) -> bool:
         return self.value < other.value
 
-    def __le__(self, other) -> bool:
+    def __le__(self, other: int) -> bool:
         return self.value <= other.value
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: int) -> bool:
         return self.value > other.value
 
-    def __ge__(self, other) -> bool:
+    def __ge__(self, other: int) -> bool:
         return self.value >= other.value
 
     def __str__(self) -> str:
@@ -49,7 +49,7 @@ class PermissionLevel(IntEnum):
                 self.ADMIN: "role_administrator",
         }[self] 
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Union[int, discord.Member]) -> bool:
         if isinstance(other, discord.Member):
             if self == self.EVERYONE:
                 return True
@@ -59,7 +59,7 @@ class PermissionLevel(IntEnum):
                 return other.id == cfg.owner_id
 
             return getattr(guild_service.get_guild(), str(self)) in list(map(lambda r: r.id, other.roles)) or self + 1 == other
-
+        assert isinstance(other, self.__class__)
         return self.value == other.value
 
     def __add__(self, other) -> "PermissionLevel":
@@ -87,7 +87,7 @@ class FilterBypassLevel(IntEnum):
     MOD = 1
     RAID = 2
 
-    def __str__(self):
+    def __str__(self) -> str:
         return {
                 self.HELPER: "Helper and up",
                 self.MOD: "Moderator and up",

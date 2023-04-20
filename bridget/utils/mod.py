@@ -9,9 +9,12 @@ from datetime import timezone
 from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
+from discord.embeds import Embed
+from discord.interactions import Interaction
+from model.guild import Guild
 
 
-async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
+async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild: Guild, bot: discord.Client):
     case = Case(
         _id=db_guild.case_id,
         _type="UNBAN",
@@ -26,7 +29,7 @@ async def add_unban_case(target_member: discord.Member, mod: discord.Member, rea
     return create_public_log(db_guild, target_member, log)
 
 
-async def add_mute_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
+async def add_mute_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild: Guild, bot: discord.Client) -> Embed:
     now = datetime.now(tz=timezone.utc)
 
     
@@ -46,7 +49,7 @@ async def add_mute_case(target_member: discord.Member, mod: discord.Member, reas
     return create_public_log(db_guild, target_member, log)
 
 
-async def add_unmute_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
+async def add_unmute_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild: Guild, bot: discord.Client) -> Embed:
     case = Case(
         _id=db_guild.case_id,
         _type="UNMUTE",
@@ -61,7 +64,7 @@ async def add_unmute_case(target_member: discord.Member, mod: discord.Member, re
     return create_public_log(db_guild, target_member, log)
 
 
-async def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild, bot: discord.Client):
+async def add_kick_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild: Guild, bot: discord.Client) -> Embed:
     """Adds kick case to user
 
     Args:
@@ -90,7 +93,7 @@ async def add_kick_case(target_member: discord.Member, mod: discord.Member, reas
     return create_public_log(db_guild, target_member, log)
 
 
-async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, points, reason):
+async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, points: int, reason: str) -> None:
     db_guild = guild_service.get_guild()
 
     case = Case(
@@ -137,7 +140,7 @@ async def notify_user(target_member: discord.Member, text: str, log: discord.Emb
     return True
 
 
-async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, db_user, db_guild, cur_points: int, log) -> bool:
+async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, db_user, db_guild: Guild, cur_points: int, log) -> bool:
     """Notifies a specified user about a warn
 
     Args:
@@ -188,7 +191,7 @@ async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Memb
     return dmed
 
 
-async def response_log(ctx, log):
+async def response_log(ctx: Interaction, log) -> None:
     if isinstance(ctx, discord.Interaction):
         if ctx.response.is_done():
             res = await ctx.followup.send(embed=log)
@@ -203,7 +206,7 @@ async def response_log(ctx, log):
 def create_public_log(db_guild: Guild,
                       user: Union[discord.Member,
                                   discord.User],
-                      log: discord.Embed):
+                      log: discord.Embed) -> Embed:
     """Submits a public log
 
     Args:
@@ -220,7 +223,7 @@ def create_public_log(db_guild: Guild,
     return log
 
 
-async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed, dmed: bool = None):
+async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed, dmed: bool = None) -> None:
     """Submits a public log
 
     Args:
@@ -242,7 +245,7 @@ async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Uni
             await public_channel.send(embed=log)
 
 
-async def add_ban_case(target_member: discord.Member, mod: discord.Member, reason, db_guild: Guild, bot: discord.Client):
+async def add_ban_case(target_member: discord.Member, mod: discord.Member, reason, db_guild: Guild, bot: discord.Client) -> Embed:
     """_summary_
 
     Args:
@@ -272,14 +275,14 @@ async def add_ban_case(target_member: discord.Member, mod: discord.Member, reaso
     return create_public_log(db_guild, target_member, log)
 
 
-async def delay_delete(interaction: discord.Interaction):
+async def delay_delete(interaction: discord.Interaction) -> None:
     await asyncio.sleep(10)
     await interaction.delete_original_message()
 
 # TODO: Fix all of this
 
 
-def prepare_warn_log(mod, target_member, case):
+def prepare_warn_log(mod, target_member, case) -> Embed:
     """Prepares warn log
 
     Parameters
@@ -307,7 +310,7 @@ def prepare_warn_log(mod, target_member, case):
     return embed
 
 
-def prepare_liftwarn_log(mod, target_member, case):
+def prepare_liftwarn_log(mod, target_member, case) -> Embed:
     """Prepares liftwarn log
 
     Parameters
@@ -335,7 +338,7 @@ def prepare_liftwarn_log(mod, target_member, case):
     return embed
 
 
-def prepare_editreason_log(mod, target_member, case, old_reason):
+def prepare_editreason_log(mod, target_member, case, old_reason) -> Embed:
     """Prepares log for reason edits
 
     Parameters
@@ -365,7 +368,7 @@ def prepare_editreason_log(mod, target_member, case, old_reason):
     return embed
 
 
-def prepare_removepoints_log(mod, target_member, case):
+def prepare_removepoints_log(mod, target_member, case) -> Embed:
     """Prepares log for point removal
 
     Parameters
@@ -393,7 +396,7 @@ def prepare_removepoints_log(mod, target_member, case):
     return embed
 
 
-def prepare_ban_log(mod, target_member, case):
+def prepare_ban_log(mod, target_member, case) -> Embed:
     """Prepares ban log
 
     Parameters
@@ -420,7 +423,7 @@ def prepare_ban_log(mod, target_member, case):
     return embed
 
 
-def prepare_unban_log(mod, target_member, case):
+def prepare_unban_log(mod, target_member, case) -> Embed:
     """Prepares unban log
 
     Parameters
@@ -447,7 +450,7 @@ def prepare_unban_log(mod, target_member, case):
     return embed
 
 
-def prepare_kick_log(mod, target_member, case):
+def prepare_kick_log(mod, target_member, case) -> Embed:
     """Prepares kick log
 
     Parameters
@@ -474,7 +477,7 @@ def prepare_kick_log(mod, target_member, case):
     return embed
 
 
-def prepare_mute_log(mod, target_member, case):
+def prepare_mute_log(mod, target_member, case) -> Embed:
     """Prepares mute log
 
     Parameters
@@ -502,7 +505,7 @@ def prepare_mute_log(mod, target_member, case):
     return embed
 
 
-def prepare_unmute_log(mod, target_member, case):
+def prepare_unmute_log(mod, target_member, case) -> Embed:
     """Prepares unmute log
 
     Parameters

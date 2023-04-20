@@ -1,6 +1,4 @@
 {
   "site_package_search_strategy": "pep561",
-  "source_directories": [
-    "bridget"
-  ]
+  "taint_models_path": "/workspaces/bot-rewrite/.venv/lib/pyre_check/taint"
 }

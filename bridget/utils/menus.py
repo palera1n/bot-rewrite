@@ -17,7 +17,7 @@ class Menu(ui.View):
                                           None],
                  whisper: bool,
                  show_skip_buttons: bool = True,
-                 start_page=1,
+                 start_page: int=1,
                  timeout_function=None) -> None:
         super().__init__(timeout=60)
 
@@ -134,5 +134,5 @@ class Menu(ui.View):
             self.current_page = len(self.pages)
             await self.refresh_response_message(interaction)
 
-    def on_interaction_check(self, interaction: discord.Interaction):
+    def on_interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user == self.ctx.author

@@ -1,8 +1,10 @@
 from model import Guild, Tag, FilterWord, Giveaway
 import os
+from typing import Optional
 
-guild_id = os.getenv("GUILD_ID")
+guild_id: Optional[str] = os.getenv("GUILD_ID")
 
+assert guild_id != None
 
 def get_guild() -> Guild:
     """Returns the state of the main guild from the database.
@@ -84,7 +86,7 @@ def all_rero_mappings():
     return current
 
 
-def add_rero_mapping(mapping):
+def add_rero_mapping(mapping) -> None:
     g = get_guild()
     current = g.reaction_role_mapping
     the_key = list(mapping.keys())[0]
@@ -93,7 +95,7 @@ def add_rero_mapping(mapping):
     g.save()
 
 
-def append_rero_mapping(message_id, mapping):
+def append_rero_mapping(message_id, mapping) -> None:
     g = get_guild()
     current = g.reaction_role_mapping
     current[str(message_id)] = current[str(message_id)] | mapping
@@ -109,7 +111,7 @@ def get_rero_mapping(id):
         return None
 
 
-def delete_rero_mapping(id):
+def delete_rero_mapping(id) -> None:
     g = get_guild()
     if str(id) in g.reaction_role_mapping.keys():
         g.reaction_role_mapping.pop(str(id))
@@ -176,7 +178,7 @@ def add_raid_phrase(phrase: str) -> bool:
     return True
 
 
-def remove_raid_phrase(phrase: str):
+def remove_raid_phrase(phrase: str) -> None:
     Guild.objects(_id=guild_id).update_one(
         pull__raid_phrases__word=FilterWord(word=phrase).word)
 
@@ -208,7 +210,7 @@ def update_filtered_word(word: FilterWord):
         set__filter_words__S=word)
 
 
-def add_whitelisted_guild(id: int):
+def add_whitelisted_guild(id: int) -> bool:
     g = Guild.objects(_id=guild_id)
     g2 = g.first()
     if id not in g2.filter_excluded_guilds:
@@ -217,7 +219,7 @@ def add_whitelisted_guild(id: int):
     return False
 
 
-def remove_whitelisted_guild(id: int):
+def remove_whitelisted_guild(id: int) -> bool:
     g = Guild.objects(_id=guild_id)
     g2 = g.first()
     if id in g2.filter_excluded_guilds:
@@ -226,7 +228,7 @@ def remove_whitelisted_guild(id: int):
     return False
 
 
-def add_ignored_channel(id: int):
+def add_ignored_channel(id: int) -> bool:
     g = Guild.objects(_id=guild_id)
     g2 = g.first()
     if id not in g2.filter_excluded_channels:
@@ -235,7 +237,7 @@ def add_ignored_channel(id: int):
     return False
 
 
-def remove_ignored_channel(id: int):
+def remove_ignored_channel(id: int) -> bool:
     g = Guild.objects(_id=guild_id)
     g2 = g.first()
     if id in g2.filter_excluded_channels:
@@ -244,7 +246,7 @@ def remove_ignored_channel(id: int):
     return False
 
 
-def add_ignored_channel_logging(id: int):
+def add_ignored_channel_logging(id: int) -> bool:
     g = Guild.objects(_id=guild_id)
     g2 = g.first()
     if id not in g2.logging_excluded_channels:
@@ -253,7 +255,7 @@ def add_ignored_channel_logging(id: int):
     return False
 
 
-def remove_ignored_channel_logging(id: int):
+def remove_ignored_channel_logging(id: int) -> bool:
     g = Guild.objects(_id=guild_id)
     g2 = g.first()
     if id in g2.logging_excluded_channels:
@@ -266,15 +268,15 @@ def get_locked_channels():
     return get_guild().locked_channels
 
 
-def add_locked_channels(channel):
+def add_locked_channels(channel) -> None:
     Guild.objects(_id=guild_id).update_one(push__locked_channels=channel)
 
 
-def remove_locked_channels(channel):
+def remove_locked_channels(channel) -> None:
     Guild.objects(_id=guild_id).update_one(pull__locked_channels=channel)
 
 
-def set_nsa_mapping(channel_id, webhooks):
+def set_nsa_mapping(channel_id, webhooks) -> None:
     guild = Guild.objects(_id=guild_id).first()
     guild.nsa_mapping[str(channel_id)] = webhooks
     guild.save()

@@ -135,7 +135,7 @@ class EditTagModal(discord.ui.Modal):
                     default=self.tag.button_links[i][1] if len(
                         self.tag.button_links) > i else None))
 
-    async def on_submit(self, interaction: discord.Interaction):
+    async def on_submit(self, interaction: discord.Interaction) -> None:
         if interaction.user != self.author:
             return
 
@@ -184,7 +184,7 @@ class EditTagModal(discord.ui.Modal):
         except BaseException:
             pass
 
-    async def send_error(self, interaction: discord.Interaction, error: str):
+    async def send_error(self, interaction: discord.Interaction, error: str) -> None:
         embed = discord.Embed(
             title="An error occurred",
             description=error,
@@ -208,7 +208,7 @@ class PostEmbedModal(discord.ui.Modal):
             )
         )
 
-    async def on_submit(self, interaction: discord.Interaction):
+    async def on_submit(self, interaction: discord.Interaction) -> None:
         if interaction.user != self.author:
             return
 
@@ -225,7 +225,7 @@ class PostEmbedModal(discord.ui.Modal):
         except BaseException:
             pass
 
-    async def send_error(self, interaction: discord.Interaction, error: str):
+    async def send_error(self, interaction: discord.Interaction, error: str) -> None:
         embed = discord.Embed(
             title="An error occurred",
             description=error,
