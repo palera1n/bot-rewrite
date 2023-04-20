@@ -15,6 +15,10 @@ dependencies = [
     "APScheduler>=3.10.1",
     "emoji-country-flag>=1.3.2",
     "humanize>=4.6.0",
+    "mypy @ git+https://github.com/python/mypy",
+    "typeguard>=3.0.2",
+    "pyannotate>=1.2.0",
+    "retype>=22.8.0",
 ]
 requires-python = ">=3.10,<4.0"
 license = {text = "BSD-3-Clause"}
@@ -31,13 +35,15 @@ bot.env_file = ".env"
 setup.cmd = "python bridget/setup.py"
 setup.env_file = ".env"
 lint.cmd = "flake8 --config=.flake8"
+gentypes.cmd = "python -m mypy.stubs bridget"
+applytypes.cmd = "python -m retype -p out bridget -t bridget
 
 [tool.pyright]
 extraPaths = ["__pypackages__/3.11/lib/"]
 
 [tool.black]
 line-length = 120
-target-version = ['py38', 'py39']
+target-version = ['py310', 'py311']
 include = '\.pyi?$'
 exclude = '''
 /(

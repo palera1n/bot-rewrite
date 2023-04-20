@@ -1,9 +1,10 @@
 import mongoengine
 
 
+from _typeshed import Incomplete
 class FilterWord(mongoengine.EmbeddedDocument):
-    notify = mongoengine.BooleanField(required=True)
-    bypass = mongoengine.IntField(required=True)
-    word = mongoengine.StringField(required=True)
-    false_positive = mongoengine.BooleanField(default=False)
-    piracy = mongoengine.BooleanField(default=False)
+    notify: Incomplete = mongoengine.BooleanField(required=True)
+    bypass: Incomplete = mongoengine.IntField(required=True)
+    word: Incomplete = mongoengine.StringField(required=True)
+    false_positive: Incomplete = mongoengine.BooleanField(default=False)
+    piracy: Incomplete = mongoengine.BooleanField(default=False)

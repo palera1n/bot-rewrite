@@ -3,7 +3,8 @@ import os
 from model import Guild
 import utils.services.guild_service as GuildService
 
-def check_envvars():
+from _typeshed import Incomplete
+def check_envvars() -> None:
     if os.getenv("GUILD_ID") is None:
         raise AttributeError(
             "Database is not set up properly! The GUILD_ID environment variable is missing. Please recheck your variables.")
@@ -17,7 +18,7 @@ def check_envvars():
             "Database is not set up properly! The TOKEN environment variable is missing. Please recheck your variables.")
 
 
-def check_perm_roles():
+def check_perm_roles() -> None:
     the_guild: Guild = GuildService.get_guild()
 
     roles_to_check = [
@@ -36,4 +37,4 @@ def check_perm_roles():
                 f"Database is not set up properly! Role '{role}' is missing. Please run `pdm run setup`.")
 
 
-checks = [check_envvars, check_perm_roles]
+checks: Incomplete = [check_envvars, check_perm_roles]

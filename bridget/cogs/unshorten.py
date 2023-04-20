@@ -14,6 +14,11 @@ class Unshorten(Cog):
         if message.author.bot:
             return
 
+
+        # Return in DMs
+        if message.guild == None:
+            return
+
         emoji = get(message.guild.emojis, name="loading")
         regex = r"\b(?:https?:\/\/(?:t\.co|bit\.ly|goo\.gl|fb\.me|tinyurl\.com|j\.mp|is\.gd|v\.gd|git\.io)\/[\w-]+)\b"
 

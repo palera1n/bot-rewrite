@@ -4,8 +4,10 @@ import asyncio
 from discord.ext import commands
 
 
+from _typeshed import Incomplete
 class Cog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    bot: Incomplete
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
 
