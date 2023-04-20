@@ -2,7 +2,7 @@ import discord
 
 from enum import IntEnum, unique
 from discord.automod import AutoModRule
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from .services import guild_service
 from .config import cfg
@@ -28,19 +28,19 @@ class PermissionLevel(IntEnum):
     OWNER = 7
 
     # Checks
-    def __lt__(self, other):
+    def __lt__(self, other: int) -> bool:
         return self.value < other.value
 
-    def __le__(self, other):
+    def __le__(self, other: int) -> bool:
         return self.value <= other.value
 
-    def __gt__(self, other):
+    def __gt__(self, other: int) -> bool:
         return self.value > other.value
 
-    def __ge__(self, other):
+    def __ge__(self, other: int) -> bool:
         return self.value >= other.value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return {
                 self.MEMPLUS: "role_memberplus",
                 self.MEMPRO: "role_memberpro",
@@ -49,7 +49,7 @@ class PermissionLevel(IntEnum):
                 self.ADMIN: "role_administrator",
         }[self] 
 
-    def __eq__(self, other):
+    def __eq__(self, other: Union[int, discord.Member]) -> bool:
         if isinstance(other, discord.Member):
             if self == self.EVERYONE:
                 return True
@@ -59,23 +59,23 @@ class PermissionLevel(IntEnum):
                 return other.id == cfg.owner_id
 
             return getattr(guild_service.get_guild(), str(self)) in list(map(lambda r: r.id, other.roles)) or self + 1 == other
-
+        assert isinstance(other, self.__class__)
         return self.value == other.value
 
-    def __add__(self, other):
+    def __add__(self, other) -> "PermissionLevel":
         return self.__class__(self.value + other)
 
-    def check(self, ctx: discord.Interaction):
+    def check(self, ctx: discord.Interaction) -> bool:
         if not self == ctx.user:
             raise discord.app_commands.MissingPermissions(
                 "You don't have permission to use this command.")
         return True
 
-    def __call__(self, command: discord.app_commands.Command):
+    def __call__(self, command: discord.app_commands.Command) -> discord.app_commands.Command:
         command.checks.append(self.check)
         return command
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.value)
 
 
@@ -87,7 +87,8 @@ class FilterBypassLevel(IntEnum):
     MOD = 1
     RAID = 2
 
-    def __str__(self):
+
+    def __str__(self) -> str:
         return {
                 self.HELPER: "Helper and up",
                 self.MOD: "Moderator and up",

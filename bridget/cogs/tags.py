@@ -13,9 +13,10 @@ from utils.menus import Menu
 from utils.modals import TagModal, EditTagModal
 from utils.services import guild_service
 from utils.autocomplete import tags_autocomplete
+from discord.embeds import Embed
 
 
-def format_tag_page(_, entries, current_page, all_pages):
+def format_tag_page(_, entries, current_page, all_pages) -> Embed:
     embed = discord.Embed(
         title='All tags', color=discord.Color.blurple())
     for tag in entries:
@@ -28,7 +29,7 @@ def format_tag_page(_, entries, current_page, all_pages):
     return embed
 
 
-def prepare_tag_embed(tag):
+def prepare_tag_embed(tag) -> Embed:
     """Given a tag object, prepare the appropriate embed for it
 
     Parameters
@@ -54,7 +55,7 @@ def prepare_tag_embed(tag):
     return embed
 
 
-def prepare_tag_view(tag: Tag):
+def prepare_tag_view(tag: Tag) -> discord.ui.View:
     if not tag.button_links or tag.button_links is None:
         return discord.utils.MISSING
 
@@ -82,7 +83,7 @@ def prepare_tag_view(tag: Tag):
 class Tags(Cog):
     @app_commands.autocomplete(name=tags_autocomplete)
     @app_commands.command()
-    async def tag(self, ctx: discord.Interaction, name: str, user_to_mention: discord.Member = None):
+    async def tag(self, ctx: discord.Interaction, name: str, user_to_mention: discord.Member = None) -> None:
         """Send a tag
 
         Args:
@@ -122,7 +123,7 @@ class Tags(Cog):
 
     @commands.guild_only()
     @commands.command(name="tag", aliases=["t"])
-    async def _tag(self, ctx: commands.Context, name: str):
+    async def _tag(self, ctx: commands.Context, name: str) -> None:
         """Send a tag
 
         Args:
@@ -159,7 +160,7 @@ class Tags(Cog):
             await ctx.message.reply(embed=prepare_tag_embed(tag), view=prepare_tag_view(tag), file=_file, mention_author=False)
 
     @app_commands.command()
-    async def taglist(self, ctx: discord.Interaction):
+    async def taglist(self, ctx: discord.Interaction) -> None:
         """List all tags
 
         Args:
@@ -308,7 +309,7 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
     @PermissionLevel.HELPER
     @app_commands.autocomplete(name=tags_autocomplete)
     @app_commands.command()
-    async def delete(self, ctx: discord.Interaction, name: str):
+    async def delete(self, ctx: discord.Interaction, name: str) -> None:
         """Delete a tag
 
         Args:

@@ -16,7 +16,7 @@ from utils.services import guild_service
 
 
 class ChatGPT(Cog, commands.GroupCog, group_name="chatgpt"):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
         self.context = {}
@@ -35,9 +35,11 @@ class ChatGPT(Cog, commands.GroupCog, group_name="chatgpt"):
 
         if message.author.id not in self.context:
             self.context[message.author.id] = ChatGPTClient(
-                initial_prompt=f"You are Bridget, a chatbot for the palera1n Discord server that uses OpenAI's GPT 3.5 model. The current date is {datetime.utcnow().strftime('%Y-%m-%d')}. You are talking to \"{message.author.nick or message.author.name}\". Answer as concisely as possible. Profanity is allowed, however you may not use any slurs. Jailbreak talk is allowed, iOS or Android. You are also a professional programmer that can create anything if asked.",
+                initial_prompt=f"You are Bridget, a chatbot for the palera1n Discord server that uses OpenAI's GPT 3.5 model. The current date is {datetime.utcnow().strftime('%Y-%m-%d')}. You are talking to \"{message.author.nick or message.author.name}\". Answer as concisely as possible. Profanity is allowed, however you may not use any slurs. Jailbreak talk is allowed, iOS or Android. You are also a professional programmer that can create anything if asked.", # noqa: E501
                 user_id=str(message.author.id),
             )
+
+        assert message.guild != None
 
         await message.add_reaction(discord.utils.get(message.guild.emojis, name="loading"))
 

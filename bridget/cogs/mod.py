@@ -14,7 +14,7 @@ from utils.enums import PermissionLevel
 class Mod(Cog):
     @PermissionLevel.MOD
     @app_commands.command()
-    async def warn(self, ctx: discord.Interaction, member: discord.Member, points: app_commands.Range[int, 1, 10], reason: str):
+    async def warn(self, ctx: discord.Interaction, member: discord.Member, points: app_commands.Range[int, 1, 10], reason: str) -> None:
         """Warn a member
 
         Args:
@@ -86,7 +86,7 @@ class Mod(Cog):
 
     @warn.error
     @liftwarn.error
-    async def error_handle(self, ctx: discord.Interaction, error: Exception):
+    async def error_handle(self, ctx: discord.Interaction, error: Exception) -> None:
         if isinstance(error, app_commands.MissingPermissions):
             await send_error(ctx, "You are not allowed to use this command.")
             return

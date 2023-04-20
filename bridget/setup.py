@@ -5,7 +5,7 @@ import mongoengine
 from model.guild import Guild
 
 
-async def setup():
+async def setup() -> None:
     print("STARTING SETUP...")
     guild = Guild()
 

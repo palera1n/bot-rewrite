@@ -2,10 +2,12 @@ import discord
 import asyncio
 
 from discord.ext import commands
+from typing import Optional
 
-
+from _typeshed import Incomplete
 class Cog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    bot: Incomplete
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
 
@@ -48,7 +50,7 @@ async def send_error(ctx: discord.Interaction, description: str, embed: discord.
             await followup.delete()
 
 
-async def send_success(ctx: discord.Interaction, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None, ephemeral: bool = True) -> None:
+async def send_success(ctx: discord.Interaction, description: str = "Done!", embed: Optional[discord.Embed] = None, delete_after: Optional[int] = None, ephemeral: bool = True) -> None:
     if embed:
         await ctx.response.send_message(
             embed=embed,
@@ -66,7 +68,7 @@ async def send_success(ctx: discord.Interaction, description: str = "Done!", emb
         )
 
 
-async def reply_success(message: discord.Message, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None) -> None:
+async def reply_success(message: discord.Message, description: str = "Done!", embed: Optional[discord.Embed] = None, delete_after: Optional[int] = None) -> None:
     if embed:
         await message.reply(
             embed=embed,
@@ -82,5 +84,5 @@ async def reply_success(message: discord.Message, description: str = "Done!", em
         )
 
 
-def format_number(number):
+def format_number(number: int) -> str:
     return f"{number:,}"

@@ -12,6 +12,7 @@ from utils.services import guild_service, user_service
 from utils.config import cfg
 
 from PIL import Image
+from discord.ext.commands.errors import CommandNotFound
 
 
 class Logging(commands.Cog):
@@ -84,7 +85,7 @@ class Logging(commands.Cog):
         await channel.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction: discord.Reaction, member: discord.User):
+    async def on_reaction_add(self, reaction: discord.Reaction, member: discord.User) -> None:
         if reaction.message.guild is None:
             return
         if reaction.message.guild.id != cfg.guild_id:
@@ -284,7 +285,7 @@ class Logging(commands.Cog):
     #         return
 
     @commands.Cog.listener()
-    async def on_bulk_message_delete(self, messages: List[discord.Message]):
+    async def on_bulk_message_delete(self, messages: List[discord.Message]) -> None:
         """Log bulk message deletes. Messages are outputted to file and sent to #server-logs
         Parameters
         ----------
@@ -338,7 +339,7 @@ class Logging(commands.Cog):
         await channel.send(file=discord.File(output, 'message.txt'))
 
     @commands.Cog.listener()
-    async def on_member_ban(self, guild, user: Union[discord.User, discord.Member]):
+    async def on_member_ban(self, guild, user: Union[discord.User, discord.Member]) -> None:
         if not guild.id == cfg.guild_id:
             return
 
@@ -366,7 +367,7 @@ class Logging(commands.Cog):
         await channel.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_member_unban(self, guild, user: discord.User):
+    async def on_member_unban(self, guild, user: discord.User) -> None:
         if not guild.id == cfg.guild_id:
             return
 
@@ -391,7 +392,7 @@ class Logging(commands.Cog):
 
         await channel.send(embed=embed)
 
-    async def on_member_kick(self, action: discord.AuditLogEntry, channel: discord.TextChannel):
+    async def on_member_kick(self, action: discord.AuditLogEntry, channel: discord.TextChannel) -> None:
         embed = discord.Embed(title="Member Left")
         embed.color = discord.Color.purple()
         embed.add_field(
@@ -407,7 +408,7 @@ class Logging(commands.Cog):
         await channel.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_user_update(self, before: discord.User, after: discord.User):
+    async def on_user_update(self, before: discord.User, after: discord.User) -> None:
         if before.name == after.name and before.discriminator == after.discriminator:
             return
 
@@ -426,7 +427,7 @@ class Logging(commands.Cog):
         await channel.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_member_update(self, before: discord.Member, after: discord.Member):
+    async def on_member_update(self, before: discord.Member, after: discord.Member) -> None:
         if after.guild.id != cfg.guild_id:
             return
         if not before or not after:
@@ -450,7 +451,7 @@ class Logging(commands.Cog):
             await self.member_roles_update(member=after, roles=removed_roles, added=False)
             return
 
-    async def member_nick_update(self, before, after):
+    async def member_nick_update(self, before, after) -> None:
         embed = discord.Embed(title="Member Renamed")
         embed.color = discord.Color.orange()
         embed.set_thumbnail(url=after.display_avatar)
@@ -468,7 +469,7 @@ class Logging(commands.Cog):
         if private:
             await private.send(embed=embed)
 
-    async def member_roles_update(self, member, roles, added):
+    async def member_roles_update(self, member, roles, added) -> None:
         embed = discord.Embed()
         if added:
             embed.title = "Member Role Added"
@@ -497,7 +498,7 @@ class Logging(commands.Cog):
         if private:
             await private.send(embed=embed)
 
-    async def member_timeout_update(self, before: discord.Member, after: discord.Member):
+    async def member_timeout_update(self, before: discord.Member, after: discord.Member) -> None:
         embed = discord.Embed()
         if before.timed_out_until is not None and after.timed_out_until is None:
             embed.title = "Member Timeout Removed"
@@ -521,7 +522,7 @@ class Logging(commands.Cog):
             await private.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_interaction(self, interaction: discord.Interaction):
+    async def on_interaction(self, interaction: discord.Interaction) -> None:
         if interaction.guild is None or interaction.guild.id != cfg.guild_id:
             return
         if interaction.type != discord.InteractionType.application_command:
@@ -567,7 +568,7 @@ class Logging(commands.Cog):
             await private.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState) -> None:
         if member.guild.id != cfg.guild_id:
             return
 
@@ -611,6 +612,6 @@ class Logging(commands.Cog):
             await private.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx, error: CommandNotFound) -> None:
         if isinstance(error, commands.CommandNotFound):
             return
