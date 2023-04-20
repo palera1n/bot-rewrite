@@ -1,10 +1,12 @@
 import discord
+from discord.enums import AutoModRuleActionType
 
-from discord.ext import commands, tasks
-from os import getenv
+from discord.ext import commands
+from datetime import datetime
 
 from utils import Cog
-from utils.mod import add_kick_case, add_mute_case, add_ban_case, add_unban_case, add_unmute_case
+from utils.enums import rule_has_timeout
+from utils.mod import add_kick_case, add_mute_case, add_ban_case, add_unban_case
 from utils.services import guild_service
 
 
@@ -50,4 +52,25 @@ class NativeActionsListeners(Cog):
 
     @commands.Cog.listener()
     async def on_automod_action(self, ctx: discord.AutoModAction):
-        await ctx.channel.send(f"{ctx.member.name} sent `{ctx.content}` and triggered automod!")
+        print(ctx)
+        rule = await ctx.fetch_rule()
+        member = ctx.guild.get_member(ctx.user_id)
+        if guild_service.get_guild().role_helper not in rule.exempt_role_ids and ctx.action.type == AutoModRuleActionType.send_alert_message:
+            embed = discord.Embed(title="Filter word detected")
+            embed.color = discord.Color.red()
+            embed.set_thumbnail(url=member.display_avatar)
+            embed.add_field(
+                name="User", value=f'{member} ({member.mention})', inline=True)
+            embed.add_field(name="Message", value=ctx.content, inline=True)
+            embed.add_field(name="Filtered word", value=ctx.matched_content, inline=True)
+            embed.timestamp = datetime.now()
+            embed.set_footer(text=f"{member.name}#{member.discriminator}")
+            channel = ctx.guild.get_channel(guild_service.get_guild().channel_reports)
+            await channel.send(content=f"<@&{guild_service.get_guild().role_reportping}>",
+                embed=embed, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True)
+            )
+        elif ctx.action.type == AutoModRuleActionType.timeout:
+            # check role and ban for raid phrase
+            if guild_service.get_guild().role_memberplus not in [ x.id for x in member.roles ]:
+                await ctx.guild.get_member(ctx.user_id).ban(reason="Raid phrase detected")
+

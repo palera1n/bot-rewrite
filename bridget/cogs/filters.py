@@ -1,8 +1,7 @@
 import discord
 
-from discord import AutoModRule, app_commands
+from discord import app_commands
 from discord.ext import commands
-from typing import List, Optional
 
 from utils import Cog, send_error, send_success
 from utils.autocomplete import filter_bypass_autocomplete, filter_phrase_autocomplete, filter_regex_autocomplete, filter_whitelist_autocomplete
