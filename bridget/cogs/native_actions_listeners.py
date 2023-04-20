@@ -1,12 +1,13 @@
 import discord
-from discord.enums import AutoModRuleActionType
 
 from discord.ext import commands
 from datetime import datetime
+from discord.utils import format_dt
+from discord.enums import AutoModRuleActionType
 
 from utils import Cog
 from utils.mod import add_kick_case, add_mute_case, add_ban_case, add_unban_case
-from utils.services import guild_service
+from utils.services import guild_service, user_service
 
 
 class NativeActionsListeners(Cog):
@@ -49,20 +50,40 @@ class NativeActionsListeners(Cog):
                 await channel.send(embed=await add_mute_case(after, audit_logs[0].user, "No reason." if audit_logs[0].reason is None else audit_logs[0].reason, guild_service.get_guild(), self.bot))
 
     @commands.Cog.listener()
-    async def on_automod_action(self, ctx: discord.AutoModAction):
-        print(ctx)
+    async def on_automod_action(self, ctx: discord.AutoModAction) -> None:
         rule = await ctx.fetch_rule()
         member = ctx.guild.get_member(ctx.user_id)
+        # mod+ bypass filter detected
         if guild_service.get_guild().role_helper not in rule.exempt_role_ids and ctx.action.type == AutoModRuleActionType.send_alert_message:
+            # embed
             embed = discord.Embed(title="Filter word detected")
             embed.color = discord.Color.red()
             embed.set_thumbnail(url=member.display_avatar)
             embed.add_field(
-                name="User", value=f'{member} ({member.mention})', inline=True)
-            embed.add_field(name="Message", value=ctx.content, inline=True)
-            embed.add_field(name="Filtered word", value=ctx.matched_content, inline=True)
+                name="Member", value=f'{member} ({member.mention})', inline=True)
+            embed.add_field(
+                name="Channel", value=ctx.channel, inline=True)
+            embed.add_field(name="Message", value=ctx.content, inline=False)
+            embed.add_field(name="Filtered word", value=ctx.matched_content, inline=False)
             embed.timestamp = datetime.now()
             embed.set_footer(text=f"{member.name}#{member.discriminator}")
+            embed.add_field(
+                name="Join date",
+                value=f"{format_dt(member.joined_at, style='F')} ({format_dt(member.joined_at, style='R')})",
+                inline=True)
+            embed.add_field(
+                name="Created",
+                value=f"{format_dt(member.created_at, style='F')} ({format_dt(member.created_at, style='R')})",
+                inline=True)
+            embed.add_field(
+                name="Warn points",
+                value=user_service.get_user(ctx.user_id).warn_points,
+                inline=True)
+
+            # buttons
+            # TODO
+
+            # send embed and buttons
             channel = ctx.guild.get_channel(guild_service.get_guild().channel_reports)
             await channel.send(content=f"<@&{guild_service.get_guild().role_reportping}>",
                 embed=embed, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True)
