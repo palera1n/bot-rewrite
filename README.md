@@ -25,3 +25,7 @@ While in development stage, you do not need to do very extensive tests AND may d
 # Contributing
 
 Please follow [the contribution guidelines](https://github.com/palera1n/bot-rewrite/blob/main/CONTRIBUTING.md).
+
+# Vulnerabilities
+
+If you find a security vulnerability, please email `me@itsnebula.net`, and **sign your email** with [this key](https://static.itsnebula.net/gpgkey.asc) (`FB04F6C8EC56DA32F33008C53D1B28A5FACCB53B`).
