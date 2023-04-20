@@ -35,6 +35,32 @@ lint.cmd = "flake8 --config=.flake8"
 [tool.pyright]
 extraPaths = ["__pypackages__/3.11/lib/"]
 
+[tool.black]
+line-length = 120
+target-version = ['py38', 'py39']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+experimental-string-processing = true
+skip-string-normalization = true
+extra = """
+    # Add a blank line before a new definition
+    def: +2
+"""
+
+
+
 [build-system]
 requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
