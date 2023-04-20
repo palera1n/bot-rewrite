@@ -50,6 +50,15 @@ requires_python = ">=3.7"
 summary = "Classes Without Boilerplate"
 
 [[package]]
+name = "autotyping"
+version = "23.3.0"
+requires_python = ">=3.7"
+summary = "A tool for autoadding simple type annotations."
+dependencies = [
+    "libcst",
+]
+
+[[package]]
 name = "certifi"
 version = "2022.12.7"
 requires_python = ">=3.6"
@@ -479,7 +488,7 @@ dependencies = [
 [metadata]
 lock_version = "4.2"
 groups = ["default"]
-content_hash = "sha256:acf1237dc51de369d8c6f398de0462d1bc6e4b7c0b747eae798cf3a65e182b03"
+content_hash = "sha256:7817d48fe32dd1bc2e9d5fb1963746108b440417a1c4c34056401a3da5c92cb2"
 
 [metadata.files]
 "aiohttp 3.8.4" = [
@@ -586,6 +595,10 @@ content_hash = "sha256:acf1237dc51de369d8c6f398de0462d1bc6e4b7c0b747eae798cf3a65
 "attrs 23.1.0" = [
     {url = "https://files.pythonhosted.org/packages/97/90/81f95d5f705be17872843536b1868f351805acf6971251ff07c1b8334dbb/attrs-23.1.0.tar.gz", hash = "sha256:6279836d581513a26f1bf235f9acd333bc9115683f14f7e8fae46c98fc50e015"},
     {url = "https://files.pythonhosted.org/packages/f0/eb/fcb708c7bf5056045e9e98f62b93bd7467eb718b0202e7698eb11d66416c/attrs-23.1.0-py3-none-any.whl", hash = "sha256:1f28b4522cdc2fb4256ac1a020c78acf9cba2c6b461ccd2c126f3aa8e8335d04"},
+]
+"autotyping 23.3.0" = [
+    {url = "https://files.pythonhosted.org/packages/0b/4a/528474a7fd26d10133d89d4fa3533a258b332585be3010b6d99887206452/autotyping-23.3.0-py3-none-any.whl", hash = "sha256:cf05803574f4172ccea59aa43d405d8e0b05d33ccca1b587ea82f23706e7cae1"},
+    {url = "https://files.pythonhosted.org/packages/98/c5/f84d3f3797b8368ec7987a310bee4cf9363e5fcb1b19f48ac28d80494629/autotyping-23.3.0.tar.gz", hash = "sha256:9f45d8e32ef3f25091c64f13a31464576fc9fbf7ecb9ce2325166652a23abded"},
 ]
 "certifi 2022.12.7" = [
     {url = "https://files.pythonhosted.org/packages/37/f7/2b1b0ec44fdc30a3d31dfebe52226be9ddc40cd6c0f34ffc8923ba423b69/certifi-2022.12.7.tar.gz", hash = "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3"},

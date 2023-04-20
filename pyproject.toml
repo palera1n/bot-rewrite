@@ -20,6 +20,7 @@ dependencies = [
     "pyannotate>=1.2.0",
     "retype>=22.8.0",
     "pyre-check>=0.9.18",
+    "autotyping>=23.3.0",
 ]
 requires-python = ">=3.10,<4.0"
 license = {text = "BSD-3-Clause"}
