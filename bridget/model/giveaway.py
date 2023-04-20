@@ -4,15 +4,15 @@ import mongoengine
 from _typeshed import Incomplete
 class Giveaway(mongoengine.Document):
     _id = mongoengine.IntField(required=True)
-    is_ended: Incomplete = mongoengine.BooleanField(default=False)
-    end_time: Incomplete = mongoengine.DateTimeField()
-    channel: Incomplete = mongoengine.IntField()
-    name: Incomplete = mongoengine.StringField()
-    entries: Incomplete = mongoengine.ListField(mongoengine.IntField(), default=[])
-    previous_winners: Incomplete = mongoengine.ListField(
+    is_ended: mongoengine.BooleanField = mongoengine.BooleanField(default=False)
+    end_time: mongoengine.DateTimeField = mongoengine.DateTimeField()
+    channel: mongoengine.IntField = mongoengine.IntField()
+    name: mongoengine.StringField = mongoengine.StringField()
+    entries: mongoengine.ListField = mongoengine.ListField(mongoengine.IntField(), default=[])
+    previous_winners: mongoengine.ListField = mongoengine.ListField(
         mongoengine.IntField(), default=[])
-    sponsor: Incomplete = mongoengine.IntField()
-    winners: Incomplete = mongoengine.IntField()
+    sponsor: mongoengine.IntField = mongoengine.IntField()
+    winners: mongoengine.IntField = mongoengine.IntField()
 
     meta: Incomplete = {
         'db_alias': 'default',
