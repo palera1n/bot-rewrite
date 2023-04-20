@@ -87,7 +87,6 @@ class FilterBypassLevel(IntEnum):
     MOD = 1
     RAID = 2
 
-
     def __str__(self) -> str:
         return {
                 self.HELPER: "Helper and up",
