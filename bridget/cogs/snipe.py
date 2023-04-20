@@ -9,8 +9,7 @@ from utils.enums import PermissionLevel
 
 
 class Snipe(Cog):
-    cached_messages: Dict[discord.Message]
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
 
         self.cached_messages: Dict[discord.Message] = {}

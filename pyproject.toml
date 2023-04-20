@@ -37,15 +37,13 @@ bot.env_file = ".env"
 setup.cmd = "python bridget/setup.py"
 setup.env_file = ".env"
 lint.cmd = "flake8 --config=.flake8"
-gentypes.cmd = "python -m mypy.stubs bridget"
-applytypes.cmd = "python -m retype -p out bridget -t bridget"
 
 [tool.pyright]
 extraPaths = ["__pypackages__/3.11/lib/"]
 
 [tool.black]
 line-length = 120
-target-version = ['py310', 'py311']
+target-version = ['py38', 'py39']
 include = '\.pyi?$'
 exclude = '''
 /(

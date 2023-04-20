@@ -142,7 +142,6 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
-out
 
 # Pyre type checker
 .pyre/
@@ -167,3 +166,5 @@ dbs
 *.swp
 .DS_Store
 .pdm.toml
+
+out
