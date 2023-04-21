@@ -9,7 +9,7 @@ from utils.enums import FilterBypassLevel, PermissionLevel
 
 
 class FiltersGroup(Cog, commands.GroupCog, group_name="filter"):
-    @PermissionLevel.HELPER
+    @PermissionLevel.MOD
     @app_commands.autocomplete(bypass=filter_bypass_autocomplete)
     @app_commands.command()
     async def add(self, ctx: discord.Interaction, bypass: int, phrase: str = None, regex: str = None, whitelist: str = None) -> None:
@@ -47,7 +47,7 @@ class FiltersGroup(Cog, commands.GroupCog, group_name="filter"):
         await rule.edit(trigger=trig, reason="Filtered word/regex/whitelist has been added")
         await send_success(ctx, "Filter has been edited.", delete_after=3)
 
-    @PermissionLevel.HELPER
+    @PermissionLevel.MOD
     @app_commands.command()
     async def list(self, ctx: discord.Interaction) -> None:
         """List filtered words
@@ -62,16 +62,21 @@ class FiltersGroup(Cog, commands.GroupCog, group_name="filter"):
 
         for rule in rules:
             # add the filtered words, regexs and whitelists to the embed
+            words = ""
             ruledict = rule.to_dict()
-            words = '\n'.join(ruledict['trigger_metadata']['keyword_filter']) + '\n'
-            words += '\n'.join(f'`/{x}/`' for x in ruledict['trigger_metadata']['regex_patterns']) + '\n'
-            words += '\n'.join(f'**{x}** (whitelisted)' for x in ruledict['trigger_metadata']['allow_list'])
+            for word in ruledict['trigger_metadata']['keyword_filter']:
+                words += discord.utils.escape_markdown(word) + '\n'
+            for x in ruledict['trigger_metadata']['regex_patterns']:
+                xr = x.replace("`", "\\`")
+                words += f'`/{xr}/`\n'
+            for x in ruledict['trigger_metadata']['allow_list']:
+                words += f'**{discord.utils.escape_markdown(x)}** (whitelisted)\n'
             embed.add_field(name=rule.name, value=words)
 
         # send the embed
         await send_success(ctx, embed=embed)
 
-    @PermissionLevel.HELPER
+    @PermissionLevel.MOD
     @app_commands.autocomplete(bypass=filter_bypass_autocomplete, phrase=filter_phrase_autocomplete, regex=filter_regex_autocomplete, whitelist=filter_whitelist_autocomplete)
     @app_commands.command()
     async def remove(self, ctx: discord.Interaction, bypass: int, phrase: str = None, regex: str = None, whitelist: str = None) -> None:

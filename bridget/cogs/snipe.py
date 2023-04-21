@@ -30,9 +30,9 @@ class Snipe(Cog):
 
     @commands.Cog.listener()
     async def on_automod_action(self, execution: discord.AutoModAction) -> None:
-        if isinstance(execution.action.type,
-                      discord.AutoModRuleActionType.block_message):
-            self.cached_messages[execution.channel_id] = execution.message
+        if execution.action.type == discord.AutoModRuleActionType.block_message:
+            msg = await execution.channel.fetch_message(execution.message_id)
+            self.cached_messages[execution.channel_id] = msg
 
     @PermissionLevel.MOD
     @app_commands.command()
