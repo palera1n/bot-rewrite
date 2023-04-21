@@ -3,57 +3,52 @@ from .filterword import FilterWord
 from .tag import Tag
 
 
-from .filterword import FilterWord as FilterWord
-from .tag import Tag as Tag
-from _typeshed import Incomplete
-from .filterword import FilterWord as FilterWord
-from .tag import Tag as Tag
 class Guild(mongoengine.Document):
     _id = mongoengine.IntField(required=True)
-    case_id: Incomplete = mongoengine.IntField(min_value=1, required=True)
-    reaction_role_mapping: Incomplete = mongoengine.DictField(default={})
+    case_id = mongoengine.IntField(min_value=1, required=True)
+    reaction_role_mapping = mongoengine.DictField(default={})
 
-    role_administrator: Incomplete = mongoengine.IntField()
-    role_birthday: Incomplete = mongoengine.IntField()
-    role_dev: Incomplete = mongoengine.IntField()
-    role_helper: Incomplete = mongoengine.IntField()
-    role_memberone: Incomplete = mongoengine.IntField()
-    role_memberedition: Incomplete = mongoengine.IntField()
-    role_memberplus: Incomplete = mongoengine.IntField()
-    role_memberpro: Incomplete = mongoengine.IntField()
-    role_memberultra: Incomplete = mongoengine.IntField()
-    role_moderator: Incomplete = mongoengine.IntField()
+    role_administrator = mongoengine.IntField()
+    role_birthday = mongoengine.IntField()
+    role_dev = mongoengine.IntField()
+    role_helper = mongoengine.IntField()
+    role_memberone = mongoengine.IntField()
+    role_memberedition = mongoengine.IntField()
+    role_memberplus = mongoengine.IntField()
+    role_memberpro = mongoengine.IntField()
+    role_memberultra = mongoengine.IntField()
+    role_moderator = mongoengine.IntField()
     role_reportping: Incomplete = mongoengine.IntField()
 
-    channel_botspam: Incomplete = mongoengine.IntField()
-    channel_common_issues: Incomplete = mongoengine.IntField()
-    channel_development: Incomplete = mongoengine.IntField()
-    channel_emoji_log: Incomplete = mongoengine.IntField()
-    channel_general: Incomplete = mongoengine.IntField()
-    channel_support: Incomplete = mongoengine.IntField()
-    channel_private: Incomplete = mongoengine.IntField()
-    channel_msg_logs: Incomplete = mongoengine.IntField(default=0)
-    channel_public: Incomplete = mongoengine.IntField()
-    channel_rules: Incomplete = mongoengine.IntField()
-    channel_reaction_roles: Incomplete = mongoengine.IntField()
-    channel_reports: Incomplete = mongoengine.IntField()
-    channel_chatgpt: Incomplete = mongoengine.IntField()
-    channel_mempro_reports: Incomplete = mongoengine.IntField()
+    channel_botspam = mongoengine.IntField()
+    channel_common_issues = mongoengine.IntField()
+    channel_development = mongoengine.IntField()
+    channel_emoji_log = mongoengine.IntField()
+    channel_general = mongoengine.IntField()
+    channel_support = mongoengine.IntField()
+    channel_private = mongoengine.IntField()
+    channel_msg_logs = mongoengine.IntField(default=0)
+    channel_public = mongoengine.IntField()
+    channel_rules = mongoengine.IntField()
+    channel_reaction_roles = mongoengine.IntField()
+    channel_reports = mongoengine.IntField()
+    channel_chatgpt = mongoengine.IntField()
+    channel_mempro_reports = mongoengine.IntField()
 
-    emoji_logging_webhook: Incomplete = mongoengine.StringField()
-    locked_channels: Incomplete = mongoengine.ListField(default=[])
-    filter_excluded_channels: Incomplete = mongoengine.ListField(default=[])
-    filter_excluded_guilds: Incomplete = mongoengine.ListField(default=[])
-    filter_words: Incomplete = mongoengine.EmbeddedDocumentListField(
+    emoji_logging_webhook = mongoengine.StringField()
+    locked_channels = mongoengine.ListField(default=[])
+    filter_excluded_channels = mongoengine.ListField(default=[])
+    filter_excluded_guilds = mongoengine.ListField(default=[])
+    filter_words = mongoengine.EmbeddedDocumentListField(
         FilterWord, default=[])
-    raid_phrases: Incomplete = mongoengine.EmbeddedDocumentListField(
+    raid_phrases = mongoengine.EmbeddedDocumentListField(
         FilterWord, default=[])
-    logging_excluded_channels: Incomplete = mongoengine.ListField(default=[])
-    tags: Incomplete = mongoengine.EmbeddedDocumentListField(Tag, default=[])
-    memes: Incomplete = mongoengine.EmbeddedDocumentListField(Tag, default=[])
-    ban_today_spam_accounts: Incomplete = mongoengine.BooleanField(default=False)
+    logging_excluded_channels = mongoengine.ListField(default=[])
+    tags = mongoengine.EmbeddedDocumentListField(Tag, default=[])
+    memes = mongoengine.EmbeddedDocumentListField(Tag, default=[])
+    ban_today_spam_accounts = mongoengine.BooleanField(default=False)
 
-    meta: Incomplete = {
+    meta = {
         'db_alias': 'default',
         'collection': 'guilds'
     }

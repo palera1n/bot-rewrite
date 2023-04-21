@@ -8,10 +8,8 @@ from utils import Cog
 from utils.enums import PermissionLevel
 
 
-from _typeshed import Incomplete
 class Snipe(Cog):
-    cached_messages: Incomplete
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
 
         self.cached_messages: Dict[discord.Message] = {}
