@@ -87,4 +87,3 @@ class PGPKeys(Cog, commands.GroupCog, group_name="pgpkeys"):
         embed.add_field(name=key.key_signature, value=f"Full name: {key.full_name}\nEmail: {key.email}\nFingerprint: {key.key_signature}", inline=False)
         await ctx.response.send_message(embed=embed, ephemeral=True, file=discord.File(io.BytesIO(bytes(str(pgpy.PGPKey.from_blob(key.key)[0].pubkey), encoding="UTF-8")), filename=f"{key.key_signature}.asc"))
 
-
