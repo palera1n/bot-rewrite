@@ -516,6 +516,14 @@ class Logging(commands.Cog):
             name="Member", value=f'{member} ({member.mention})', inline=True)
         embed.timestamp = datetime.now()
         embed.set_footer(text=member.id)
+
+        async for action in member.guild.audit_logs(limit=1, action=discord.AuditLogAction.member_role_update):
+            if action.target.id == member.id:
+                embed.add_field(
+                    name="Updated by",
+                    value=f'{action.user} ({action.user.mention})',
+                    inline=False)
+
         db_guild = guild_service.get_guild()
         private = member.guild.get_channel(db_guild.channel_private)
         if private:
