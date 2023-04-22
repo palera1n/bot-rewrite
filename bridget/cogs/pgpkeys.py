@@ -64,6 +64,9 @@ class PGPKeys(Cog, commands.GroupCog, group_name="pgpkeys"):
             user: discord.User = ctx.user
         db_user = user_service.get_user(user.id)
         embed = discord.Embed(title="PGP keys")
+        if db_user.pgpkeys == []:
+            await send_error(ctx, f"{user.display_name} doesn't have any keys added")
+            return
         embed.description = f"Here are all the PGP keys {user.display_name} has added to {user.display_name}'s account."
         for key in db_user.pgpkeys:
             try:
