@@ -1,12 +1,23 @@
 import discord
 import discord.ui as ui
 
+from datetime import datetime
+
 from utils.mod import warn
 from utils.modals import AutoModWarnButtonModal, ReasonModal
+
 
 class AutoModReportView(ui.View):
     member: discord.Member
     bot: discord.BotIntegration
+
+    def __init__(self, member: discord.Member, bot: discord.BotIntegration) -> None:
+        super().__init__()
+        self.member = member
+        self.bot = bot
+
+        if not self.member.is_timed_out():
+            self.remove_item(self.unmute)
 
     @ui.button(label='Dismiss', style=discord.ButtonStyle.green)
     async def dismiss(self, ctx: discord.Interaction, button: ui.Button) -> None:
@@ -19,9 +30,10 @@ class AutoModReportView(ui.View):
         await ctx.response.send_modal(modal)
         await modal.wait()
 
+        self.warn.disabled = True
         await warn(ctx, target_member=self.member, mod=ctx.user, points=modal.points, reason=modal.reason, no_interaction=True)
         try:
-            await ctx.edit_original_response(view=None)
+            await ctx.edit_original_response(view=self)
         except:
             await ctx.message.delete()
 
@@ -31,8 +43,21 @@ class AutoModReportView(ui.View):
         await ctx.response.send_modal(modal)
         await modal.wait()
 
+        self.ban.disabled = True
         await self.member.ban(reason=modal.reason)
         try:
-            await ctx.edit_original_response(view=None)
+            await ctx.edit_original_response(view=self)
         except:
             await ctx.message.delete()
+
+    @ui.button(label="Unmute", style=discord.ButtonStyle.gray)
+    async def unmute(self, ctx: discord.Interaction, button: ui.Button) -> None:
+        await self.member.timeout(None, reason="Action reviewed by a moderator")
+
+        self.unmute.disabled = True
+        await ctx.response.defer()
+        try:
+            await ctx.edit_original_response(view=self)
+        except:
+            await ctx.message.delete()
+

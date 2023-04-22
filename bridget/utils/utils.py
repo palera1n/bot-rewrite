@@ -1,8 +1,9 @@
+from datetime import datetime
 import discord
 import asyncio
 
 from discord.ext import commands
-from typing import Optional
+from typing import List, Optional, Union
 
 class Cog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -84,3 +85,10 @@ async def reply_success(message: discord.Message, description: str = "Done!", em
 
 def format_number(number: int) -> str:
     return f"{number:,}"
+
+async def audit_logs_multi(guild: discord.Guild, actions: List[discord.AuditLogAction], limit: int, after: Union[discord.abc.Snowflake, datetime]) -> List[discord.AuditLogEntry]:
+    logs = []
+    for action in actions:
+        logs.extend([audit async for audit in guild.audit_logs(limit=limit, action=action, after=after)])
+    logs.sort(key=lambda x: x.created_at, reverse=True)
+    return logs

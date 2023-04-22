@@ -223,7 +223,7 @@ def create_public_log(db_guild: Guild,
 
     log.remove_author()
     log.set_thumbnail(url=user.display_avatar)
-    log.remove_field(1)
+    #log.remove_field(1)
     return log
 
 
@@ -474,7 +474,7 @@ def prepare_kick_log(mod, target_member, case) -> Embed:
         name="Member",
         value=f'{target_member} ({target_member.mention})',
         inline=True)
-    # embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
+    embed.add_field(name="Mod", value=f'{mod} ({mod.mention})', inline=True)
     embed.add_field(name="Reason", value=case.reason, inline=False)
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date

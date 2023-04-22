@@ -3,6 +3,7 @@ import discord
 from typing import Any, Dict
 from discord import app_commands
 from discord.ext import commands
+from datetime import datetime
 
 from utils import Cog
 from utils.enums import PermissionLevel
@@ -31,7 +32,23 @@ class Snipe(Cog):
     @commands.Cog.listener()
     async def on_automod_action(self, execution: discord.AutoModAction) -> None:
         if execution.action.type == discord.AutoModRuleActionType.block_message:
-            msg = await execution.channel.fetch_message(execution.message_id)
+            # we have to build a fake message because the real one was blocked
+            member = execution.guild.get_member(execution.user_id)
+            msg = discord.Message(state=None, channel=execution.channel, data={
+                'id': discord.utils.time_snowflake(datetime.now()),
+                'attachments': [],
+                'embeds': [],
+                'edited_timestamp': datetime.now().isoformat(),
+                'type': discord.MessageType.default,
+                'pinned': False,
+                'mention_everyone': False,
+                'mentions': [],
+                'mention_roles': [],
+                'mention_channels': [],
+                'tts': False,
+                'content': execution.content,
+            })
+            msg.author = member
             self.cached_messages[execution.channel_id] = msg
 
     @PermissionLevel.MOD
@@ -60,6 +77,10 @@ class Snipe(Cog):
             )
             return
 
+        avt_url = None
+        if self.cached_messages[ctx.channel_id].author.avatar is not None:
+            avt_url = self.cached_messages[ctx.channel_id].author.avatar.url
+
         embed = discord.Embed(
             color=discord.Color.green(),
             description=self.cached_messages[ctx.channel_id].content,
@@ -67,7 +88,7 @@ class Snipe(Cog):
         )
         embed.set_author(
             name=self.cached_messages[ctx.channel_id].author,
-            icon_url=self.cached_messages[ctx.channel_id].author.avatar.url)
+            icon_url=avt_url)
         embed.set_footer(text=f"Sent in #{self.cached_messages[ctx.channel_id].channel.name}")
         
         try:
@@ -76,6 +97,6 @@ class Snipe(Cog):
         except:
             pass
 
-        embed.set_thumbnail(url=self.cached_messages[ctx.channel_id].author.avatar.url)
+        embed.set_thumbnail(url=avt_url)
 
         await ctx.response.send_message(embed=embed)
