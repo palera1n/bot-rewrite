@@ -4,6 +4,8 @@ import mongoengine
 import traceback
 import base64
 import hashlib
+import pgpy
+import re
 
 from Crypto.Cipher import AES
 from discord import app_commands
@@ -20,6 +22,7 @@ from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync
 from utils.startup_checks import checks
 from utils.config import cfg
 from utils import send_error, send_success
+from model import PGPKey
 
 for check in checks:
     check()
@@ -61,6 +64,27 @@ async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.M
     )
     embed.set_author(name=message.author, icon_url=message.author.avatar.url)
     await send_success(interaction, embed=embed, ephemeral=True)
+
+@bot.tree.context_menu(name="Check PGP Signature")
+async def check_signature(ctx: discord.Interaction, message: discord.Message) -> None:
+    if "-----BEGIN PGP SIGNED MESSAGE-----" not in message.content and "-----BEGIN PGP SIGNATURE-----" not in message.content and "-----END PGP SIGNATURE-----" not in message.content:
+        await send_error(ctx, "This message is not signed!")
+        return
+    try:
+        keys = [pgpy.PGPKey.from_blob(bytes(x.key))[0] for x in PGPKey.objects(_id=ctx.user.id).all()]
+        message_PGP: str = str(re.search(r"-----BEGIN PGP SIGNED MESSAGE-----(.|\n)*-----BEGIN PGP SIGNATURE-----(.|\n)*-----END PGP SIGNATURE-----", message.content)[0])
+        pgpmessage = pgpy.PGPMessage.from_blob(message_PGP)
+        for key in keys:
+            if not key.verify(pgpmessage):
+                continue
+            await send_success(ctx, f"This signature is verified by key `{key.fingerprint}`!")
+            return
+        await send_error(ctx, "This message could not be verified!")
+        return
+    except pgpy.errors.PGPError as e:
+        await send_error(ctx, "This message is not signed!")
+        raise e
+#        return
 
 # Cogs
 asyncio.run(bot.add_cog(ChatGPT(bot)))
