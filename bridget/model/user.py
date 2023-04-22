@@ -20,6 +20,7 @@ class User(mongoengine.Document):
         default=False, required=True)
 
     timezone = mongoengine.StringField(default=None)
+    pgpkeys = mongoengine.ListField(default=[])
     birthday = mongoengine.ListField(default=[])
     sticky_roles = mongoengine.ListField(default=[])
     command_bans = mongoengine.DictField(default={})
