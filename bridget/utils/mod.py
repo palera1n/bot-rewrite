@@ -4,13 +4,13 @@ import humanize
 
 from typing import Optional, List, Union
 from discord.utils import escape_markdown
+from discord.embeds import Embed
+from discord.interactions import Interaction
 from datetime import timezone
 
 from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
-from discord.embeds import Embed
-from discord.interactions import Interaction
 from model.guild import Guild
 
 
@@ -93,7 +93,7 @@ async def add_kick_case(target_member: discord.Member, mod: discord.Member, reas
     return create_public_log(db_guild, target_member, log)
 
 
-async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, points: int, reason: str) -> None:
+async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, points: int, reason: str, no_interaction: bool = False) -> None:
     db_guild = guild_service.get_guild()
 
     case = Case(
@@ -116,7 +116,7 @@ async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: dis
     log.add_field(name="Current points", value=f"{cur_points}/10", inline=True)
 
     dmed = await notify_user_warn(ctx, target_member, mod, db_user, db_guild, cur_points, log)
-    await response_log(ctx, log)
+    await response_log(ctx, log, no_interaction=no_interaction)
     await submit_public_log(ctx, db_guild, target_member, log, dmed)
 
 
@@ -191,7 +191,11 @@ async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Memb
     return dmed
 
 
-async def response_log(ctx: Interaction, log) -> None:
+async def response_log(ctx: Interaction, log, no_interaction: bool = False) -> None:
+    if no_interaction:
+        await ctx.channel.send(embed=log, delete_after=10)
+        return
+
     if isinstance(ctx, discord.Interaction):
         if ctx.response.is_done():
             res = await ctx.followup.send(embed=log)
@@ -530,3 +534,4 @@ def prepare_unmute_log(mod, target_member, case) -> Embed:
     embed.set_footer(text=f"Case #{case._id} | {target_member.id}")
     embed.timestamp = case.date
     return embed
+

@@ -191,6 +191,7 @@ class EditTagModal(discord.ui.Modal):
             color=discord.Color.red())
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
+
 class PostEmbedModal(discord.ui.Modal):
     def __init__(self, bot, channel: discord.TextChannel, author: discord.Member) -> None:
         self.bot = bot
@@ -219,6 +220,114 @@ class PostEmbedModal(discord.ui.Modal):
             return
 
         self.description = description
+        self.stop()
+        try:
+            await interaction.response.send_message()
+        except BaseException:
+            pass
+
+    async def send_error(self, interaction: discord.Interaction, error: str) -> None:
+        embed = discord.Embed(
+            title="An error occurred",
+            description=error,
+            color=discord.Color.red())
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+class AutoModWarnButtonModal(discord.ui.Modal):
+    def __init__(self, bot, ctx: discord.Interaction, author: discord.User, user: discord.Member) -> None:
+        self.bot = bot
+        self.ctx = ctx
+        self.author = author
+        self.points = 0
+        self.reason = None
+
+        super().__init__(title=f"Warn {user}")
+
+        self.add_item(
+            discord.ui.TextInput(
+                label="Warn points",
+                placeholder="1-10",
+                style=discord.TextStyle.short,
+            )
+        )
+        self.add_item(
+            discord.ui.TextInput(
+                label="Reason",
+                placeholder="Enter the reason of the warn",
+                style=discord.TextStyle.short,
+            )
+        )
+
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        if interaction.user != self.author:
+            return
+
+
+        wp = self.children[0].value
+        if not wp:
+            await self.send_error(interaction, "Invalid warn points")
+            return
+        try:
+            wp = int(wp)
+            if wp < 1 or wp > 10:
+                await self.send_error(interaction, "Invalid warn points")
+                return
+        except:
+            await self.send_error(interaction, "Invalid warn points")
+            return
+
+        reason = self.children[1].value
+        if not reason:
+            await self.send_error(interaction, "Invalid reason")
+            return
+
+        self.points = wp
+        self.reason = reason
+        self.stop()
+        try:
+            await interaction.response.send_message()
+        except BaseException:
+            pass
+
+    async def send_error(self, interaction: discord.Interaction, error: str) -> None:
+        embed = discord.Embed(
+            title="An error occurred",
+            description=error,
+            color=discord.Color.red())
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+class ReasonModal(discord.ui.Modal):
+    def __init__(self, bot, ctx: discord.Interaction, author: discord.User, title="Reason") -> None:
+        self.bot = bot
+        self.ctx = ctx
+        self.author = author
+        self.reason = None
+
+        super().__init__(title=title)
+
+        self.add_item(
+            discord.ui.TextInput(
+                label="Reason",
+                placeholder="Enter the reason",
+                style=discord.TextStyle.long,
+            )
+        )
+
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        if interaction.user != self.author:
+            return
+
+
+        reason = self.children[0].value
+        if not reason:
+            await self.send_error(interaction, "Invalid reason")
+            return
+
+        self.reason = reason
         self.stop()
         try:
             await interaction.response.send_message()

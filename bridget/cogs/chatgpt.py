@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands
 from datetime import datetime
 from typing import Any
+from os import getenv
 
 from utils import Cog
 from utils.config import cfg
@@ -27,6 +28,9 @@ class ChatGPT(Cog, commands.GroupCog, group_name="chatgpt"):
             or message.author.bot
             or message.content.startswith(("--", "–", "—", "<@"))
         ):
+            return
+
+        if getenv('OPENAI_API_KEY') == '':
             return
 
         if message.author.id not in self.context:
