@@ -1,11 +1,12 @@
 import discord
 import pgpy
+import io
 
 from discord import app_commands
 from discord.ext import commands
 from typing import Optional
 
-from utils import Cog, send_error
+from utils import Cog, send_error, send_success
 from model import User, PGPKey
 from utils.modals import PGPKeyModal
 from utils.services import user_service
@@ -13,7 +14,6 @@ from utils.services import user_service
 class PGPKeys(Cog, commands.GroupCog, group_name="pgpkeys"):
     @app_commands.command()
     async def add(self, ctx: discord.Interaction, keyfile: discord.Attachment) -> None:
-        modal = PGPKeyModal(bot=self.bot, author=ctx.user)
         # await ctx.response.send_modal(modal)
         # await modal.wait()
         # if not modal.key:
@@ -33,13 +33,13 @@ class PGPKeys(Cog, commands.GroupCog, group_name="pgpkeys"):
             keyobject.key_signature = str(parsed_key.fingerprint)
             keyobject.full_name = str(parsed_key.userids[0].name)
             keyobject.email = str(parsed_key.userids[0].email)
-            keyobject.user = User.objects(_id=ctx.user.id).first()
+            keyobject.user = ctx.user.id
+            keyobject._id = ctx.user.id
         except pgpy.errors.PGPError:
             send_error(ctx, "Invalid PGP key!")
 
-        db_user.pgpkeys.append(keyobject)
-        
-        db_user.save()
+        keyobject.save()
+        pgpkeys = PGPKey.objects(_id=ctx.user.id).all()
         embed = discord.Embed(title="PGP key added")
         embed.description = f"Added PGP key with fingerprint `{keyobject.key_signature}` to your account."
         await ctx.response.send_message(embed=embed, ephemeral=True)
@@ -47,28 +47,27 @@ class PGPKeys(Cog, commands.GroupCog, group_name="pgpkeys"):
     @app_commands.command()
     async def remove(self, ctx: discord.Interaction, signature: str) -> None:
         db_user = user_service.get_user(ctx.user.id)
-        key = db_user.pgpkeys.filter(key_signature=signature).first()
+        key = PGPKey.objects(_id=ctx.user.id, key_signature=signature).first()
         if not key:
             await ctx.response.send_message("PGP key not found!", ephemeral=True)
             return
-        
-        db_user.pgpkeys.remove(key)
         db_user.save()
         embed = discord.Embed(title="PGP key removed")
         embed.description = f"Removed PGP key with fingerprint `{key.key_signature}` from your account."
+        key.delete()
         await ctx.response.send_message(embed=embed, ephemeral=True)
 
     @app_commands.command()
     async def list(self, ctx: discord.Interaction, user: Optional[discord.User]) -> None:
         if user == None:
             user: discord.User = ctx.user
-        db_user = user_service.get_user(user.id)
+        keys = PGPKey.objects(_id=ctx.user.id).all()
         embed = discord.Embed(title="PGP keys")
-        if db_user.pgpkeys == []:
+        if not keys:
             await send_error(ctx, f"{user.display_name} doesn't have any keys added")
             return
         embed.description = f"Here are all the PGP keys {user.display_name} has added to {user.display_name}'s account."
-        for key in db_user.pgpkeys:
+        for key in keys:
             try:
                 embed.add_field(name=key.key_signature, value=f"Full name: {key.full_name}\nEmail: {key.email}\nFingerprint: {key.key_signature}", inline=False)
             except:
@@ -78,13 +77,14 @@ class PGPKeys(Cog, commands.GroupCog, group_name="pgpkeys"):
 
     @app_commands.command()
     async def get(self, ctx: discord.Interaction, signature: str) -> None:
-        key = PGPKeys.objects(key_signature=signature).first()
+        key = PGPKey.objects(key_signature=signature).first()
         if not key:
             await ctx.response.send_message("PGP key not found!", ephemeral=True)
             return
         
         embed = discord.Embed(title="PGP key")
         embed.description = f"Here is the PGP key with fingerprint `{key.key_signature}`."
-        embed.add_field(name=key.key_signature, value=f"Full name: {key.full_name}\nEmail: {key.email}\nFingerprint: {key.signature}", inline=False)
-        await ctx.response.send_message(f"```{str(pgpy.PGPKey.from_blob(key.key)[0].pubkey)}```", embed=embed, ephemeral=True)
+        embed.add_field(name=key.key_signature, value=f"Full name: {key.full_name}\nEmail: {key.email}\nFingerprint: {key.key_signature}", inline=False)
+        await ctx.response.send_message(embed=embed, ephemeral=True, file=discord.File(io.BytesIO(bytes(str(pgpy.PGPKey.from_blob(key.key)[0].pubkey), encoding="UTF-8")), filename=f"{key.key_signature}.asc"))
+
 

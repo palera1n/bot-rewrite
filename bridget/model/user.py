@@ -1,5 +1,17 @@
 import mongoengine
 
+class PGPKey(mongoengine.Document):
+    _id = mongoengine.IntField(required=True)
+    key = mongoengine.BinaryField(default=None, required=True)
+    key_signature = mongoengine.StringField(default=None)
+    full_name = mongoengine.StringField(default=None)
+    email = mongoengine.StringField(default=None)
+    user = mongoengine.IntField(default=None)
+
+    meta = {
+        'db_alias': 'default',
+        'collection': 'pgpkeys'
+    }
 
 class User(mongoengine.Document):
     _id = mongoengine.IntField(required=True)
@@ -20,7 +32,6 @@ class User(mongoengine.Document):
         default=False, required=True)
 
     timezone = mongoengine.StringField(default=None)
-    pgpkeys = mongoengine.ListField(default=[])
     birthday = mongoengine.ListField(default=[])
     sticky_roles = mongoengine.ListField(default=[])
     command_bans = mongoengine.DictField(default={})
