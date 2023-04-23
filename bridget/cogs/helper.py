@@ -43,7 +43,7 @@ class Helper(Cog):
 
     @PermissionLevel.HELPER
     @app_commands.command()
-    async def postembed(self, ctx: discord.Interaction, title: str, channel: discord.TextChannel = None, image: discord.Attachment = None, color: str = None) -> None:
+    async def postembed(self, ctx: discord.Interaction, title: str, channel: discord.TextChannel = None, image: discord.Attachment = None, color: str = None, anonymous: bool = False) -> None:
         """Sends an embed
 
         Args:
@@ -52,6 +52,7 @@ class Helper(Cog):
             channel (discord.TextChannel): Channel to post the embed in
             color (str): Color of the embed in hexadecimal notation
             image (discord.Attachment): Image to show in embed
+            anonymous (bool): Wether to show "Posted by" in footer
         """
 
         # TODO this can fail when parsing the hex color and will spit out
@@ -70,7 +71,7 @@ class Helper(Cog):
 
         # create the embed, add the image and color if specified
         embed = discord.Embed(title=title, timestamp=datetime.now())
-        embed.set_footer(text=f"Posted by {ctx.user.name}#{ctx.user.discriminator}")
+        embed.set_footer(text="" if anonymous else f"Posted by {ctx.user.name}#{ctx.user.discriminator}")
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:

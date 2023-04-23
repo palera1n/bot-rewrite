@@ -10,4 +10,3 @@ from .unshorten import Unshorten
 from .timezones import Timezones
 from .helper import Helper
 from .filters import FiltersGroup
-from .pgpkeys import PGPKeys

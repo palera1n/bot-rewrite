@@ -1,44 +1,7 @@
 import re
 import discord
-import pgpy
 
-from model import Tag, User, PGPKey
-
-class PGPKeyModal(discord.ui.Modal):
-    def __init__(self, bot, author: discord.Member) -> None:
-        self.bot = bot
-        self.author = author
-        self.key: PGPKey = None
-
-        super().__init__(title="Add PGP key")
-
-        self.add_item(
-            discord.ui.TextInput(
-                label="PGP key",
-                placeholder="Enter your PGP key",
-                style=discord.TextStyle.long,
-            )
-        )
-
-    async def on_submit(self, interaction: discord.Interaction) -> None:
-        if interaction.user != self.author:
-            return
-        
-        key = self.children[0].value.strip()
-        if len(key) == 0:
-            return
-        try:
-            parsed_key, _ = pgpy.PGPKey.from_blob(key)
-            keyobject = PGPKey()
-            keyobject.key = bytes(key)
-            keyobject.key_signature = str(parsed_key.fingerprint)
-            keyobject.full_name = str(parsed_key.userids[0].name)
-            keyobject.email = str(parsed_key.userids[0].email)
-            keyobject.user = User.objects(id=interaction.user.id).first()
-            self.key = keyobject
-        except pgpy.errors.PGPError:
-            interaction.response.send_message("Invalid PGP key!", ephemeral=True)
-        
+from model import Tag, User
 
 class TagModal(discord.ui.Modal):
     def __init__(self, bot, tag_name, author: discord.Member) -> None:
