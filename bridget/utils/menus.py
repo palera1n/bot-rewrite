@@ -46,7 +46,11 @@ class Menu(ui.View):
             self.remove_item(self.last)
 
     async def start(self) -> None:
-        await self.refresh_response_message(self.ctx)
+        embed = await self.generate_next_embed()
+        self.refresh_button_state()
+        await self.ctx.response.send_message(embed=embed, view=self, ephemeral=self.whisper)
+
+        #await self.refresh_response_message(self.ctx)
 
     async def generate_next_embed(self):
         if self.current_page in self.page_cache:
@@ -88,10 +92,8 @@ class Menu(ui.View):
 
         if interaction is not None:  # we want to edit, due to button press
             await interaction.response.edit_message(embed=embed, view=self)
-        elif interaction.response.is_done():
-            await interaction.edit_original_message(embed=embed, view=self)
-        else:  # this is the first time we're posting this menu
-            await interaction.response.send_message(embed=embed, view=self, ephemeral=self.whisper)
+        elif self.ctx.response.is_done(): # i guess this fixes it, too lazy to test it - Jan
+            await self.ctx.response.edit_message(embed=embed, view=self)
 
     async def on_timeout(self) -> None:
         self.stopped = True
@@ -135,4 +137,4 @@ class Menu(ui.View):
             await self.refresh_response_message(interaction)
 
     def on_interaction_check(self, interaction: discord.Interaction) -> bool:
-        return interaction.user == self.ctx.author
+        return interaction.user == self.ctx.user
