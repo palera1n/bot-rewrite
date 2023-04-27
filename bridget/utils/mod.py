@@ -13,6 +13,8 @@ from utils.config import cfg
 from utils.services import guild_service, user_service
 from model.guild import Guild
 
+print("Hello World")
+
 
 async def add_unban_case(target_member: discord.Member, mod: discord.Member, reason: str, db_guild: Guild, bot: discord.Client):
     case = Case(
