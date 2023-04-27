@@ -92,10 +92,8 @@ class Menu(ui.View):
 
         if interaction is not None:  # we want to edit, due to button press
             await interaction.response.edit_message(embed=embed, view=self)
-        elif interaction.response.is_done():
-            await interaction.edit_original_message(embed=embed, view=self)
-        else:  # this is the first time we're posting this menu
-            await interaction.response.send_message(embed=embed, view=self, ephemeral=self.whisper)
+        elif self.ctx.response.is_done(): # i guess this fixes it, too lazy to test it - Jan
+            await self.ctx.response.edit_message(embed=embed, view=self)
 
     async def on_timeout(self) -> None:
         self.stopped = True
