@@ -25,6 +25,12 @@ async def tags_autocomplete(_: discord.Interaction, current: str) -> List[app_co
     return [app_commands.Choice(name=tag, value=tag)
             for tag in tags if current.lower() in tag.lower()][:25]
 
+async def issues_autocomplete(_: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+    issues = sorted([issue.name for issue in guild_service.get_guild().issues])
+    return [app_commands.Choice(name=issue, value=issue)
+            for issue in issues if current.lower() in issue.lower()][:25]
+
+
 async def filter_bypass_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[int]]:
     # TODO: Real permission check for mod+
     if ctx.user.id != cfg.owner_id:

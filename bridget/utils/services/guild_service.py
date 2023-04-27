@@ -1,4 +1,4 @@
-from model import Guild, Tag, FilterWord, Giveaway
+from model import Guild, Tag, Issue, FilterWord, Giveaway
 import os
 from typing import Optional
 
@@ -43,6 +43,37 @@ def get_tag(name: str):
     tag.use_count += 1
     edit_tag(tag)
     return tag
+
+
+def add_issue(issue: Issue) -> None:
+    Guild.objects(_id=guild_id).update_one(push__issues=issue)
+
+
+def remove_issue(issue: str):
+    return Guild.objects(
+        _id=guild_id).update_one(
+        pull__issues__name=Tag(
+            name=issue).name)
+
+
+def edit_issue(issue):
+    return Guild.objects(
+        _id=guild_id,
+        issues__name=issue.name).update_one(
+        set__issues__S=issue)
+
+
+def get_issue(name: str):
+    issue = Guild.objects.get(_id=guild_id).issues.filter(name=name).first()
+    if issue is None:
+        return
+    return issue
+
+
+def edit_issues_list(ids):
+    return Guild.objects(
+        _id=guild_id).update_one(
+        set__issues_list_msg=ids)
 
 
 def add_meme(meme: Tag) -> None:

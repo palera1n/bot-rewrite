@@ -1,6 +1,7 @@
 import mongoengine
 from .filterword import FilterWord
 from .tag import Tag
+from .issues import Issue
 
 
 class Guild(mongoengine.Document):
@@ -47,6 +48,8 @@ class Guild(mongoengine.Document):
     tags = mongoengine.EmbeddedDocumentListField(Tag, default=[])
     memes = mongoengine.EmbeddedDocumentListField(Tag, default=[])
     ban_today_spam_accounts = mongoengine.BooleanField(default=False)
+    issues = mongoengine.EmbeddedDocumentListField(Issue, default=[])
+    issues_list_msg = mongoengine.ListField(default=[])
 
     meta = {
         'db_alias': 'default',
