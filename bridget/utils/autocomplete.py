@@ -90,3 +90,11 @@ async def filter_whitelist_autocomplete(ctx: discord.Interaction, current: str) 
     return [app_commands.Choice(name=filter, value=filter)
             for filter in filters if current.lower() in filter[0].lower()][:25]
 
+async def rule_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+    channel = ctx.guild.get_channel(guild_service.get_guild().channel_rules)
+    messages = [ x async for x in channel.history(limit=50, oldest_first=True) ]
+
+    rules = [ x for x in messages if x.embeds ]
+    return [app_commands.Choice(name=rule.embeds[0].title, value=str(rule.id))
+            for rule in rules if current.lower() in rule.embeds[0].title.lower()][:25]
+

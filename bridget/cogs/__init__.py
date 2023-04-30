@@ -11,3 +11,4 @@ from .timezones import Timezones
 from .helper import Helper
 from .filters import FiltersGroup
 from .issues import Issues, IssuesGroup
+from .misc import Misc
