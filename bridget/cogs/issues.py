@@ -130,7 +130,7 @@ async def do_reindex(ctx: discord.Interaction) -> None:
 
     # refresh common issue list
     await refresh_common_issues(ctx.guild)
-    await ctx.followup.send(content="Reindexed!", ephemeral=True)
+    await send_success(ctx, description="Reindexed!")
 
 
 class Issues(Cog):
