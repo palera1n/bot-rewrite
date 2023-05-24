@@ -65,11 +65,11 @@ class NativeActionsListeners(Cog):
         member = ctx.guild.get_member(ctx.user_id)
 
         # filter with mod+ bypass
-        if guild_service.get_guild().role_helper not in rule.exempt_role_ids and ctx.action.type == AutoModRuleActionType.send_alert_message:
+        if ctx.action.type == discord.AutoModRuleActionType.send_alert_message and rule.name.endswith('🚨'):
+            print(ctx, rule)
             await automod_fancy_embed(self.bot, ctx, rule, member)
         elif ctx.action.type == AutoModRuleActionType.timeout:
             # check role and ban for raid phrase
-            await automod_fancy_embed(self.bot, ctx, rule, member)
             if guild_service.get_guild().role_memberplus not in [ x.id for x in member.roles ]:
                 await ctx.guild.get_member(ctx.user_id).ban(reason="Raid phrase detected")
 

@@ -94,25 +94,23 @@ class FilterBypassLevel(IntEnum):
                 self.RAID: "Raid phrases"
         }[self] 
 
-    def find_rule_for_bypass(self, rules: List[AutoModRule]) -> Optional[AutoModRule]:
+    def find_rules_for_bypass(self, rules: List[AutoModRule]) -> List[AutoModRule]:
+        rules = []
         if self == FilterBypassLevel.HELPER:
-            # find the rule that has Helper exempt
+            # find the rules that has Helper exempt
             for rule in rules:
                 if guild_service.get_guild().role_helper in rule.exempt_role_ids and not rule_has_timeout(rule):
-                    return rule
-            return None
+                    rules.append(rule)
         elif self == FilterBypassLevel.MOD:
             for rule in rules:
-                # find the rule that doesnt have Helper exempt
+                # find the rules that doesnt have Helper exempt
                 if guild_service.get_guild().role_helper not in rule.exempt_role_ids and not rule_has_timeout(rule):
-                    return rule
-            return None
+                    rules.append(rule)
         elif self == FilterBypassLevel.RAID:
             for rule in rules:
                 # find the rule that times out the member
                 if rule_has_timeout(rule):
-                    return rule
-            return None
+                    rules.append(rule)
 
-        return None
+        return rules
 
