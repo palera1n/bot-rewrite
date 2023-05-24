@@ -12,3 +12,4 @@ from .helper import Helper
 from .filters import FiltersGroup
 from .issues import Issues, IssuesGroup
 from .misc import Misc
+from .memes import Memes, MemesGroup

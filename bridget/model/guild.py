@@ -20,6 +20,7 @@ class Guild(mongoengine.Document):
     role_memberultra = mongoengine.IntField()
     role_moderator = mongoengine.IntField()
     role_reportping = mongoengine.IntField()
+    role_nicknamelock = mongoengine.IntField()
 
     channel_botspam = mongoengine.IntField()
     channel_common_issues = mongoengine.IntField()

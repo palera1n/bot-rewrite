@@ -26,4 +26,3 @@ class Misc(Cog):
         except:
             await send_error(ctx, "Could not find rule")
 
-

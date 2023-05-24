@@ -27,6 +27,7 @@ async def setup():
     guild.role_memberplus = 1096623117746573375
     guild.role_memberultra = 123
     guild.role_reportping = 1096623117746573374
+    guild.role_nicknamelock = 1110986834554667098
 
     guild.channel_reports = 1096623118761599051
     guild.channel_mempro_reports = 1096623118761599052
