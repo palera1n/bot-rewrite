@@ -2,6 +2,11 @@
 # It is not intended for manual editing.
 
 [[package]]
+name = "aiocache"
+version = "0.12.1"
+summary = "multi backend asyncio cache"
+
+[[package]]
 name = "aiohttp"
 version = "3.8.4"
 requires_python = ">=3.6"
@@ -85,10 +90,10 @@ dependencies = [
 
 [[package]]
 name = "discord-py"
-version = "2.3.0a4811+gc6162cfe"
+version = "2.3.0a4846+ge6d2d828"
 requires_python = ">=3.8.0"
 git = "https://github.com/Rapptz/discord.py"
-revision = "c6162cfec5534416fe3281fc987bbbf8d9ae281b"
+revision = "e6d2d82803d79cdd3fccecb7c5fd473e98100787"
 summary = "A Python wrapper for the Discord API"
 dependencies = [
     "aiohttp<4,>=3.7.4",
@@ -312,9 +317,13 @@ dependencies = [
 [metadata]
 lock_version = "4.2"
 groups = ["default"]
-content_hash = "sha256:9facbd813862962b3c75c58d1dc5b9f457c1cf799d8e11766c59c6c01f6d08d2"
+content_hash = "sha256:4713d73a2f3f0b6378d5882eb801027939056c83aecd8c186027cf8d1c10e1cf"
 
 [metadata.files]
+"aiocache 0.12.1" = [
+    {url = "https://files.pythonhosted.org/packages/1a/06/cf9d238d4217e9bd0de7516ed3f00bd00436cc374e5afb1b53f2318ee758/aiocache-0.12.1-py2.py3-none-any.whl", hash = "sha256:15eb17188e12d7226678c22a890824ff9c406cf7e5b418f86944395db63a3c1b"},
+    {url = "https://files.pythonhosted.org/packages/a5/d5/ed708c09760198501fecda59e458f4ab10b94c0508da4bab0076a219fe8b/aiocache-0.12.1.tar.gz", hash = "sha256:7d9ffbd4ca2b1c51e5b213fd7d42dc43b80af01a436b14be5ebcbde199709fb3"},
+]
 "aiohttp 3.8.4" = [
     {url = "https://files.pythonhosted.org/packages/03/e7/84b65e341b1f45753fea51158d8a9522e57a5ae804acbc6dc34edf07cea0/aiohttp-3.8.4-cp39-cp39-musllinux_1_1_aarch64.whl", hash = "sha256:bca5f24726e2919de94f047739d0a4fc01372801a3672708260546aa2601bf57"},
     {url = "https://files.pythonhosted.org/packages/04/03/3ce412b191aba5961b4ada3ee7a93498623e218fb4d50ac6d357da61dc26/aiohttp-3.8.4-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:8189c56eb0ddbb95bfadb8f60ea1b22fcfa659396ea36f6adcc521213cd7b44d"},

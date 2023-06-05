@@ -4,7 +4,8 @@ version = "1.0.0"
 description = "Bot for the palera1n Discord server"
 authors = [
     {name = "Nebula", email = "me@itsnebula.net"},
-    {name = "June Park", email = "rjp2030@outlook.com"}
+    {name = "June Park", email = "rjp2030@outlook.com"},
+    {name = "Jan Garcia", email = "me@jancr.dev"},
 ]
 dependencies = [
     "mongoengine>=0.27.0",
@@ -15,6 +16,7 @@ dependencies = [
     "emoji-country-flag>=1.3.2",
     "humanize>=4.6.0",
     "autotyping>=23.3.0",
+    "aiocache>=0.12.1",
 ]
 requires-python = ">=3.10,<4.0"
 license = {text = "BSD-3-Clause"}
