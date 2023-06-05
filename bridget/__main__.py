@@ -17,9 +17,10 @@ mongoengine.connect(
     port=int(
         getenv("DB_PORT")))
 
-from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper, FiltersGroup, Issues, IssuesGroup, Misc, Memes, MemesGroup
+from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper, FiltersGroup, Issues, IssuesGroup, Misc, Memes, MemesGroup, LogParsing
 from utils.startup_checks import checks
 from utils.config import cfg
+from utils.fetchers import init_client_session
 from utils import send_error, send_success
 
 for check in checks:
@@ -63,6 +64,7 @@ async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.M
     embed.set_author(name=message.author, icon_url=message.author.avatar.url)
     await send_success(interaction, embed=embed, ephemeral=True)
 
+
 # Cogs
 asyncio.run(bot.add_cog(ChatGPT(bot)))
 asyncio.run(bot.add_cog(Logging(bot)))
@@ -82,6 +84,11 @@ asyncio.run(bot.add_cog(IssuesGroup(bot)))
 asyncio.run(bot.add_cog(Misc(bot)))
 asyncio.run(bot.add_cog(Memes(bot)))
 asyncio.run(bot.add_cog(MemesGroup(bot)))
+asyncio.run(bot.add_cog(LogParsing(bot)))
+
+@bot.event
+async def on_ready():
+    await init_client_session()
 
 # Error handler
 @bot.tree.error
