@@ -11,3 +11,4 @@ class Issue(mongoengine.EmbeddedDocument):
     image = mongoengine.FileField(default=None)
     button_links = mongoengine.ListField(default=[], required=False)
     message_id = mongoengine.IntField()
+    panic_string = mongoengine.StringField()

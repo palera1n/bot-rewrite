@@ -1,6 +1,8 @@
 import discord
 import re
 import asyncio
+import aiohttp
+import tempfile
 
 from io import BytesIO
 from discord import Guild
@@ -14,6 +16,20 @@ from utils.enums import PermissionLevel
 from utils.modals import IssueModal, EditIssueModal
 from utils.services import guild_service
 from utils.autocomplete import issues_autocomplete
+
+async def get_discord_file_from_url(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                file_data = await response.read()
+                with tempfile.NamedTemporaryFile(delete=True) as temp_file:
+                    temp_file.write(file_data)
+                    temp_file.seek(0)
+                    file = discord.File(temp_file, filename='file.png')
+                return file
+            else:
+                # Handle the case where the URL request fails
+                return None
 
 def prepare_issue_embed(issue: Issue) -> Embed:
     """Given an issue object, prepare the appropriate embed for it
@@ -131,6 +147,46 @@ async def do_reindex(ctx: discord.Interaction) -> None:
     # refresh common issue list
     await refresh_common_issues(ctx.guild)
     await send_success(ctx, description="Reindexed!")
+
+
+async def do_import(ctx: discord.Interaction) -> None:
+    channel = ctx.guild.get_channel(guild_service.get_guild().channel_common_issues)
+
+    async for message in channel.history(limit=None, oldest_first=True):
+        if not message.author.bot:
+            continue
+        if not message.embeds:
+            continue
+
+        embed = message.embeds[0]
+        if not embed.footer.text:
+            continue
+
+        if embed.footer.text.startswith('Submitted by'):
+            iss = Issue()
+            iss.name = embed.title
+            iss.content = embed.description
+            iss.added_date = embed.timestamp
+            iss.added_by_id = 0
+            iss.added_by_tag = ' '.join(embed.footer.text.split(' ')[2:])
+            if embed.image.url:
+                iss.image = await get_discord_file_from_url(embed.image.url)
+            riss = guild_service.get_issue(iss.name)
+
+            msg = await channel.send(file=iss.image or discord.utils.MISSING, embed=prepare_issue_embed(iss) or discord.utils.MISSING, view=prepare_issue_view(iss) or discord.utils.MISSING)
+            iss.message_id = msg.id
+
+            if riss is not None:
+                guild_service.edit_issue(iss)
+            else:
+                guild_service.add_issue(iss)
+            await message.delete()
+        elif embed.title.startswith('Table of'):
+            await message.delete()
+
+    # refresh common issue list
+    await refresh_common_issues(ctx.guild)
+    await send_success(ctx, description="Imported all embeds as common issues!")
 
 
 class Issues(Cog):
@@ -342,3 +398,15 @@ class IssuesGroup(Cog, commands.GroupCog, group_name="commonissue"):
 
         await ctx.response.defer(ephemeral=True, thinking=True)
         ctx.client.loop.create_task(do_reindex(ctx))
+
+    @PermissionLevel.HELPER
+    @app_commands.command()
+    async def importembeds(self, ctx: discord.Interaction) -> None:
+        """Imports all embeds as common issues.
+
+        Args:
+            ctx (discord.Interaction): Context
+        """
+
+        await ctx.response.defer(ephemeral=True, thinking=True)
+        ctx.client.loop.create_task(do_import(ctx))
