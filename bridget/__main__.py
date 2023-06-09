@@ -36,32 +36,32 @@ bot = commands.Bot(
 bot.remove_command("help")
 
 # Apps
-@bot.tree.context_menu(name="Meowcrypt Decrypt")
-async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.Message) -> None:
-    if "nya>.<" not in message.content:
-        await send_error(interaction, "The selected message is not encrypted by Meowcrypt.")
+# @bot.tree.context_menu(name="Meowcrypt Decrypt")
+# async def meowcrypt_decrypt(interaction: discord.Interaction, message: discord.Message) -> None:
+#     if "nya>.<" not in message.content:
+#         await send_error(interaction, "The selected message is not encrypted by Meowcrypt.")
 
-    spl = message.content.split(">.<")
-    one = base64.b64decode(spl[1])
-    two = base64.b64decode(spl[2])
-    three = base64.b64decode(spl[3])
+#     spl = message.content.split(">.<")
+#     one = base64.b64decode(spl[1])
+#     two = base64.b64decode(spl[2])
+#     three = base64.b64decode(spl[3])
 
-    pass_str = "8f5SCpAbDyCdtPTNBwQpYPJVussZFXVaVWP587ZNgZr3uxKGzRLf4naudDBxmdw5"
-    pass_bytes = pass_str.encode("utf-8")
+#     pass_str = "8f5SCpAbDyCdtPTNBwQpYPJVussZFXVaVWP587ZNgZr3uxKGzRLf4naudDBxmdw5"
+#     pass_bytes = pass_str.encode("utf-8")
 
-    key = hashlib.pbkdf2_hmac('sha512', pass_bytes, one, 50000, dklen=32)
+#     key = hashlib.pbkdf2_hmac('sha512', pass_bytes, one, 50000, dklen=32)
 
-    cipher = AES.new(key, AES.MODE_GCM, nonce=two)
-    plaintext = cipher.decrypt_and_verify(
-        three[:-16], three[-16:]).decode('utf-8')
+#     cipher = AES.new(key, AES.MODE_GCM, nonce=two)
+#     plaintext = cipher.decrypt_and_verify(
+#         three[:-16], three[-16:]).decode('utf-8')
 
-    embed = discord.Embed(
-        title="Decrypted text",
-        description=f"```{plaintext}```",
-        color=discord.Color.green()
-    )
-    embed.set_author(name=message.author, icon_url=message.author.avatar.url)
-    await send_success(interaction, embed=embed, ephemeral=True)
+#     embed = discord.Embed(
+#         title="Decrypted text",
+#         description=f"```{plaintext}```",
+#         color=discord.Color.green()
+#     )
+#     embed.set_author(name=message.author, icon_url=message.author.avatar.url)
+#     await send_success(interaction, embed=embed, ephemeral=True)
 
 
 # Cogs
