@@ -12,3 +12,4 @@ class Issue(mongoengine.EmbeddedDocument):
     button_links = mongoengine.ListField(default=[], required=False)
     message_id = mongoengine.IntField()
     panic_string = mongoengine.StringField()
+    color = mongoengine.IntField()

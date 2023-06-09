@@ -5,6 +5,7 @@ import asyncio
 from io import BytesIO
 from discord import app_commands
 from discord.ext import commands
+from datetime import datetime
 
 from model.tag import Tag
 from utils import Cog, send_error, send_success, format_number
@@ -81,6 +82,8 @@ def prepare_tag_view(tag: Tag) -> discord.ui.View:
 
 
 class Tags(Cog):
+    cooldown = commands.CooldownMapping.from_cooldown(1.0, 5.0, commands.BucketType.channel)
+
     @app_commands.autocomplete(name=tags_autocomplete)
     @app_commands.command()
     async def tag(self, ctx: discord.Interaction, name: str, user_to_mention: discord.Member = None) -> None:
@@ -99,11 +102,11 @@ class Tags(Cog):
             raise commands.BadArgument("That tag does not exist.")
 
         # run cooldown so tag can't be spammed
-        # bucket = self.tag_cooldown.get_bucket(tag.name)
-        # current = datetime.now().timestamp()
+        bucket = self.cooldown.get_bucket(tag.name)
+        current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        # if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.user, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.user.roles):
-        #    raise commands.BadArgument("That tag is on cooldown.")
+        if bucket.update_rate_limit(current) and not PermissionLevel.MOD.check(ctx):
+           raise commands.BadArgument("That tag is on cooldown.")
 
         # if the Tag has an image, add it to the embed
         _file = tag.image.read()
@@ -138,11 +141,11 @@ class Tags(Cog):
             raise commands.BadArgument("That tag does not exist.")
 
         # run cooldown so tag can't be spammed
-        # bucket = self.tag_cooldown.get_bucket(tag.name)
-        # current = datetime.now().timestamp()
+        bucket = self.cooldown.get_bucket(tag.name)
+        current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        # if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.author, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.author.roles):
-        #    raise commands.BadArgument("That tag is on cooldown.")
+        if bucket.update_rate_limit(current) and not PermissionLevel.MOD.check(ctx):
+           raise commands.BadArgument("That tag is on cooldown.")
 
         # if the Tag has an image, add it to the embed
         _file = tag.image.read()
