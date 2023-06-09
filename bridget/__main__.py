@@ -123,6 +123,4 @@ async def app_command_error(interaction: discord.Interaction, error: app_command
 
             await send_error(interaction, f"`{error}`\n```{tb_formatted}```")
 
-# galaxy's ratio goes here
-
 bot.run(getenv("TOKEN"))
