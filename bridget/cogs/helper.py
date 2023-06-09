@@ -1,7 +1,7 @@
 import discord
 import random
 
-from discord import ChannelType, app_commands
+from discord import ChannelType, Color, app_commands
 from datetime import datetime
 
 from utils import Cog, send_error, send_success
@@ -75,13 +75,7 @@ class Helper(Cog):
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:
-            # remove leading # sign
-            if color.startswith('#'):
-                color = color[1:]
-            # shorthand notation (#faf)
-            if len(color) == 3:
-                color = color[0] * 2 + color[1] * 2 + color[2] * 2
-            embed.color = int(color, 16)
+            embed.color = Color.from_str(color)
 
         modal = PostEmbedModal(bot=self.bot, channel=channel, author=ctx.user)
         await ctx.response.send_modal(modal)
@@ -127,13 +121,7 @@ class Helper(Cog):
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:
-            # remove leading # sign
-            if color.startswith('#'):
-                color = color[1:]
-            # shorthand notation (#faf)
-            if len(color) == 3:
-                color = color[0] * 2 + color[1] * 2 + color[2] * 2
-            embed.color = int(color, 16)
+            embed.color = Color.from_str(color)
 
         # send the embed
         msg = await channel.send(embed=embed)

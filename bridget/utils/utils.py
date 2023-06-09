@@ -1,13 +1,30 @@
-from datetime import datetime
 import discord
 import asyncio
 
+from binascii import crc32
+from datetime import datetime
 from discord.ext import commands
 from typing import List, Optional, Union
+from discord import Color
 
 class Cog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+
+
+def hash_color(content: str) -> Color:
+    # ChatGPT made this lmao
+    color = crc32(content.encode('utf-8')) & 0xFFFFFF  # Get the lower 24 bits
+    red = (color >> 16) & 0xFF
+    green = (color >> 8) & 0xFF
+    blue = color & 0xFF
+
+    # Adjust the RGB components to create a pastel color
+    red = int((red + 255) / 2)
+    green = int((green + 255) / 2)
+    blue = int((blue + 255) / 2)
+
+    return Color.from_rgb(red, green, blue)
 
 
 async def send_error(ctx: discord.Interaction, description: str, embed: discord.Embed = None, delete_after: int = None) -> None:

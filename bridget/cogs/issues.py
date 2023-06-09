@@ -1,19 +1,38 @@
 import discord
 import re
 import asyncio
+import aiohttp
+import tempfile
 
 from io import BytesIO
-from discord import Guild
+from discord import Guild, Color
+from discord.components import Button
 from discord.ext import commands
 from discord import app_commands
 from discord.embeds import Embed
+from datetime import datetime
 
 from model.issues import Issue
 from utils import Cog, send_error, send_success
+from utils.utils import hash_color
 from utils.enums import PermissionLevel
 from utils.modals import IssueModal, EditIssueModal
 from utils.services import guild_service
 from utils.autocomplete import issues_autocomplete
+
+async def get_discord_file_from_url(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                file_data = await response.read()
+                with tempfile.NamedTemporaryFile(delete=True) as temp_file:
+                    temp_file.write(file_data)
+                    temp_file.seek(0)
+                    file = discord.File(temp_file, filename='file.png')
+                return file
+            else:
+                # Handle the case where the URL request fails
+                return None
 
 def prepare_issue_embed(issue: Issue) -> Embed:
     """Given an issue object, prepare the appropriate embed for it
@@ -31,7 +50,7 @@ def prepare_issue_embed(issue: Issue) -> Embed:
     embed = discord.Embed(title=issue.name)
     embed.description = issue.content
     embed.timestamp = issue.added_date
-    embed.color = discord.Color.blue()
+    embed.color = Color(issue.color).value or hash_color(issue.name).value
 
     if issue.image.read() is not None:
         embed.set_image(url="attachment://image.gif" if issue.image.content_type ==
@@ -130,10 +149,63 @@ async def do_reindex(ctx: discord.Interaction) -> None:
 
     # refresh common issue list
     await refresh_common_issues(ctx.guild)
-    await send_success(ctx, description="Reindexed!")
+    await ctx.followup.send("Reindexed!", ephemeral=True)
+
+
+async def do_import(ctx: discord.Interaction) -> None:
+    # imports embeds from old bot into the new db-based system
+    channel = ctx.guild.get_channel(guild_service.get_guild().channel_common_issues)
+
+    async for message in channel.history(limit=None, oldest_first=True):
+        if not message.author.bot:
+            continue
+        if not message.embeds:
+            continue
+
+        embed = message.embeds[0]
+        if not embed.footer.text:
+            continue
+
+        if not embed.footer.text.startswith('Submitted by'):
+            continue
+
+        if embed.footer.text.startswith('Submitted by'):
+            iss = Issue()
+            iss.name = embed.title
+            iss.content = embed.description
+            iss.added_date = embed.timestamp
+            iss.added_by_id = 0
+            iss.added_by_tag = ' '.join(embed.footer.text.split(' ')[2:])
+            if embed.image.url:
+                iss.image = await get_discord_file_from_url(embed.image.url)
+            riss = guild_service.get_issue(iss.name)
+            iss.button_links = []
+            iss.color = embed.color.value
+
+            for ar in message.components:
+                for btn in ar.children:
+                    if type(btn) is Button:
+                        iss.button_links.append((btn.label, btn.url))
+
+            msg = await channel.send(file=iss.image or discord.utils.MISSING, embed=prepare_issue_embed(iss) or discord.utils.MISSING, view=prepare_issue_view(iss) or discord.utils.MISSING)
+            iss.message_id = msg.id
+
+            if riss is not None:
+                guild_service.edit_issue(iss)
+            else:
+                guild_service.add_issue(iss)
+            await message.delete()
+        elif embed.title.startswith('Table of'):
+            await message.delete()
+
+    # refresh common issue list
+    await refresh_common_issues(ctx.guild)
+    await ctx.followup.send("Imported all embeds as common issues!", ephemeral=True)
 
 
 class Issues(Cog):
+    cooldown = commands.CooldownMapping.from_cooldown(1.0, 5.0, commands.BucketType.channel)
+
     @app_commands.autocomplete(name=issues_autocomplete)
     @app_commands.command()
     async def issue(self, ctx: discord.Interaction, name: str, user_to_mention: discord.Member = None) -> None:
@@ -152,11 +224,11 @@ class Issues(Cog):
             raise commands.BadArgument("That issue does not exist.")
 
         # run cooldown so tag can't be spammed
-        # bucket = self.tag_cooldown.get_bucket(tag.name)
-        # current = datetime.now().timestamp()
+        bucket = self.cooldown.get_bucket(issue.name)
+        current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        # if bucket.update_rate_limit(current) and not (gatekeeper.has(ctx.guild, ctx.user, 5) or ctx.guild.get_role(guild_service.get_guild().role_sub_mod) in ctx.user.roles):
-        #    raise commands.BadArgument("That tag is on cooldown.")
+        if bucket.update_rate_limit(current) and not PermissionLevel.MOD.check(ctx):
+           raise commands.BadArgument("That issue is on cooldown.")
 
         # if the Issue has an image, add it to the embed
         _file = issue.image.read()
@@ -178,13 +250,15 @@ class Issues(Cog):
 class IssuesGroup(Cog, commands.GroupCog, group_name="commonissue"):
     @PermissionLevel.HELPER
     @app_commands.command()
-    async def add(self, ctx: discord.Interaction, name: str, image: discord.Attachment = None) -> None:
+    async def add(self, ctx: discord.Interaction, name: str, image: discord.Attachment = None, panic_keyword: str = None, color: str = None) -> None:
         """Add a common issue
 
         Args:
             ctx (discord.Interaction): Context
             name (str): Name of the issue
             image (discord.Attachment, optional): Issue image. Defaults to None.
+            panic_keyword (str): The panic keyword for this common issue.
+            color (str): The hexadecimal color of the embed.
         """
 
         if (guild_service.get_issue(name)) is not None:
@@ -228,6 +302,8 @@ class IssuesGroup(Cog, commands.GroupCog, group_name="commonissue"):
         ci_channel = guild_service.get_guild().channel_common_issues
         ci_msg = await ctx.guild.get_channel(ci_channel).send(file=_file or discord.utils.MISSING, embed=prepare_issue_embed(issue) or discord.utils.MISSING, view=prepare_issue_view(issue) or discord.utils.MISSING)
         issue.message_id = ci_msg.id
+        issue.panic_string = panic_keyword or ''
+        issue.color = Color.from_str(color) if color else hash_color(name).value
 
         # store issue in database
         guild_service.add_issue(issue)
@@ -242,13 +318,15 @@ class IssuesGroup(Cog, commands.GroupCog, group_name="commonissue"):
     @PermissionLevel.HELPER
     @app_commands.autocomplete(name=issues_autocomplete)
     @app_commands.command()
-    async def edit(self, ctx: discord.Interaction, name: str, image: discord.Attachment = None) -> None:
+    async def edit(self, ctx: discord.Interaction, name: str, image: discord.Attachment = None, panic_keyword: str = None, color: str = None) -> None:
         """Edit a common issue
 
         Args:
             ctx (discord.Interaction): Context
             name (str): Name of the issue
             image (discord.Attachment, optional): Issue image. Defaults to None.
+            panic_keyword (str): The panic keyword for this common issue.
+            color (str): The hexadecimal color of the embed.
         """
 
 
@@ -287,6 +365,8 @@ class IssuesGroup(Cog, commands.GroupCog, group_name="commonissue"):
             _file = discord.File(
                 BytesIO(_file),
                 filename="image.gif" if issue.image.content_type == "image/gif" else "image.png")
+        issue.panic_string = panic_keyword or ''
+        issue.color = Color.from_str(color) if color else hash_color(name).value
 
         # store issue in database
         guild_service.edit_issue(issue)
@@ -342,3 +422,15 @@ class IssuesGroup(Cog, commands.GroupCog, group_name="commonissue"):
 
         await ctx.response.defer(ephemeral=True, thinking=True)
         ctx.client.loop.create_task(do_reindex(ctx))
+
+    @PermissionLevel.HELPER
+    @app_commands.command()
+    async def importembeds(self, ctx: discord.Interaction) -> None:
+        """Imports all embeds as common issues.
+
+        Args:
+            ctx (discord.Interaction): Context
+        """
+
+        await ctx.response.defer(ephemeral=True, thinking=True)
+        ctx.client.loop.create_task(do_import(ctx))
