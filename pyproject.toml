@@ -1,5 +1,5 @@
 [project]
-name = "bridget"
+name = "nickchan"
 version = "1.0.0"
 description = "Bot for the palera1n Discord server"
 authors = [
@@ -26,9 +26,9 @@ readme = "README.md"
 includes = []
 
 [tool.pdm.scripts]
-bot.cmd = "python bridget"
+bot.cmd = "python nickchan"
 bot.env_file = ".env"
-setup.cmd = "python bridget/setup.py"
+setup.cmd = "python nickchan/setup.py"
 setup.env_file = ".env"
 lint.cmd = "flake8 --config=.flake8"
 
