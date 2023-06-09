@@ -9,7 +9,7 @@ authors = [
 ]
 dependencies = [
     "mongoengine>=0.27.0",
-    "discord-py @ git+https://github.com/Rapptz/discord.py",
+    "discord-py @ https://github.com/Rapptz/discord.py/archive/d34a88411d3d973453d80128ab924f6aca197995.zip",
     "Pillow>=9.5.0",
     "chatgpt @ git+https://github.com/0xallie/chatgpt",
     "APScheduler>=3.10.1",

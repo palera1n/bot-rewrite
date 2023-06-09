@@ -90,10 +90,9 @@ dependencies = [
 
 [[package]]
 name = "discord-py"
-version = "2.3.0a4846+ge6d2d828"
+version = "2.3.0a0"
 requires_python = ">=3.8.0"
-git = "https://github.com/Rapptz/discord.py"
-revision = "e6d2d82803d79cdd3fccecb7c5fd473e98100787"
+url = "https://github.com/Rapptz/discord.py/archive/d34a88411d3d973453d80128ab924f6aca197995.zip"
 summary = "A Python wrapper for the Discord API"
 dependencies = [
     "aiohttp<4,>=3.7.4",
@@ -316,8 +315,9 @@ dependencies = [
 
 [metadata]
 lock_version = "4.2"
+cross_platform = true
 groups = ["default"]
-content_hash = "sha256:4713d73a2f3f0b6378d5882eb801027939056c83aecd8c186027cf8d1c10e1cf"
+content_hash = "sha256:713918be0528885230ea2e9f4a93b6e5ba978c264d8fc0a46ae56c139e5a9f3a"
 
 [metadata.files]
 "aiocache 0.12.1" = [
@@ -513,6 +513,9 @@ content_hash = "sha256:4713d73a2f3f0b6378d5882eb801027939056c83aecd8c186027cf8d1
     {url = "https://files.pythonhosted.org/packages/f8/ed/500609cb2457b002242b090c814549997424d72690ef3058cfdfca91f68b/charset_normalizer-3.1.0-cp38-cp38-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:78cacd03e79d009d95635e7d6ff12c21eb89b894c354bd2b2ed0b4763373693b"},
     {url = "https://files.pythonhosted.org/packages/fa/8e/2e5c742c3082bce3eea2ddd5b331d08050cda458bc362d71c48e07a44719/charset_normalizer-3.1.0-cp37-cp37m-musllinux_1_1_ppc64le.whl", hash = "sha256:04afa6387e2b282cf78ff3dbce20f0cc071c12dc8f685bd40960cc68644cfea6"},
     {url = "https://files.pythonhosted.org/packages/ff/d7/8d757f8bd45be079d76309248845a04f09619a7b17d6dfc8c9ff6433cac2/charset-normalizer-3.1.0.tar.gz", hash = "sha256:34e0a2f9c370eb95597aae63bf85eb5e96826d81e3dcf88b8886012906f509b5"},
+]
+"discord-py 2.3.0a0" = [
+    {url = "https://github.com/Rapptz/discord.py/archive/d34a88411d3d973453d80128ab924f6aca197995.zip", hash = "sha256:912a06175720ef006fb226248a3f7e7ee1a148cf9f3ca82ee804ace53c91220d"},
 ]
 "dnspython 2.3.0" = [
     {url = "https://files.pythonhosted.org/packages/12/86/d305e87555430ff4630d729420d97dece3b16efcbf2b7d7e974d11b0d86c/dnspython-2.3.0-py3-none-any.whl", hash = "sha256:89141536394f909066cabd112e3e1a37e4e654db00a25308b0f130bc3152eb46"},
