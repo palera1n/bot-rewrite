@@ -90,10 +90,11 @@ dependencies = [
 
 [[package]]
 name = "discord-py"
-version = "2.3.0a4846+ge6d2d828"
+version = "2.3.0a4848+gd34a8841"
 requires_python = ">=3.8.0"
 git = "https://github.com/Rapptz/discord.py"
-revision = "e6d2d82803d79cdd3fccecb7c5fd473e98100787"
+ref = "d34a88411d3d973453d80128ab924f6aca197995"
+revision = "d34a88411d3d973453d80128ab924f6aca197995"
 summary = "A Python wrapper for the Discord API"
 dependencies = [
     "aiohttp<4,>=3.7.4",
@@ -316,8 +317,9 @@ dependencies = [
 
 [metadata]
 lock_version = "4.2"
+cross_platform = true
 groups = ["default"]
-content_hash = "sha256:4713d73a2f3f0b6378d5882eb801027939056c83aecd8c186027cf8d1c10e1cf"
+content_hash = "sha256:b5f1e5432bb7604c315d6072c447e2e344c3007620b19aec76642483f23ae8cb"
 
 [metadata.files]
 "aiocache 0.12.1" = [

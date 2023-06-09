@@ -6,7 +6,6 @@ import base64
 import hashlib
 import re
 
-from Crypto.Cipher import AES
 from discord import app_commands
 from discord.ext import commands
 
