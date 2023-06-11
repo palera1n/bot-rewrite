@@ -2,7 +2,6 @@ import inspect
 import discord
 
 from discord import ui
-from discord.asset import ValidAssetFormatTypes
 from typing import Callable, Generator, Optional
 
 
@@ -175,7 +174,7 @@ class PFPButton(discord.ui.Button):
         animated = ["gif", "png", "jpeg", "webp"]
         not_animated = ["png", "jpeg", "webp"]
 
-        def fmt(format_: ValidAssetFormatTypes) -> str:
+        def fmt(format_) -> str:
             return f"[{format_}]({avatar.replace(format=format_, size=4096)})"
 
         if avatar.is_animated():

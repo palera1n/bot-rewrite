@@ -4,7 +4,6 @@ import io
 import random
 
 from discord import app_commands, Embed
-from discord.asset import ValidAssetFormatTypes
 from discord.ext import commands
 
 from utils import Cog, send_error, send_success
@@ -123,7 +122,7 @@ class Misc(Cog):
 
         avatar = user.avatar or user.default_avatar
 
-        def fmt(format_: ValidAssetFormatTypes) -> str:
+        def fmt(format_) -> str:
             return f"[{format_}]({avatar.replace(format=format_, size=4096)})"
 
         if user.display_avatar.is_animated():

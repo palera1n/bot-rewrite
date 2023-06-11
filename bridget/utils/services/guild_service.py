@@ -1,6 +1,8 @@
-from model import Guild, Tag, Issue, FilterWord, Giveaway
 import os
-from typing import Optional
+
+from typing import Optional, Any
+
+from model import Guild, Tag, Issue, FilterWord, Giveaway
 
 guild_id: Optional[str] = os.getenv("GUILD_ID")
 
