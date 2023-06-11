@@ -2,7 +2,7 @@ import discord
 
 from enum import IntEnum, unique
 from discord.automod import AutoModRule
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from .services import guild_service
 from .config import cfg
@@ -50,7 +50,10 @@ class PermissionLevel(IntEnum):
                 self.ADMIN: "role_administrator",
         }[self] 
 
-    def __eq__(self, other: Union[int, discord.Member]) -> bool:
+    def __eq__(self, other: Union[int, discord.Member, discord.interactions.Interaction]) -> bool:
+        if isinstance(other, discord.interactions.Interaction):
+            other = other.user
+
         if isinstance(other, discord.Member):
             if self == self.EVERYONE:
                 return True
