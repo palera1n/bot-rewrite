@@ -55,9 +55,6 @@ class Helper(Cog):
             anonymous (bool): Wether to show "Posted by" in footer
         """
 
-        # TODO this can fail when parsing the hex color and will spit out
-        # a full Python error to the user
-
         # if channel is not specified, default to the channel where
         # the interaction was ran in
         if channel is None:
@@ -75,7 +72,11 @@ class Helper(Cog):
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:
-            embed.color = Color.from_str(color)
+            try:
+                embed.color = Color.from_str(color)
+            except:
+                await send_error(ctx, "Invalid color!", delete_after=1)
+                return
 
         modal = PostEmbedModal(bot=self.bot, channel=channel, author=ctx.user)
         await ctx.response.send_modal(modal)
@@ -98,9 +99,6 @@ class Helper(Cog):
             image (discord.Attachment): Image to attach to poll
         """
 
-        # TODO this can fail when parsing the hex color and will spit out
-        # a full Python error to the user
-
         # if channel is not specified, default to the channel where
         # the interaction was ran in
         if channel is None:
@@ -121,7 +119,11 @@ class Helper(Cog):
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:
-            embed.color = Color.from_str(color)
+            try:
+                embed.color = Color.from_str(color)
+            except:
+                await send_error(ctx, "Invalid color!", delete_after=1)
+                return
 
         # send the embed
         msg = await channel.send(embed=embed)

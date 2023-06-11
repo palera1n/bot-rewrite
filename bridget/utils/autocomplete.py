@@ -4,14 +4,13 @@ from typing import List
 from discord import app_commands
 from discord.enums import AutoModRuleTriggerType
 
-from utils.config import cfg
-from utils.enums import FilterBypassLevel
+from utils.enums import PermissionLevel
+from utils.fetchers import canister_fetch_repos
 from utils.services import guild_service, user_service
 
 
 async def warn_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    # TODO: Real permission check for mod+
-    if ctx.user.id != cfg.owner_id:
+    if not PermissionLevel.MOD.check(ctx):
         return []
 
     cases: List[Case] = [case for case in user_service.get_cases(int(
@@ -36,21 +35,8 @@ async def issues_autocomplete(_: discord.Interaction, current: str) -> List[app_
     return [app_commands.Choice(name=issue, value=issue)
             for issue in issues if current.lower() in issue.lower()][:25]
 
-# TODO: Check if this is even used at all anymore
-async def filter_bypass_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[int]]:
-    # TODO: Real permission check for mod+
-    if ctx.user.id != cfg.owner_id:
-        return []
-
-    levels = [ FilterBypassLevel.HELPER, FilterBypassLevel.MOD, FilterBypassLevel.RAID ]
-    return [
-        app_commands.Choice(name=str(level), value=int(level))
-        for level in levels if current.lower() in str(level).lower()
-    ]
-
 async def automod_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    # TODO: Real permission check for mod+
-    if ctx.user.id != cfg.owner_id:
+    if not PermissionLevel.MOD.check(ctx):
         return []
 
     rules = await ctx.guild.fetch_automod_rules()
@@ -60,8 +46,7 @@ async def automod_autocomplete(ctx: discord.Interaction, current: str) -> List[a
     ]
 
 async def filter_phrase_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    # TODO: Real permission check for mod+
-    if ctx.user.id != cfg.owner_id:
+    if not PermissionLevel.MOD.check(ctx):
         return []
 
     rules = await ctx.guild.fetch_automod_rules()
@@ -76,8 +61,7 @@ async def filter_phrase_autocomplete(ctx: discord.Interaction, current: str) -> 
             for filter in filters if current.lower() in filter[0].lower()][:25]
 
 async def filter_regex_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    # TODO: Real permission check for mod+
-    if ctx.user.id != cfg.owner_id:
+    if not PermissionLevel.MOD.check(ctx):
         return []
 
     rules = await ctx.guild.fetch_automod_rules()
@@ -92,8 +76,7 @@ async def filter_regex_autocomplete(ctx: discord.Interaction, current: str) -> L
             for filter in filters if current.lower() in filter[0].lower()][:25]
 
 async def filter_whitelist_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    # TODO: Real permission check for mod+
-    if ctx.user.id != cfg.owner_id:
+    if not PermissionLevel.MOD.check(ctx):
         return []
 
     rules = await ctx.guild.fetch_automod_rules()
@@ -114,4 +97,13 @@ async def rule_autocomplete(ctx: discord.Interaction, current: str) -> List[app_
     rules = [ x for x in messages if x.embeds ]
     return [app_commands.Choice(name=rule.embeds[0].title, value=str(rule.id))
             for rule in rules if current.lower() in rule.embeds[0].title.lower()][:25]
+
+async def repo_autocomplete(_: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+    repos = await canister_fetch_repos()
+    if repos is None:
+        return []
+    repos = [repo['slug'] for repo in repos if repo.get(
+        "slug") and repo.get("slug") is not None]
+    repos.sort()
+    return [app_commands.Choice(name=repo, value=repo) for repo in repos if current.lower() in repo.lower()][:25]
 

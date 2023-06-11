@@ -331,3 +331,4 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
 
         guild_service.remove_tag(name)
         await send_success(ctx, f"Deleted tag `{tag.name}`.", delete_after=5)
+

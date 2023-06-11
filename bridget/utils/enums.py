@@ -78,39 +78,3 @@ class PermissionLevel(IntEnum):
     def __hash__(self) -> int:
         return hash(self.value)
 
-
-@unique
-class FilterBypassLevel(IntEnum):
-    """Filter bypass level enum"""
-
-    HELPER = 0
-    MOD = 1
-    RAID = 2
-
-    def __str__(self) -> str:
-        return {
-                self.HELPER: "Helper and up",
-                self.MOD: "Moderator and up",
-                self.RAID: "Raid phrases"
-        }[self] 
-
-    def find_rules_for_bypass(self, rules: List[AutoModRule]) -> List[AutoModRule]:
-        rules = []
-        if self == FilterBypassLevel.HELPER:
-            # find the rules that has Helper exempt
-            for rule in rules:
-                if guild_service.get_guild().role_helper in rule.exempt_role_ids and not rule_has_timeout(rule):
-                    rules.append(rule)
-        elif self == FilterBypassLevel.MOD:
-            for rule in rules:
-                # find the rules that doesnt have Helper exempt
-                if guild_service.get_guild().role_helper not in rule.exempt_role_ids and not rule_has_timeout(rule):
-                    rules.append(rule)
-        elif self == FilterBypassLevel.RAID:
-            for rule in rules:
-                # find the rule that times out the member
-                if rule_has_timeout(rule):
-                    rules.append(rule)
-
-        return rules
-

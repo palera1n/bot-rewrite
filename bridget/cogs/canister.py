@@ -6,11 +6,12 @@ from discord import app_commands
 from discord.ext import commands
 
 from utils.config import cfg
+from utils.enums import PermissionLevel
 from utils.services import guild_service
 from utils.fetchers import canister_fetch_repos, canister_search_package
-from utils.canister import TweakDropdown, default_repos
-from utils.utils import send_error, send_success
-
+from utils.canister import TweakDropdown
+from utils.utils import send_error
+from utils.autocomplete import repo_autocomplete
 
 class Canister(commands.Cog):
     def __init__(self, bot):
@@ -76,9 +77,8 @@ class Canister(commands.Cog):
             raise commands.BadArgument("Please enter a longer query.")
 
         should_whisper = False
-        # TODO This is for mods showing the embed instead of whisper
-        #if not gatekeeper.has(ctx.guild, ctx.author, 5) and ctx.channel.id == guild_service.get_guild().channel_general:
-        #    should_whisper = True
+        if not PermissionLevel.MOD.check(ctx) and ctx.channel_id == guild_service.get_guild().channel_general:
+            should_whisper = True
 
         await ctx.response.defer(ephemeral=should_whisper)
         result = list(await canister_search_package(query))
@@ -102,7 +102,7 @@ class Canister(commands.Cog):
 
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
-    #@app_commands.autocomplete(query=repo_autocomplete) # TODO Steal this from GIR later
+    @app_commands.autocomplete(query=repo_autocomplete)
     async def repo(self, ctx: discord.Interaction, query: str) -> None:
         """Search for a tweak repository
 
@@ -148,5 +148,5 @@ class Canister(commands.Cog):
                                   url=f'https://repos.slim.rocks/repo/?repoUrl={this_repo}', style=discord.ButtonStyle.url, row=1)
             ]]
 
-        await ctx.response.send_message(embed=embed, ephemeral=True, view=view)
+        await ctx.response.send_message(embed=embed, view=view)
 
