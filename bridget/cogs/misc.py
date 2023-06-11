@@ -53,7 +53,7 @@ class Misc(Cog):
         usr = user_service.get_user(user.id)
 
         embed = Embed(title="User Information")
-        embed.set_author(name=str(user), icon_url=user.avatar.url if user.avatar else None)
+        embed.set_thumbnail(url=user.avatar.url if user.avatar else None)
         embed.add_field(name="Username", value=f"{str(user)} ({user.mention})", inline=True)
         embed.add_field(name="Level", value=usr.level, inline=True)
         embed.add_field(name="XP", value=usr.xp, inline=True)

@@ -86,7 +86,7 @@ async def automod_fancy_embed(bot: discord.BotIntegration, ctx: discord.AutoModA
     embed.add_field(name="Message", value=ctx.content, inline=False)
     embed.add_field(name="Filtered word", value=ctx.matched_content, inline=True)
     embed.timestamp = datetime.now()
-    embed.set_footer(text=f"{member.name}#{member.discriminator}")
+    embed.set_footer(text=f"{member}")
     embed.add_field(
         name="Join date",
         value=f"{format_dt(member.joined_at, style='F')} ({format_dt(member.joined_at, style='R')})",

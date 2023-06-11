@@ -68,7 +68,7 @@ class Helper(Cog):
 
         # create the embed, add the image and color if specified
         embed = discord.Embed(title=title, timestamp=datetime.now())
-        embed.set_footer(text="" if anonymous else f"Posted by {ctx.user.name}#{ctx.user.discriminator}")
+        embed.set_footer(text="" if anonymous else f"Posted by {ctx.user}")
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:
@@ -115,7 +115,7 @@ class Helper(Cog):
             description=question, color=random.randint(
                 0, 16777215), timestamp=datetime.now())
         embed.set_footer(
-            text=f"Poll started by {ctx.user.name}#{ctx.user.discriminator}")
+            text=f"Poll started by {ctx.user}")
         if image is not None:
             embed.set_image(url=image.url)
         if color is not None:
