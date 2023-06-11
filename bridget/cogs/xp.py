@@ -72,7 +72,7 @@ class Xp(commands.Cog):
 
         whisper = False
         bot_chan = guild_service.get_guild().channel_botspam
-        if not PermissionLevel.MOD.check(ctx) and ctx.channel_id != bot_chan:
+        if not PermissionLevel.MOD == ctx.user and ctx.channel_id != bot_chan:
             whisper = True
 
         embed = discord.Embed(title="Level Statistics")
@@ -98,7 +98,7 @@ class Xp(commands.Cog):
 
         whisper = False
         bot_chan = guild_service.get_guild().channel_botspam
-        if not PermissionLevel.MOD.check(ctx) and ctx.channel_id != bot_chan:
+        if not PermissionLevel.MOD == ctx.user and ctx.channel_id != bot_chan:
             whisper = True
 
         results = enumerate(user_service.leaderboard())

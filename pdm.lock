@@ -77,10 +77,10 @@ summary = "The Real First Universal Charset Detector. Open, modern and actively 
 
 [[package]]
 name = "chatgpt"
-version = "0.2.1"
+version = "0.2.2"
 requires_python = ">=3.8,<4.0"
 git = "https://github.com/0xallie/chatgpt"
-revision = "ba16a1183cf580d5f5efaf946468ac65b59b0022"
+revision = "7dd3afe72bfa807841766a68ac8d2ba18c290805"
 summary = "Asynchronous Python ChatGPT library using OpenAI API"
 dependencies = [
     "aiohttp<4,>=3.7.4.post0",

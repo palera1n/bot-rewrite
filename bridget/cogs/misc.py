@@ -46,8 +46,8 @@ class Misc(Cog):
         if not user:
             user = ctx.user
 
-        if not PermissionLevel.MOD.check(ctx) and user.id != ctx.user.id:
-            raise commands.BadArgument(
+        if not PermissionLevel.MOD == ctx.user and user.id != ctx.user.id:
+            raise app_commands.MissingPermissions(
                 "You do not have permission to use this command.")
 
         usr = user_service.get_user(user.id)
@@ -79,7 +79,7 @@ class Misc(Cog):
 
         # non-mod users will be ratelimited
         bot_chan = guild_service.get_guild().channel_botspam
-        if not PermissionLevel.MOD.check(ctx) and ctx.channel_id != bot_chan:
+        if not PermissionLevel.MOD == ctx.user and ctx.channel_id != bot_chan:
             bucket = self.spam_cooldown.get_bucket(ctx)
             if bucket.update_rate_limit():
                 raise commands.BadArgument("This command is on cooldown.")
@@ -140,7 +140,7 @@ class Misc(Cog):
 
         whisper = False
         bot_chan = guild_service.get_guild().channel_botspam
-        if not PermissionLevel.MOD.check(ctx) and ctx.channel_id != bot_chan:
+        if not PermissionLevel.MOD == ctx.user and ctx.channel_id != bot_chan:
             whisper = True
 
         await ctx.response.send_message(embed=embed, ephemeral=whisper, view=view)
@@ -160,7 +160,7 @@ class Misc(Cog):
 
         whisper = False
         bot_chan = guild_service.get_guild().channel_botspam
-        if not PermissionLevel.MOD.check(ctx) and ctx.channel_id != bot_chan:
+        if not PermissionLevel.MOD == ctx.user and ctx.channel_id != bot_chan:
             whisper = True
 
         response = random.choice(responses)

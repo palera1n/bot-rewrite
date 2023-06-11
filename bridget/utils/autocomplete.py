@@ -10,7 +10,7 @@ from utils.services import guild_service, user_service
 
 
 async def warn_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    if not PermissionLevel.MOD.check(ctx):
+    if not PermissionLevel.MOD == ctx.user:
         return []
 
     cases: List[Case] = [case for case in user_service.get_cases(int(
@@ -36,7 +36,7 @@ async def issues_autocomplete(_: discord.Interaction, current: str) -> List[app_
             for issue in issues if current.lower() in issue.lower()][:25]
 
 async def automod_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    if not PermissionLevel.MOD.check(ctx):
+    if not PermissionLevel.MOD == ctx.user:
         return []
 
     rules = await ctx.guild.fetch_automod_rules()
@@ -46,7 +46,7 @@ async def automod_autocomplete(ctx: discord.Interaction, current: str) -> List[a
     ]
 
 async def filter_phrase_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    if not PermissionLevel.MOD.check(ctx):
+    if not PermissionLevel.MOD == ctx.user:
         return []
 
     rules = await ctx.guild.fetch_automod_rules()
@@ -61,7 +61,7 @@ async def filter_phrase_autocomplete(ctx: discord.Interaction, current: str) -> 
             for filter in filters if current.lower() in filter[0].lower()][:25]
 
 async def filter_regex_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    if not PermissionLevel.MOD.check(ctx):
+    if not PermissionLevel.MOD == ctx.user:
         return []
 
     rules = await ctx.guild.fetch_automod_rules()
@@ -76,7 +76,7 @@ async def filter_regex_autocomplete(ctx: discord.Interaction, current: str) -> L
             for filter in filters if current.lower() in filter[0].lower()][:25]
 
 async def filter_whitelist_autocomplete(ctx: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
-    if not PermissionLevel.MOD.check(ctx):
+    if not PermissionLevel.MOD == ctx.user:
         return []
 
     rules = await ctx.guild.fetch_automod_rules()
