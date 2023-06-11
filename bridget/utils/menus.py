@@ -2,7 +2,7 @@ import inspect
 import discord
 
 from discord import ui
-from typing import Callable
+from typing import Callable, Generator, Optional
 
 
 class Menu(ui.View):
@@ -25,7 +25,7 @@ class Menu(ui.View):
         self.is_interaction = isinstance(ctx, discord.Interaction)
 
         """Initializes a menu"""
-        def chunks(lst, n):
+        def chunks(lst: list, n: int) -> Generator:
             """Yield successive n-sized chunks from lst."""
             for i in range(0, len(lst), n):
                 yield lst[i:i + n]
@@ -52,7 +52,7 @@ class Menu(ui.View):
 
         #await self.refresh_response_message(self.ctx)
 
-    async def generate_next_embed(self):
+    async def generate_next_embed(self) -> Optional[discord.Embed]:
         if self.current_page in self.page_cache:
             return self.page_cache.get(self.current_page)
 
@@ -145,7 +145,7 @@ class PFPView(discord.ui.View):
         self.embed = embed
         self.ctx = ctx
 
-    async def on_timeout(self):
+    async def on_timeout(self) -> None:
         for child in self.children:
             child.disabled = True
         await self.ctx.response.edit_message(embed=self.embed, view=self)
@@ -158,7 +158,7 @@ class PFPButton(discord.ui.Button):
         self.member = member
         self.other = False
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         if interaction.user != self.ctx.author:
             return
         if not self.other:
@@ -174,7 +174,7 @@ class PFPButton(discord.ui.Button):
         animated = ["gif", "png", "jpeg", "webp"]
         not_animated = ["png", "jpeg", "webp"]
 
-        def fmt(format_):
+        def fmt(format_) -> str:
             return f"[{format_}]({avatar.replace(format=format_, size=4096)})"
 
         if avatar.is_animated():

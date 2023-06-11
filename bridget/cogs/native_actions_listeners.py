@@ -58,7 +58,6 @@ class NativeActionsListeners(Cog):
             if audit_logs and audit_logs[0].target == after:
                 await channel.send(embed=await add_unmute_case(after, audit_logs[0].user, "No reason." if audit_logs[0].reason is None else audit_logs[0].reason, guild_service.get_guild(), self.bot))
 
-
     @commands.Cog.listener()
     async def on_automod_action(self, ctx: discord.AutoModAction) -> None:
         rule = await ctx.fetch_rule()
@@ -108,3 +107,4 @@ async def automod_fancy_embed(bot: discord.BotIntegration, ctx: discord.AutoModA
     await channel.send(content=f"<@&{guild_service.get_guild().role_reportping}>",
         embed=embed, view=view, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True)
     )
+

@@ -280,7 +280,7 @@ class Logging(commands.Cog):
                 await channel.send(file=file)
 
     # @commands.Cog.listener()
-    # async def on_command_error(self, ctx: GIRContext, error):
+    # async def on_command_error(self, ctx: GIRContext, error) -> None:
     #     if isinstance(error, commands.CommandNotFound):
     #         return
 

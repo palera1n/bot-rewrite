@@ -2,6 +2,7 @@ import re
 import discord
 
 from datetime import datetime
+from typing import List
 
 from .menus import Menu
 
@@ -25,7 +26,7 @@ default_repos = [
 ]
 
 
-def tweak_embed_format(entry):
+def tweak_embed_format(entry: dict) -> discord.Embed:
     titleKey = entry.get('name')
     description = discord.utils.escape_markdown(entry.get('description'))
 
@@ -73,7 +74,7 @@ def tweak_embed_format(entry):
     return embed
 
 
-async def format_tweak_page(ctx, entries, current_page, all_pages):
+async def format_tweak_page(ctx: discord.Interaction, entries: List[dict], current_page: int, all_pages: list) -> discord.Embed:
     """Formats the page for the tweak embed.
 
     Parameters
@@ -112,7 +113,7 @@ class TweakMenu(Menu):
         self.jump_button = JumpButton(self.ctx, len(self.pages), self)
         self.extra_buttons = []
 
-    def refresh_button_state(self):
+    def refresh_button_state(self) -> None:
         if self.ctx.repo:
             extra_buttons = [
                 discord.ui.Button(label='Add Repo to Sileo', emoji="<:sileo:679466569407004684>",
@@ -151,17 +152,17 @@ class TweakMenu(Menu):
 
         super().refresh_button_state()
 
-    def on_interaction_check(self, interaction: discord.Interaction):
+    def on_interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user == self.ctx.author # or gatekeeper.has(interaction.guild, interaction.user, 4)
 
-    async def on_timeout(self):
+    async def on_timeout(self) -> None:
         self.jump_button.disabled = True
         self.stopped = True
         await self.refresh_response_message()
         self.stop()
 
 
-async def canister(ctx: discord.Interaction, whisper: bool, result):
+async def canister(ctx: discord.Interaction, whisper: bool, result) -> None:
     await TweakMenu(ctx, result, per_page=1, page_formatter=format_tweak_page, whisper=whisper, start_page=25, show_skip_buttons=False).start(ctx)
 
 
@@ -195,10 +196,10 @@ class TweakDropdown(discord.ui.Select):
         super().__init__(placeholder='Pick a tweak to view...',
                          min_values=1, max_values=1, options=options)
 
-    def start(self, ctx):
+    def start(self, ctx: discord.Interaction) -> None:
         self.ctx = ctx
 
-    async def callback(self, interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         if interaction.user != self.author: # and not gatekeeper.has(interaction.guild, interaction.user, 4):
             return
 
@@ -214,9 +215,9 @@ class TweakDropdown(discord.ui.Select):
             return
 
         self.refresh_view(selected_value)
-        await self.ctx.response.edit_message(embed=await self.format_tweak_page(selected_value), view=self._view)
+        await self.ctx.response.edit_message(embed=tweak_embed_format(selected_value), view=self._view)
 
-    async def on_timeout(self):
+    async def on_timeout(self) -> None:
         self.disabled = True
         self.placeholder = "Timed out"
         if isinstance(self.ctx, discord.Interaction):
@@ -224,11 +225,7 @@ class TweakDropdown(discord.ui.Select):
         else:
             await self.ctx.message.edit(view=self._view)
 
-    async def format_tweak_page(self, entry):
-        embed = tweak_embed_format(entry)
-        return embed
-
-    def generate_buttons(self, entry):
+    def generate_buttons(self, entry: dict) -> List[discord.ui.Button]:
         repo = entry.get('repository').get('uri')
         depiction = entry.get('depiction')
 
@@ -260,7 +257,7 @@ class TweakDropdown(discord.ui.Select):
                                  )
         return extra_buttons
 
-    def refresh_view(self, entry):
+    def refresh_view(self, entry: dict) -> None:
         extra_buttons = self.generate_buttons(entry)
         self._view.clear_items()
 
@@ -276,7 +273,7 @@ class BypassMenu(Menu):
         super().__init__(*args, **kwargs, timeout_function=self.on_timeout)
         self.extra_buttons = []
 
-    def refresh_button_state(self):
+    def refresh_button_state(self) -> None:
         app = self.ctx.app
         bypass = self.ctx.current_bypass
         extra_buttons = []
@@ -308,7 +305,7 @@ class BypassMenu(Menu):
 
         super().refresh_button_state()
 
-    async def on_timeout(self):
+    async def on_timeout(self) -> None:
         self.stopped = True
         await self.refresh_response_message()
         self.stop()
@@ -323,7 +320,7 @@ class JumpButton(discord.ui.Button):
         self.tmb = tmb
         self.row = 2
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         if interaction.user != self.tmb.ctx.author:
             return
 
@@ -355,8 +352,9 @@ class JumpModal(discord.ui.Modal):
             label="Page", placeholder=f"Between 1 and {max_page}")
         self.add_item(self.page)
 
-    async def on_submit(self, interaction: discord.Interaction):
+    async def on_submit(self, interaction: discord.Interaction) -> None:
         try:
             await interaction.response.send_message()
         except:
             pass
+

@@ -1,14 +1,15 @@
 import json
 import urllib
-
 import aiohttp
+
 from aiocache import cached
+from typing import Union, Optional
 
 client_session = None
 
 
 @cached(ttl=3600)
-async def get_ios_cfw():
+async def get_ios_cfw() -> Optional[dict]:
     """Gets all apps on ios.cfw.guide
 
     Returns
@@ -20,12 +21,11 @@ async def get_ios_cfw():
     async with client_session.get("https://api.appledb.dev/main.json") as resp:
         if resp.status == 200:
             data = await resp.json()
-
-    return data
+            return data
 
 
 @cached(ttl=3600)
-async def get_ipsw_firmware_info(version: str):
+async def get_ipsw_firmware_info(version: str) -> Union[dict, list]:
     """Gets all apps on ios.cfw.guide
 
     Returns
@@ -43,7 +43,7 @@ async def get_ipsw_firmware_info(version: str):
 
 
 @cached(ttl=600)
-async def get_dstatus_components():
+async def get_dstatus_components() -> Optional[dict]:
     async with client_session.get("https://discordstatus.com/api/v2/components.json") as resp:
         if resp.status == 200:
             components = await resp.json()
@@ -51,14 +51,14 @@ async def get_dstatus_components():
 
 
 @cached(ttl=600)
-async def get_dstatus_incidents():
+async def get_dstatus_incidents() -> Optional[dict]:
     async with client_session.get("https://discordstatus.com/api/v2/incidents.json") as resp:
         if resp.status == 200:
             incidents = await resp.json()
             return incidents
 
 
-async def fetch_remote_json(url):
+async def fetch_remote_json(url: str) -> Optional[dict]:
     """Get a JSON file from a URL
 
     Parameters
@@ -87,7 +87,7 @@ async def fetch_remote_json(url):
             return None
 
 
-async def fetch_remote_file(url):
+async def fetch_remote_file(url: str) -> Optional[str]:
     """Get a file from a URL
 
     Parameters
@@ -109,7 +109,7 @@ async def fetch_remote_file(url):
             return None
 
 
-async def canister_search_package(query):
+async def canister_search_package(query: str) -> Optional[list]:
     """Search for a tweak in Canister's catalogue
 
     Parameters
@@ -132,7 +132,7 @@ async def canister_search_package(query):
             return None
 
 
-async def canister_search_repo(query):
+async def canister_search_repo(query: str) -> Optional[list]:
     """Search for a repo in Canister's catalogue
 
     Parameters
@@ -156,7 +156,7 @@ async def canister_search_repo(query):
 
 
 @cached(ttl=3600)
-async def canister_fetch_repos():
+async def canister_fetch_repos() -> Optional[list]:
     async with client_session.get('https://api.canister.me/v2/jailbreak/repository/ranking?rank=*') as resp:
         if resp.status == 200:
             response = await resp.json(content_type=None)
@@ -166,13 +166,13 @@ async def canister_fetch_repos():
 
 
 @cached(ttl=3600)
-async def fetch_scam_urls():
+async def fetch_scam_urls() -> Optional[dict]:
     async with client_session.get("https://raw.githubusercontent.com/SlimShadyIAm/Anti-Scam-Json-List/main/antiscam.json") as resp:
         if resp.status == 200:
             obj = json.loads(await resp.text())
             return obj
 
 
-async def init_client_session():
+async def init_client_session() -> None:
     global client_session
     client_session = aiohttp.ClientSession()

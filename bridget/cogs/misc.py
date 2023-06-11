@@ -122,7 +122,7 @@ class Misc(Cog):
 
         avatar = user.avatar or user.default_avatar
 
-        def fmt(format_):
+        def fmt(format_) -> str:
             return f"[{format_}]({avatar.replace(format=format_, size=4096)})"
 
         if user.display_avatar.is_animated():
