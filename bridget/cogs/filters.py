@@ -2,7 +2,7 @@ import discord
 
 from discord import Embed, app_commands
 from discord.ext import commands
-from typing import Optional
+from typing import Optional, List, Tuple
 
 from utils import Cog, send_error, send_success
 from utils.menus import Menu
@@ -10,7 +10,7 @@ from utils.autocomplete import automod_autocomplete, filter_phrase_autocomplete,
 from utils.enums import PermissionLevel
 
 
-def format_filter_page(_, entries, current_page, all_pages) -> Embed:
+def format_filter_page(_, entries: List[Tuple[str, str]], current_page: int, all_pages: list) -> Embed:
     embed = discord.Embed(
         title='Filtered words', color=discord.Color.blurple())
     for filter in entries:
@@ -62,7 +62,7 @@ class FiltersGroup(Cog, commands.GroupCog, group_name="filter"):
     @PermissionLevel.MOD
     @app_commands.autocomplete(rule=automod_autocomplete)
     @app_commands.command()
-    async def list(self, ctx: discord.Interaction, rule: Optional[str] = None) -> None:
+    async def list(self, ctx: discord.Interaction, rule: str = None) -> None:
         """List filtered words
 
         Args:

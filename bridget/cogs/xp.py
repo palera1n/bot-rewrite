@@ -4,7 +4,7 @@ import math
 from discord.ext import commands
 from discord import app_commands
 from random import randint
-from typing import List
+from typing import List, Union
 
 from utils.services import guild_service
 from utils.services import user_service
@@ -170,7 +170,7 @@ class Xp(commands.Cog):
 
         return roles_to_add
 
-    async def add_new_roles(self, obj: discord.Message | discord.User, roles_to_add: List[int]) -> None:
+    async def add_new_roles(self, obj: Union[discord.Message, discord.User], roles_to_add: List[int]) -> None:
         if roles_to_add is None:
             return
 

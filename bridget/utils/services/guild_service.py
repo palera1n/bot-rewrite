@@ -22,21 +22,21 @@ def add_tag(tag: Tag) -> None:
     Guild.objects(_id=guild_id).update_one(push__tags=tag)
 
 
-def remove_tag(tag: str):
+def remove_tag(tag: str) -> int:
     return Guild.objects(
         _id=guild_id).update_one(
         pull__tags__name=Tag(
             name=tag).name)
 
 
-def edit_tag(tag):
+def edit_tag(tag) -> int:
     return Guild.objects(
         _id=guild_id,
         tags__name=tag.name).update_one(
         set__tags__S=tag)
 
 
-def get_tag(name: str):
+def get_tag(name: str) -> Optional[Tag]:
     tag = Guild.objects.get(_id=guild_id).tags.filter(name=name).first()
     if tag is None:
         return
@@ -49,28 +49,28 @@ def add_issue(issue: Issue) -> None:
     Guild.objects(_id=guild_id).update_one(push__issues=issue)
 
 
-def remove_issue(issue: str):
+def remove_issue(issue: str) -> int:
     return Guild.objects(
         _id=guild_id).update_one(
         pull__issues__name=Tag(
             name=issue).name)
 
 
-def edit_issue(issue):
+def edit_issue(issue: Issue) -> int:
     return Guild.objects(
         _id=guild_id,
         issues__name=issue.name).update_one(
         set__issues__S=issue)
 
 
-def get_issue(name: str):
+def get_issue(name: str) -> Optional[Issue]:
     issue = Guild.objects.get(_id=guild_id).issues.filter(name=name).first()
     if issue is None:
         return
     return issue
 
 
-def edit_issues_list(ids):
+def edit_issues_list(ids) -> int:
     return Guild.objects(
         _id=guild_id).update_one(
         set__issues_list_msg=ids)
@@ -80,21 +80,21 @@ def add_meme(meme: Tag) -> None:
     Guild.objects(_id=guild_id).update_one(push__memes=meme)
 
 
-def remove_meme(meme: str):
+def remove_meme(meme: str) -> int:
     return Guild.objects(
         _id=guild_id).update_one(
         pull__memes__name=Tag(
             name=meme).name)
 
 
-def edit_meme(meme):
+def edit_meme(meme: Tag) -> int:
     return Guild.objects(
         _id=guild_id,
         memes__name=meme.name).update_one(
         set__memes__S=meme)
 
 
-def get_meme(name: str):
+def get_meme(name: str) -> Optional[Tag]:
     meme = Guild.objects.get(_id=guild_id).memes.filter(name=name).first()
     if meme is None:
         return
@@ -111,7 +111,7 @@ def inc_caseid() -> None:
     Guild.objects(_id=guild_id).update_one(inc__case_id=1)
 
 
-def all_rero_mappings():
+def all_rero_mappings() -> dict:
     g = get_guild()
     current = g.reaction_role_mapping
     return current
@@ -134,7 +134,7 @@ def append_rero_mapping(message_id, mapping) -> None:
     g.save()
 
 
-def get_rero_mapping(id):
+def get_rero_mapping(id) -> Optional[Any]:
     g = get_guild()
     if id in g.reaction_role_mapping:
         return g.reaction_role_mapping[id]
@@ -227,14 +227,14 @@ def add_filtered_word(fw: FilterWord) -> None:
     return True
 
 
-def remove_filtered_word(word: str):
+def remove_filtered_word(word: str) -> int:
     return Guild.objects(
         _id=guild_id).update_one(
         pull__filter_words__word=FilterWord(
             word=word).word)
 
 
-def update_filtered_word(word: FilterWord):
+def update_filtered_word(word: FilterWord) -> int:
     return Guild.objects(
         _id=guild_id,
         filter_words__word=word.word).update_one(
@@ -295,7 +295,7 @@ def remove_ignored_channel_logging(id: int) -> bool:
     return False
 
 
-def get_locked_channels():
+def get_locked_channels() -> list:
     return get_guild().locked_channels
 
 

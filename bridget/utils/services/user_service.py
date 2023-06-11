@@ -37,7 +37,7 @@ def leaderboard() -> list:
         '-xp', '-_id').select_related()
 
 
-def leaderboard_rank(xp):
+def leaderboard_rank(xp: int) -> Tuple[int, int]:
     users = User.objects().only('_id', 'xp')
     overall = users().count()
     rank = users(xp__gte=xp).count()
@@ -173,7 +173,7 @@ def rundown(id: int) -> list:
     return cases[0:3]
 
 
-def retrieve_birthdays(date):
+def retrieve_birthdays(date) -> Any:
     return User.objects(birthday=date)
 
 
@@ -214,7 +214,7 @@ def fetch_raids() -> Dict[str, Any]:
     return values
 
 
-def fetch_cases_by_mod(_id):
+def fetch_cases_by_mod(_id) -> dict:
     values = {}
     cases = Cases.objects(cases__mod_id=str(_id))
     values["total"] = 0
@@ -226,7 +226,7 @@ def fetch_cases_by_mod(_id):
                 final_cases.append(case)
                 values["total"] += 1
 
-    def get_case_reason(reason):
+    def get_case_reason(reason: str) -> str:
         string = reason.lower()
         return ''.join(e for e in string if e.isalnum() or e == " ").strip()
 
@@ -240,7 +240,7 @@ def fetch_cases_by_mod(_id):
     return values
 
 
-def fetch_cases_by_keyword(keyword):
+def fetch_cases_by_keyword(keyword: str) -> dict:
     values = {}
     cases = Cases.objects(cases__reason__contains=keyword)
     cases = list(cases.all())

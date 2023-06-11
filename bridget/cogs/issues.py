@@ -5,12 +5,13 @@ import aiohttp
 import tempfile
 
 from io import BytesIO
-from discord import Guild, Color
+from discord import Guild, Color, File
 from discord.components import Button
 from discord.ext import commands
 from discord import app_commands
 from discord.embeds import Embed
 from datetime import datetime
+from typing import Optional
 
 from model.issues import Issue
 from utils import Cog, send_error, send_success
@@ -20,7 +21,7 @@ from utils.modals import IssueModal, EditIssueModal
 from utils.services import guild_service
 from utils.autocomplete import issues_autocomplete
 
-async def get_discord_file_from_url(url):
+async def get_discord_file_from_url(url) -> Optional[File]:
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             if response.status == 200:

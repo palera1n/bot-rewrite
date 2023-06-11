@@ -66,7 +66,7 @@ async def send_error(ctx: discord.Interaction, description: str, embed: discord.
             await followup.delete()
 
 
-async def send_success(ctx: discord.Interaction, description: str = "Done!", embed: Optional[discord.Embed] = None, delete_after: Optional[int] = None, ephemeral: bool = True) -> None:
+async def send_success(ctx: discord.Interaction, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None, ephemeral: bool = True) -> None:
     if embed:
         await ctx.response.send_message(
             embed=embed,
@@ -84,7 +84,7 @@ async def send_success(ctx: discord.Interaction, description: str = "Done!", emb
         )
 
 
-async def reply_success(message: discord.Message, description: str = "Done!", embed: Optional[discord.Embed] = None, delete_after: Optional[int] = None) -> None:
+async def reply_success(message: discord.Message, description: str = "Done!", embed: discord.Embed = None, delete_after: int = None) -> None:
     if embed:
         await message.reply(
             embed=embed,
@@ -122,7 +122,7 @@ pun_map = {
 }
 
 
-def determine_emoji(type):
+def determine_emoji(type: str) -> str:
     emoji_dict = {
         "KICK": "👢",
         "BAN": "❌",

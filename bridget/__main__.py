@@ -89,12 +89,12 @@ asyncio.run(bot.add_cog(Xp(bot)))
 asyncio.run(bot.add_cog(Appeals(bot)))
 
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     await init_client_session()
 
 # Error handler
 @bot.tree.error
-async def app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+async def app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
     if isinstance(error, app_commands.CommandInvokeError):
         error = error.original
 

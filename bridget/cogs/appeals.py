@@ -3,6 +3,7 @@ import discord
 
 from discord.ext import commands
 from discord.utils import format_dt
+from typing import Generator, List
 
 from utils.services import user_service
 from utils.config import cfg
@@ -10,7 +11,7 @@ from utils.enums import PermissionLevel
 from utils import pun_map, determine_emoji
 
 
-def chunks(lst, n):
+def chunks(lst: list, n: int) -> Generator:
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
@@ -23,7 +24,7 @@ class Appeals(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member):
+    async def on_member_join(self, member: discord.Member) -> None:
         if member.guild.id != cfg.ban_appeal_guild_id:
             return
         main_guild = self.bot.get_guild(cfg.guild_id)
@@ -40,7 +41,7 @@ class Appeals(commands.Cog):
             await member.kick(reason="You are not allowed to join this server.")
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
+    async def on_message(self, message: discord.Message) -> None:
         if message.guild is None:
             return
         if message.guild.id != cfg.ban_appeal_guild_id:
@@ -99,7 +100,7 @@ class Appeals(commands.Cog):
 
         await thread.send(unban_id)
 
-    async def generate_userinfo(self, appealer: discord.User):
+    async def generate_userinfo(self, appealer: discord.User) -> discord.Embed:
         results = user_service.get_user(appealer.id)
 
         embed = discord.Embed(title=f"User Information",
@@ -119,7 +120,7 @@ class Appeals(commands.Cog):
                         value=f"{format_dt(appealer.created_at, style='F')} ({format_dt(appealer.created_at, style='R')})", inline=True)
         return embed
 
-    async def generate_cases(self, appealer: discord.User):
+    async def generate_cases(self, appealer: discord.User) -> List[discord.Embed]:
         results = user_service.get_cases(appealer.id)
         if not results.cases:
             return None
