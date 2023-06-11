@@ -1,3 +1,4 @@
+import asyncio
 import discord
 
 from discord.ext import commands
@@ -16,7 +17,9 @@ def chunks(lst, n):
 
 
 class Appeals(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
+        if cfg.ban_appeal_guild_id == -1 or cfg.ban_appeal_mod_role == -1:
+            asyncio.run(bot.remove_cog(self))
         self.bot = bot
 
     @commands.Cog.listener()
