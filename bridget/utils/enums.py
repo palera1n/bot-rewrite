@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 
 from .services import guild_service
 from .config import cfg
+from .errors import MissingPermissionsError
 
 
 def rule_has_timeout(rule: AutoModRule) -> bool:
@@ -65,14 +66,9 @@ class PermissionLevel(IntEnum):
     def __add__(self, other) -> "PermissionLevel":
         return self.__class__(self.value + other)
 
-    def check(self, ctx: discord.Interaction) -> bool:
-        if not self == ctx.user:
-            raise discord.app_commands.MissingPermissions(
-                "You don't have permission to use this command.")
-        return True
 
     def __call__(self, command: discord.app_commands.Command) -> discord.app_commands.Command:
-        command.checks.append(self.check)
+        command.checks.append(lambda ctx: True if self == ctx.user else MissingPermissionsError.throw())
         return command
 
     def __hash__(self) -> int:

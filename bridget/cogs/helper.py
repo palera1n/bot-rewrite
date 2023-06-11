@@ -29,7 +29,9 @@ class Helper(Cog):
 
         # only OP and helpers can mark as solved
         if ctx.channel.owner_id != ctx.user.id:
-            PermissionLevel.HELPER.check(ctx)
+            if not self == ctx.user:
+                raise discord.app_commands.MissingPermissions(
+                    "You don't have permission to use this command.")
 
         await send_success(ctx, "Thread marked as solved!", ephemeral=False)
 
