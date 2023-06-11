@@ -103,9 +103,36 @@ async def reply_success(message: discord.Message, description: str = "Done!", em
 def format_number(number: int) -> str:
     return f"{number:,}"
 
+
 async def audit_logs_multi(guild: discord.Guild, actions: List[discord.AuditLogAction], limit: int, after: Union[discord.abc.Snowflake, datetime]) -> List[discord.AuditLogEntry]:
     logs = []
     for action in actions:
         logs.extend([audit async for audit in guild.audit_logs(limit=limit, action=action, after=after)])
     logs.sort(key=lambda x: x.created_at, reverse=True)
     return logs
+
+
+pun_map = {
+    "KICK": "Kicked",
+    "BAN": "Banned",
+    "CLEM": "Clemmed",
+    "UNBAN": "Unbanned",
+    "MUTE": "Duration",
+    "REMOVEPOINTS": "Points removed"
+}
+
+
+def determine_emoji(type):
+    emoji_dict = {
+        "KICK": "👢",
+        "BAN": "❌",
+        "UNBAN": "✅",
+        "MUTE": "🔇",
+        "WARN": "⚠️",
+        "UNMUTE": "🔈",
+        "LIFTWARN": "⚠️",
+        "REMOVEPOINTS": "⬇️",
+        "CLEM": "👎"
+    }
+    return emoji_dict[type]
+

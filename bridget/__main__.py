@@ -16,7 +16,7 @@ mongoengine.connect(
     port=int(
         getenv("DB_PORT")))
 
-from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper, FiltersGroup, Issues, IssuesGroup, Misc, Memes, MemesGroup, LogParsing, Canister, Xp
+from cogs import ChatGPT, Logging, Mod, NativeActionsListeners, Say, Snipe, Sync, Tags, TagsGroup, Unshorten, Timezones, Helper, FiltersGroup, Issues, IssuesGroup, Misc, Memes, MemesGroup, LogParsing, Canister, Xp, Appeals
 from utils.startup_checks import checks
 from utils.config import cfg
 from utils.fetchers import init_client_session
@@ -86,6 +86,7 @@ asyncio.run(bot.add_cog(MemesGroup(bot)))
 asyncio.run(bot.add_cog(LogParsing(bot)))
 asyncio.run(bot.add_cog(Canister(bot)))
 asyncio.run(bot.add_cog(Xp(bot)))
+asyncio.run(bot.add_cog(Appeals(bot)))
 
 @bot.event
 async def on_ready():

@@ -16,3 +16,4 @@ from .memes import Memes, MemesGroup
 from .logparsing import LogParsing
 from .canister import Canister
 from .xp import Xp
+from .appeals import Appeals
