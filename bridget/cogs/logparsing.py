@@ -1,6 +1,7 @@
 import discord
 
 from discord.ext import commands
+from typing import Tuple
 
 from utils.fetchers import fetch_remote_json, fetch_remote_file
 from utils.services import guild_service
@@ -27,7 +28,7 @@ class LogParsing(commands.Cog):
         elif att.filename.endswith(".log") and att.filename.startswith("FAIL"):
             await self.do_log_file(msg, att)
 
-    async def reply_with_issue(self, msg: discord.Message, issue: Issue) -> None:
+    async def issue_embed(self, msg: discord.Message, issue: Issue) -> Tuple[discord.Embed, discord.ui.View, discord.File]:
         _file = issue.image.read()
         if _file is not None:
             _file = discord.File(
@@ -36,7 +37,7 @@ class LogParsing(commands.Cog):
         else:
             _file = discord.utils.MISSING
 
-        await msg.reply(embed=prepare_issue_embed(issue), view=prepare_issue_view(issue), file=_file)
+        return (prepare_issue_embed(issue), prepare_issue_view(issue), _file)
 
     async def do_panic_log(self, msg: discord.Message, att) -> None:
         json = await fetch_remote_json(att.url)
@@ -54,10 +55,15 @@ class LogParsing(commands.Cog):
                 return
 
             if (not "```" in string or "@everyone" in string or "@here" in string) and (not "`" in build or "@everyone" in build or "@here" in build) and (not "`" in product or "@everyone" in product or "@here" in product):
-                await msg.reply(f"Hey, it looks like this is a panic log for build: `{discord.utils.escape_markdown(build)}` on a `{discord.utils.escape_markdown(product)}`!\n\nHere is the panic string:```{discord.utils.escape_markdown(string)}```")
+                issue_embed = None
                 for issue in guild_service.get_guild().issues:
                     if issue.panic_string is not None and len(issue.panic_string) > 0 and issue.panic_string in string:
-                        await self.reply_with_issue(msg, issue)
+                        issue_embed = await self.issue_embed(msg, issue)
+                        break
+                if issue_embed:
+                    await msg.reply(f"Hey, it looks like this is a panic log for build: `{discord.utils.escape_markdown(build)}` on a `{discord.utils.escape_markdown(product)}`!\n\nHere is the panic string:```{discord.utils.escape_markdown(string)}```", embed=issue_embed[0], view=issue_embed[1], file=issue_embed[2])
+                else:
+                    await msg.reply(f"Hey, it looks like this is a panic log for build: `{discord.utils.escape_markdown(build)}` on a `{discord.utils.escape_markdown(product)}`!\n\nHere is the panic string:```{discord.utils.escape_markdown(string)}```")
 
     async def do_log_file(self, msg: discord.Message, att) -> None:
         text = await fetch_remote_file(att.url)

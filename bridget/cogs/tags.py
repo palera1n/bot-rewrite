@@ -105,7 +105,7 @@ class Tags(Cog):
         bucket = self.cooldown.get_bucket(tag.name)
         current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        if bucket.update_rate_limit(current) and not PermissionLevel.MOD.check(ctx):
+        if bucket.update_rate_limit(current) and not PermissionLevel.MOD == ctx.user:
            raise commands.BadArgument("That tag is on cooldown.")
 
         # if the Tag has an image, add it to the embed
@@ -144,7 +144,7 @@ class Tags(Cog):
         bucket = self.cooldown.get_bucket(tag.name)
         current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        if bucket.update_rate_limit(current) and not PermissionLevel.MOD.check(ctx):
+        if bucket.update_rate_limit(current) and not PermissionLevel.MOD == ctx.user:
            raise commands.BadArgument("That tag is on cooldown.")
 
         # if the Tag has an image, add it to the embed
@@ -331,3 +331,4 @@ class TagsGroup(Cog, commands.GroupCog, group_name="tags"):
 
         guild_service.remove_tag(name)
         await send_success(ctx, f"Deleted tag `{tag.name}`.", delete_after=5)
+
