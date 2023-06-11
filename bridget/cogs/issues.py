@@ -227,7 +227,7 @@ class Issues(Cog):
         bucket = self.cooldown.get_bucket(issue.name)
         current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
-        if bucket.update_rate_limit(current) and not PermissionLevel.MOD.check(ctx):
+        if bucket.update_rate_limit(current) and not PermissionLevel.MOD == ctx:
            raise commands.BadArgument("That issue is on cooldown.")
 
         # if the Issue has an image, add it to the embed
