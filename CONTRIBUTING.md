@@ -70,6 +70,19 @@ def format_number(number: int) -> str:
     return f"{number:,}"
 ```
 
+If there are multiple possible types, Union should be used.
+```py
+def __eq__(self, other: Union[int, discord.Member, discord.interactions.Interaction]) -> bool:
+        if isinstance(other, discord.interactions.Interaction):
+            other = other.user
+
+        if isinstance(other, discord.Member):
+            # ...
+        
+        assert isinstance(other, self.__class__)
+        return self.value == other.value
+```
+
 Functions should have 1 space between each other:
 ```py
 def a(text: str) -> str:
