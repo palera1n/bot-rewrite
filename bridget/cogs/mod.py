@@ -84,9 +84,3 @@ class Mod(Cog):
         await send_success(ctx, embed=log, delete_after=10, ephemeral=False)
         await submit_public_log(ctx, guild_service.get_guild(), member, log, dmed)
 
-    @warn.error
-    @liftwarn.error
-    async def error_handle(self, ctx: discord.Interaction, error: Exception) -> None:
-        if isinstance(error, app_commands.MissingPermissions):
-            await send_error(ctx, "You are not allowed to use this command.")
-            return
