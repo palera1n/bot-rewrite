@@ -47,8 +47,7 @@ class Misc(Cog):
             user = ctx.user
 
         if not PermissionLevel.MOD == ctx.user and user.id != ctx.user.id:
-            raise app_commands.MissingPermissions(
-                "You do not have permission to use this command.")
+                MissingPermissionsError.throw([f"<@&{guild_service.get_guild().role_moderator}>"])
 
         usr = user_service.get_user(user.id)
 
