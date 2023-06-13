@@ -48,7 +48,7 @@ class PermissionLevel(IntEnum):
                 self.HELPER: "role_helper",
                 self.MOD: "role_moderator",
                 self.ADMIN: "role_administrator",
-        }[self] 
+        }[self]
 
     def __eq__(self, other: Union[int, discord.Member, discord.interactions.Interaction]) -> bool:
         if isinstance(other, discord.interactions.Interaction):
@@ -71,7 +71,7 @@ class PermissionLevel(IntEnum):
 
 
     def __call__(self, command: discord.app_commands.Command) -> discord.app_commands.Command:
-        command.checks.append(lambda ctx: True if self == ctx.user else MissingPermissionsError.throw())
+        command.checks.append(lambda ctx: True if self == ctx.user else MissingPermissionsError.throw(perms=[f"<@&{guild_service.get_guild()[self.__str__()]}>"]))
         return command
 
     def __hash__(self) -> int:

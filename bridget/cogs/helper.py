@@ -8,6 +8,7 @@ from utils import Cog, send_error, send_success
 from utils.modals import PostEmbedModal
 from utils.services import guild_service
 from utils.enums import PermissionLevel
+from utils.errors import MissingPermissionsError
 
 
 class Helper(Cog):
@@ -29,9 +30,8 @@ class Helper(Cog):
 
         # only OP and helpers can mark as solved
         if ctx.channel.owner_id != ctx.user.id:
-            if not self == ctx.user:
-                raise discord.app_commands.MissingPermissions(
-                    "You don't have permission to use this command.")
+            if not PermissionLevel.HELPER == ctx.user:
+                MissingPermissionsError.throw([f"<@&{guild_service.get_guild().role_helper}>"])
 
         await send_success(ctx, "Thread marked as solved!", ephemeral=False)
 
@@ -133,10 +133,3 @@ class Helper(Cog):
         await msg.add_reaction('⬇️')
         await send_success(ctx, "Poll started!", delete_after=1)
 
-    @solved.error
-    @postembed.error
-    @poll.error
-    async def error_handle(self, ctx: discord.Interaction, error: Exception) -> None:
-        if isinstance(error, app_commands.MissingPermissions):
-            await send_error(ctx, "You are not allowed to use this command.")
-            return

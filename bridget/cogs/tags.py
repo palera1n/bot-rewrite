@@ -102,7 +102,7 @@ class Tags(Cog):
             raise commands.BadArgument("That tag does not exist.")
 
         # run cooldown so tag can't be spammed
-        bucket = self.cooldown.get_bucket(tag.name)
+        bucket = self.cooldown.get_bucket(ctx)
         current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
         if bucket.update_rate_limit(current) and not PermissionLevel.MOD == ctx.user:
@@ -141,7 +141,7 @@ class Tags(Cog):
             raise commands.BadArgument("That tag does not exist.")
 
         # run cooldown so tag can't be spammed
-        bucket = self.cooldown.get_bucket(tag.name)
+        bucket = self.cooldown.get_bucket(ctx)
         current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
         if bucket.update_rate_limit(current) and not PermissionLevel.MOD == ctx.user:

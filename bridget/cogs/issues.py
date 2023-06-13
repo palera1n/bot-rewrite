@@ -218,14 +218,13 @@ class Issues(Cog):
             user_to_mention (discord.Member, optional): User to mention. Defaults to None.
         """
 
-        name = name.lower()
         issue = guild_service.get_issue(name)
 
         if issue is None:
             raise commands.BadArgument("That issue does not exist.")
 
         # run cooldown so tag can't be spammed
-        bucket = self.cooldown.get_bucket(issue.name)
+        bucket = self.cooldown.get_bucket(ctx)
         current = datetime.now().timestamp()
         # ratelimit only if the invoker is not a moderator
         if bucket.update_rate_limit(current) and not PermissionLevel.MOD == ctx.user:
