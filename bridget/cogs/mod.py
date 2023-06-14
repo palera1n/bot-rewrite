@@ -9,7 +9,7 @@ from utils.autocomplete import warn_autocomplete
 from utils.mod import warn, prepare_liftwarn_log, notify_user, submit_public_log
 from utils.services import guild_service, user_service
 from utils.enums import PermissionLevel
-from model.case import Case
+from model.infraction import Infraction
 
 
 class Mod(Cog):
@@ -96,7 +96,7 @@ class Mod(Cog):
             new_member (discord.Member): The user to transfer data to
         """
 
-        u, case_count = user_service.transfer_profile(old_member.id, new_member.id)
+        u, infraction_count = user_service.transfer_profile(old_member.id, new_member.id)
 
         embed = discord.Embed(title="Transferred profile")
         embed.description = f"Transferred {old_member.mention}'s profile to {new_member.mention}"
@@ -104,7 +104,7 @@ class Mod(Cog):
         embed.add_field(name="Level", value=u.level)
         embed.add_field(name="XP", value=u.xp)
         embed.add_field(name="Warn points", value=u.warn_points)
-        embed.add_field(name="Infractions", value=case_count)
+        embed.add_field(name="Infractions", value=infraction_count)
 
         await send_success(ctx, embed=embed, delete_after=10)
         try:
@@ -112,10 +112,9 @@ class Mod(Cog):
         except:
             pass
 
-    # TODO: Put this back to GUILD_OWNER
-    @PermissionLevel.OWNER
+    @PermissionLevel.GUILD_OWNER
     @app_commands.command()
-    async def clem(self, ctx: discord.Interaction, member: discord.Member):
+    async def clem(self, ctx: discord.Interaction, member: discord.Member) -> None:
         """Sets user's XP and Level to 0, freezes XP, sets warn points to 599
 
         Args:
@@ -137,8 +136,8 @@ class Mod(Cog):
         results.warn_points = 9
         results.save()
 
-        case = Case(
-            _id=guild_service.get_guild().case_id,
+        infraction = Infraction(
+            _id=guild_service.get_guild().infraction_id,
             _type="CLEM",
             mod_id=ctx.user.id,
             mod_tag=str(ctx.user),
@@ -146,10 +145,10 @@ class Mod(Cog):
             reason="No reason."
         )
 
-        # incrememnt DB's max case ID for next case
-        guild_service.inc_caseid()
-        # add case to db
-        user_service.add_case(member.id, case)
+        # incrememnt DB's max infraction ID for next infraction
+        guild_service.inc_infractionid()
+        # add infraction to db
+        user_service.add_infraction(member.id, infraction)
 
         await send_success(ctx, f"{member.mention} was put on clem.")
 
