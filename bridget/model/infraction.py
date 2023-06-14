@@ -2,7 +2,7 @@ import mongoengine
 import datetime
 
 
-class Case(mongoengine.EmbeddedDocument):
+class Infraction(mongoengine.EmbeddedDocument):
     _id = mongoengine.IntField(required=True)
     _type = mongoengine.StringField(required=True)
     date = mongoengine.DateTimeField(

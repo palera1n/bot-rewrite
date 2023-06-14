@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import os
 from typing import Any, Dict, Tuple, Counter
-from model import User, Case, Cases
+from model import User, Infraction, Infractions
 from model.user import User
 
 
@@ -80,49 +80,49 @@ def inc_level(id: int) -> None:
     User.objects(_id=id).update_one(inc__level=1)
 
 
-def get_cases(id: int) -> Cases:
-    """Return the Document representing the cases of a user, whose ID is given by `id`
-    If the user doesn't have a Cases document in the database, first create that.
+def get_infractions(id: int) -> Infractions:
+    """Return the Document representing the infractions of a user, whose ID is given by `id`
+    If the user doesn't have a Infractions document in the database, first create that.
 
     Parameters
     ----------
     id : int
-        The user whose cases we want to look up.
+        The user whose infractions we want to look up.
 
     Returns
     -------
-    Cases
+    Infractions
         [description]
     """
 
-    cases = Cases.objects(_id=id).first()
-    # first we ensure this user has a Cases document in the database before
+    infractions = Infractions.objects(_id=id).first()
+    # first we ensure this user has a Infractions document in the database before
     # continuing
-    if cases is None:
-        cases = Cases()
-        cases._id = id
-        cases.save()
-    return cases
+    if infractions is None:
+        infractions = Infractions()
+        infractions._id = id
+        infractions.save()
+    return infractions
 
 
-def add_case(_id: int, case: Case) -> None:
-    """Cases holds all the cases for a particular user with id `_id` as an
-    EmbeddedDocumentListField. This function appends a given case object to
-    this list. If this user doesn't have any previous cases, we first add
-    a new Cases document to the database.
+def add_infraction(_id: int, infraction: Infraction) -> None:
+    """Infractions holds all the infractions for a particular user with id `_id` as an
+    EmbeddedDocumentListField. This function appends a given infraction object to
+    this list. If this user doesn't have any previous infractions, we first add
+    a new Infractions document to the database.
 
     Parameters
     ----------
     _id : int
-        ID of the user who we want to add the case to.
-    case : Case
-        The case we want to add to the user.
+        ID of the user who we want to add the infraction to.
+    infraction : Infraction
+        The infraction we want to add to the user.
     """
 
-    # ensure this user has a cases document before we try to append the new
-    # case
-    get_cases(_id)
-    Cases.objects(_id=_id).update_one(push__cases=case)
+    # ensure this user has a infractions document before we try to append the new
+    # infraction
+    get_infractions(_id)
+    Infractions.objects(_id=_id).update_one(push__infractions=infraction)
 
 
 def set_warn_kicked(_id: int) -> None:
@@ -143,34 +143,34 @@ def set_warn_kicked(_id: int) -> None:
 
 
 def rundown(id: int) -> list:
-    """Return the 3 most recent cases of a user, whose ID is given by `id`
-    If the user doesn't have a Cases document in the database, first create that.
+    """Return the 3 most recent infractions of a user, whose ID is given by `id`
+    If the user doesn't have a Infractions document in the database, first create that.
 
     Parameters
     ----------
     id : int
-        The user whose cases we want to look up.
+        The user whose infractions we want to look up.
 
     Returns
     -------
-    Cases
+    Infractions
         [description]
     """
 
-    cases = Cases.objects(_id=id).first()
-    # first we ensure this user has a Cases document in the database before
+    infractions = Infractions.objects(_id=id).first()
+    # first we ensure this user has a Infractions document in the database before
     # continuing
-    if cases is None:
-        cases = Cases()
-        cases._id = id
-        cases.save()
+    if infractions is None:
+        infractions = Infractions()
+        infractions._id = id
+        infractions.save()
         return []
 
-    cases = cases.cases
-    cases = filter(lambda x: x._type != "UNMUTE", cases)
-    cases = sorted(cases, key=lambda i: i['date'])
-    cases.reverse()
-    return cases[0:3]
+    infractions = infractions.infractions
+    infractions = filter(lambda x: x._type != "UNMUTE", infractions)
+    infractions = sorted(infractions, key=lambda i: i['date'])
+    infractions.reverse()
+    return infractions[0:3]
 
 
 def retrieve_birthdays(date) -> Any:
@@ -187,75 +187,75 @@ def transfer_profile(oldmember: int, newmember) -> Tuple[User, int]:
     u2.level = 0
     u2.save()
 
-    cases = get_cases(oldmember)
-    cases._id = newmember
-    cases.save()
+    infractions = get_infractions(oldmember)
+    infractions._id = newmember
+    infractions.save()
 
-    cases2 = get_cases(oldmember)
-    cases2.cases = []
-    cases2.save()
+    infractions2 = get_infractions(oldmember)
+    infractions2.infractions = []
+    infractions2.save()
 
-    return u, len(cases.cases)
+    return u, len(infractions.infractions)
 
 
 def fetch_raids() -> Dict[str, Any]:
     values = {}
-    values["Join spam"] = Cases.objects(
-        cases__reason__contains="Join spam detected").count()
-    values["Join spam over time"] = Cases.objects(
-        cases__reason__contains="Join spam over time detected").count()
-    values["Raid phrase"] = Cases.objects(
-        cases__reason__contains="Raid phrase detected").count()
-    values["Ping spam"] = Cases.objects(
-        cases__reason__contains="Ping spam").count()
-    values["Message spam"] = Cases.objects(
-        cases__reason__contains="Message spam").count()
+    values["Join spam"] = Infractions.objects(
+        infractions__reason__contains="Join spam detected").count()
+    values["Join spam over time"] = Infractions.objects(
+        infractions__reason__contains="Join spam over time detected").count()
+    values["Raid phrase"] = Infractions.objects(
+        infractions__reason__contains="Raid phrase detected").count()
+    values["Ping spam"] = Infractions.objects(
+        infractions__reason__contains="Ping spam").count()
+    values["Message spam"] = Infractions.objects(
+        infractions__reason__contains="Message spam").count()
 
     return values
 
 
-def fetch_cases_by_mod(_id) -> dict:
+def fetch_infractions_by_mod(_id) -> dict:
     values = {}
-    cases = Cases.objects(cases__mod_id=str(_id))
+    infractions = Infractions.objects(infractions__mod_id=str(_id))
     values["total"] = 0
-    cases = list(cases.all())
-    final_cases = []
-    for target in cases:
-        for case in target.cases:
-            if str(case.mod_id) == str(_id):
-                final_cases.append(case)
+    infractions = list(infractions.all())
+    final_infractions = []
+    for target in infractions:
+        for infraction in target.infractions:
+            if str(infraction.mod_id) == str(_id):
+                final_infractions.append(infraction)
                 values["total"] += 1
 
-    def get_case_reason(reason: str) -> str:
+    def get_infraction_reason(reason: str) -> str:
         string = reason.lower()
         return ''.join(e for e in string if e.isalnum() or e == " ").strip()
 
-    case_reasons = [
-        get_case_reason(
-            case.reason) for case in final_cases if get_case_reason(
-            case.reason) != "temporary mute expired"]
+    infraction_reasons = [
+        get_infraction_reason(
+            infraction.reason) for infraction in final_infractions if get_infraction_reason(
+            infraction.reason) != "temporary mute expired"]
     values["counts"] = sorted(
-        Counter(case_reasons).items(), key=lambda item: item[1])
+        Counter(infraction_reasons).items(), key=lambda item: item[1])
     values["counts"].reverse()
     return values
 
 
-def fetch_cases_by_keyword(keyword: str) -> dict:
+def fetch_infractions_by_keyword(keyword: str) -> dict:
     values = {}
-    cases = Cases.objects(cases__reason__contains=keyword)
-    cases = list(cases.all())
+    infractions = Infractions.objects(infractions__reason__contains=keyword)
+    infractions = list(infractions.all())
     values["total"] = 0
-    final_cases = []
+    final_infractions = []
 
-    for target in cases:
-        for case in target.cases:
-            if keyword.lower() in case.reason:
+    for target in infractions:
+        for infraction in target.infractions:
+            if keyword.lower() in infraction.reason:
                 values["total"] += 1
-                final_cases.append(case)
+                final_infractions.append(infraction)
 
-    case_mods = [case.mod_tag for case in final_cases]
+    infraction_mods = [infraction.mod_tag for infraction in final_infractions]
     values["counts"] = sorted(
-        Counter(case_mods).items(), key=lambda item: item[1])
+        Counter(infraction_mods).items(), key=lambda item: item[1])
     values["counts"].reverse()
     return values
 

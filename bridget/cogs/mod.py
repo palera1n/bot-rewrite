@@ -32,53 +32,53 @@ class Mod(Cog):
         await warn(ctx, target_member=member, mod=ctx.user, points=points, reason=reason)
 
     @PermissionLevel.MOD
-    @app_commands.autocomplete(case_id=warn_autocomplete)
+    @app_commands.autocomplete(infraction_id=warn_autocomplete)
     @app_commands.command()
-    async def liftwarn(self, ctx: discord.Interaction, member: discord.Member, case_id: str, reason: str) -> None:
+    async def liftwarn(self, ctx: discord.Interaction, member: discord.Member, infraction_id: str, reason: str) -> None:
         """Lift a member's warn
 
         Args:
             ctx (discord.Interaction): Context
             member (discord.Member): Member to lift warn
-            case_id (str): Id of the warn's case
+            infraction_id (str): Id of the warn's infraction
             reason (str): Reason to lift warn
         """
 
-        cases = user_service.get_cases(member.id)
-        case = cases.cases.filter(_id=case_id).first()
+        infractions = user_service.get_infractions(member.id)
+        infraction = infractions.infractions.filter(_id=infraction_id).first()
 
         reason = escape_markdown(reason)
         reason = escape_mentions(reason)
 
         # sanity checks
-        if case is None:
-            await send_error(ctx, f"{member} has no case with ID {case_id}")
+        if infraction is None:
+            await send_error(ctx, f"{member} has no infraction with ID {infraction_id}")
             return
-        elif case._type != "WARN":
-            await send_error(ctx, f"{member}'s case with ID {case_id} is not a warn case.")
+        elif infraction._type != "WARN":
+            await send_error(ctx, f"{member}'s infraction with ID {infraction_id} is not a warn infraction.")
             return
-        elif case.lifted:
-            await send_error(ctx, f"Case with ID {case_id} already lifted.")
+        elif infraction.lifted:
+            await send_error(ctx, f"Infraction with ID {infraction_id} already lifted.")
             return
 
         u = user_service.get_user(id=member.id)
-        if u.warn_points - int(case.punishment) < 0:
-            await send_error(ctx, f"Can't lift Case #{case_id} because it would make {member.mention}'s points negative.")
+        if u.warn_points - int(infraction.punishment) < 0:
+            await send_error(ctx, f"Can't lift Infraction #{infraction_id} because it would make {member.mention}'s points negative.")
             return
 
-        # passed sanity checks, so update the case in DB
-        case.lifted = True
-        case.lifted_reason = reason
-        case.lifted_by_tag = str(ctx.user)
-        case.lifted_by_id = ctx.user.id
-        case.lifted_date = datetime.now()
-        cases.save()
+        # passed sanity checks, so update the infraction in DB
+        infraction.lifted = True
+        infraction.lifted_reason = reason
+        infraction.lifted_by_tag = str(ctx.user)
+        infraction.lifted_by_id = ctx.user.id
+        infraction.lifted_date = datetime.now()
+        infractions.save()
 
         # remove the warn points from the user in DB
-        user_service.inc_points(member.id, -1 * int(case.punishment))
+        user_service.inc_points(member.id, -1 * int(infraction.punishment))
         dmed = True
         # prepare log embed, send to #public-logs, user, channel where invoked
-        log = prepare_liftwarn_log(ctx.user, member, case)
+        log = prepare_liftwarn_log(ctx.user, member, infraction)
         dmed = await notify_user(member, f"Your warn has been lifted in {ctx.guild}.", log)
 
         await send_success(ctx, embed=log, delete_after=10, ephemeral=False)

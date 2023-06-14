@@ -1,5 +1,5 @@
-from .case import *
-from .cases import *
+from .infraction import *
+from .infractions import *
 from .filterword import *
 from .giveaway import *
 from .guild import *

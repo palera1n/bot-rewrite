@@ -32,7 +32,7 @@ async def get_discord_file_from_url(url) -> Optional[File]:
                     file = discord.File(temp_file, filename='file.png')
                 return file
             else:
-                # Handle the case where the URL request fails
+                # Handle the infraction where the URL request fails
                 return None
 
 def prepare_issue_embed(issue: Issue) -> Embed:

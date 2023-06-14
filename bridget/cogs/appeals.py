@@ -69,14 +69,14 @@ class Appeals(commands.Cog):
         if appealer is not None:
             # await thread.send(embed=await self.generate_userinfo(appealer))
             embeds_to_send.append(await self.generate_userinfo(appealer))
-            cases_embeds = await self.generate_cases(appealer)
-            if cases_embeds is not None:
-                # await thread.send(embeds=cases_embeds)
-                embeds_to_send.extend(cases_embeds)
+            infractions_embeds = await self.generate_infractions(appealer)
+            if infractions_embeds is not None:
+                # await thread.send(embeds=infractions_embeds)
+                embeds_to_send.extend(infractions_embeds)
             else:
-                # await thread.send(embed=discord.Embed(color=discord.Color.green(), description="No cases found for this user."))
+                # await thread.send(embed=discord.Embed(color=discord.Color.green(), description="No infractions found for this user."))
                 embeds_to_send.append(discord.Embed(
-                    color=discord.Color.green(), description="No cases found for this user."))
+                    color=discord.Color.green(), description="No infractions found for this user."))
             if message.guild.get_member(appealer.id) is not None:
                 embeds_to_send.append(discord.Embed(
                     description=f"{appealer.mention} is in the unban appeals server!", color=discord.Color.green()))
@@ -114,49 +114,49 @@ class Appeals(commands.Cog):
         embed.add_field(
             name="XP", value=results.xp if not results.is_clem else "CLEMMED", inline=True)
         embed.add_field(
-            name="Punishments", value=f"{results.warn_points} warn points\n{len(user_service.get_cases(appealer.id).cases)} cases", inline=True)
+            name="Punishments", value=f"{results.warn_points} warn points\n{len(user_service.get_infractions(appealer.id).infractions)} infractions", inline=True)
 
         embed.add_field(name="Account creation date",
                         value=f"{format_dt(appealer.created_at, style='F')} ({format_dt(appealer.created_at, style='R')})", inline=True)
         return embed
 
-    async def generate_cases(self, appealer: discord.User) -> List[discord.Embed]:
-        results = user_service.get_cases(appealer.id)
-        if not results.cases:
+    async def generate_infractions(self, appealer: discord.User) -> List[discord.Embed]:
+        results = user_service.get_infractions(appealer.id)
+        if not results.infractions:
             return None
-        cases = [case for case in results.cases if case._type != "UNMUTE"]
-        # reverse so newest cases are first
-        cases.reverse()
+        infractions = [infraction for infraction in results.infractions if infraction._type != "UNMUTE"]
+        # reverse so newest infractions are first
+        infractions.reverse()
 
-        cases_chunks = list(chunks(cases, 10))
+        infractions_chunks = list(chunks(infractions, 10))
 
         embeds = []
-        for i, entries in enumerate(cases_chunks):
+        for i, entries in enumerate(infractions_chunks):
             embed = discord.Embed(
-                title=f'Cases - Page {i + 1}', color=discord.Color.blurple())
+                title=f'Infractions - Page {i + 1}', color=discord.Color.blurple())
             embed.set_author(name=appealer, icon_url=appealer.display_avatar)
-            for case in entries:
-                timestamp = case.date
+            for infraction in entries:
+                timestamp = infraction.date
                 formatted = f"{format_dt(timestamp, style='F')} ({format_dt(timestamp, style='R')})"
-                if case._type == "WARN" or case._type == "LIFTWARN":
-                    if case.lifted:
+                if infraction._type == "WARN" or infraction._type == "LIFTWARN":
+                    if infraction.lifted:
                         embed.add_field(
-                            name=f'{determine_emoji(case._type)} Case #{case._id} [LIFTED]', value=f'**Points**: {case.punishment}\n**Reason**: {case.reason}\n**Lifted by**: {case.lifted_by_tag}\n**Lift reason**: {case.lifted_reason}\n**Warned on**: {formatted}', inline=True)
-                    elif case._type == "LIFTWARN":
-                        embed.add_field(name=f'{determine_emoji(case._type)} Case #{case._id} [LIFTED (legacy)]',
-                                        value=f'**Points**: {case.punishment}\n**Reason**: {case.reason}\n**Moderator**: {case.mod_tag}\n**Warned on**: {formatted}', inline=True)
+                            name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id} [LIFTED]', value=f'**Points**: {infraction.punishment}\n**Reason**: {infraction.reason}\n**Lifted by**: {infraction.lifted_by_tag}\n**Lift reason**: {infraction.lifted_reason}\n**Warned on**: {formatted}', inline=True)
+                    elif infraction._type == "LIFTWARN":
+                        embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id} [LIFTED (legacy)]',
+                                        value=f'**Points**: {infraction.punishment}\n**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**Warned on**: {formatted}', inline=True)
                     else:
-                        embed.add_field(name=f'{determine_emoji(case._type)} Case #{case._id}',
-                                        value=f'**Points**: {case.punishment}\n**Reason**: {case.reason}\n**Moderator**: {case.mod_tag}\n**Warned on**: {formatted}', inline=True)
-                elif case._type == "MUTE" or case._type == "REMOVEPOINTS":
-                    embed.add_field(name=f'{determine_emoji(case._type)} Case #{case._id}',
-                                    value=f'**{pun_map[case._type]}**: {case.punishment}\n**Reason**: {case.reason}\n**Moderator**: {case.mod_tag}\n**Time**: {formatted}', inline=True)
-                elif case._type in pun_map:
-                    embed.add_field(name=f'{determine_emoji(case._type)} Case #{case._id}',
-                                    value=f'**Reason**: {case.reason}\n**Moderator**: {case.mod_tag}\n**{pun_map[case._type]} on**: {formatted}', inline=True)
+                        embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id}',
+                                        value=f'**Points**: {infraction.punishment}\n**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**Warned on**: {formatted}', inline=True)
+                elif infraction._type == "MUTE" or infraction._type == "REMOVEPOINTS":
+                    embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id}',
+                                    value=f'**{pun_map[infraction._type]}**: {infraction.punishment}\n**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**Time**: {formatted}', inline=True)
+                elif infraction._type in pun_map:
+                    embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id}',
+                                    value=f'**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**{pun_map[infraction._type]} on**: {formatted}', inline=True)
                 else:
-                    embed.add_field(name=f'{determine_emoji(case._type)} Case #{case._id}',
-                                    value=f'**Reason**: {case.reason}\n**Moderator**: {case.mod_tag}\n**Time**: {formatted}', inline=True)
+                    embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id}',
+                                    value=f'**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**Time**: {formatted}', inline=True)
             embeds.append(embed)
         return embeds
 

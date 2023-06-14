@@ -105,12 +105,12 @@ def get_meme(name: str) -> Optional[Tag]:
     return meme
 
 
-def inc_caseid() -> None:
-    """Increments Guild.case_id, which keeps track of the next available ID to
-    use for a case.
+def inc_infractionid() -> None:
+    """Increments Guild.infraction_id, which keeps track of the next available ID to
+    use for a infraction.
     """
 
-    Guild.objects(_id=guild_id).update_one(inc__case_id=1)
+    Guild.objects(_id=guild_id).update_one(inc__infraction_id=1)
 
 
 def all_rero_mappings() -> dict:

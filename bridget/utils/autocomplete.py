@@ -13,12 +13,12 @@ async def warn_autocomplete(ctx: discord.Interaction, current: str) -> List[app_
     if not PermissionLevel.MOD == ctx.user:
         return []
 
-    cases: List[Case] = [case for case in user_service.get_cases(int(
-        ctx.namespace["member"].id)).cases if case._type == "WARN" and not case.lifted]
-    cases.sort(key=lambda x: x._id, reverse=True)
+    infractions: List[Infraction] = [infraction for infraction in user_service.get_infractions(int(
+        ctx.namespace["member"].id)).infractions if infraction._type == "WARN" and not infraction.lifted]
+    infractions.sort(key=lambda x: x._id, reverse=True)
 
-    return [app_commands.Choice(name=f"#{case._id} - {case.punishment} points - {case.reason}", value=str(
-        case._id)) for case in cases if (not current or str(case._id).startswith(str(current)))][:25]
+    return [app_commands.Choice(name=f"#{infraction._id} - {infraction.punishment} points - {infraction.reason}", value=str(
+        infraction._id)) for infraction in infractions if (not current or str(infraction._id).startswith(str(current)))][:25]
 
 async def tags_autocomplete(_: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
     tags = sorted([tag.name.lower() for tag in guild_service.get_guild().tags])

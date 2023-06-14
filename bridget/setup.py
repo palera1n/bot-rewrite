@@ -12,9 +12,9 @@ async def setup() -> None:
     # you should have this setup in the .env file beforehand
     guild._id = int(os.environ.get("GUILD_ID"))
 
-    # If you're re-running this script to update a value, set case_id
-    # to the last unused case ID or else it will start over from 1!
-    guild.case_id = 71
+    # If you're re-running this script to update a value, set infraction_id
+    # to the last unused infraction ID or else it will start over from 1!
+    guild.infraction_id = 109
 
     guild.role_administrator = 1096623117780140072
     guild.role_moderator = 1096623117763354713
