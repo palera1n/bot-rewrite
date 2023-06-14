@@ -69,9 +69,13 @@ class PermissionLevel(IntEnum):
     def __add__(self, other) -> "PermissionLevel":
         return self.__class__(self.value + other)
 
-
     def __call__(self, command: discord.app_commands.Command) -> discord.app_commands.Command:
-        command.checks.append(lambda ctx: True if self == ctx.user else MissingPermissionsError.throw(perms=[f"<@&{guild_service.get_guild()[self.__str__()]}>"]))
+        if self == self.OWNER:
+            command.checks.append(lambda ctx: True if self == ctx.user else MissingPermissionsError.throw(perms=[f"Bot Owner"]))
+        elif self == self.GUILD_OWNER:
+            command.checks.append(lambda ctx: True if self == ctx.user else MissingPermissionsError.throw(perms=[f"Guild Owner"]))
+        else:
+            command.checks.append(lambda ctx: True if self == ctx.user else MissingPermissionsError.throw(perms=[f"<@&{guild_service.get_guild()[self.__str__()]}>"]))
         return command
 
     def __hash__(self) -> int:
