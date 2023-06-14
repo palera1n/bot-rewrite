@@ -54,8 +54,12 @@ class Misc(Cog):
         embed = Embed(title="User Information")
         embed.set_thumbnail(url=user.avatar.url if user.avatar else None)
         embed.add_field(name="Username", value=f"{str(user)} ({user.mention})", inline=True)
-        embed.add_field(name="Level", value=usr.level, inline=True)
-        embed.add_field(name="XP", value=usr.xp, inline=True)
+        embed.add_field(
+            name="Level", value=usr.level if not usr.is_clem else "CLEMMED", inline=True)
+        embed.add_field(
+            name="XP", value=usr.xp if not usr.is_clem else "CLEMMED", inline=True)
+        embed.add_field(
+            name="Punishments", value=f"{usr.warn_points} warn point(s)\n{len(user_service.get_cases(user.id).cases)} infraction(s)", inline=True)
 
         roles = [r.mention for r in user.roles if r.name != "@everyone"]
         roles.reverse()

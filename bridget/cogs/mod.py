@@ -9,6 +9,7 @@ from utils.autocomplete import warn_autocomplete
 from utils.mod import warn, prepare_liftwarn_log, notify_user, submit_public_log
 from utils.services import guild_service, user_service
 from utils.enums import PermissionLevel
+from model.case import Case
 
 
 class Mod(Cog):
@@ -83,4 +84,72 @@ class Mod(Cog):
 
         await send_success(ctx, embed=log, delete_after=10, ephemeral=False)
         await submit_public_log(ctx, guild_service.get_guild(), member, log, dmed)
+
+    @PermissionLevel.ADMIN
+    @app_commands.command()
+    async def transferprofile(self, ctx: discord.Interaction, old_member: discord.Member, new_member: discord.Member) -> None:
+        """Transfers all data in the database between users
+
+        Args:
+            ctx (discord.ctx): Context
+            old_member (discord.Member): The user to transfer data from
+            new_member (discord.Member): The user to transfer data to
+        """
+
+        u, case_count = user_service.transfer_profile(old_member.id, new_member.id)
+
+        embed = discord.Embed(title="Transferred profile")
+        embed.description = f"Transferred {old_member.mention}'s profile to {new_member.mention}"
+        embed.color = discord.Color.blurple()
+        embed.add_field(name="Level", value=u.level)
+        embed.add_field(name="XP", value=u.xp)
+        embed.add_field(name="Warn points", value=u.warn_points)
+        embed.add_field(name="Infractions", value=case_count)
+
+        await send_success(ctx, embed=embed, delete_after=10)
+        try:
+            await new_member.send(f"{ctx.user} has transferred your profile from {old_member}", embed=embed)
+        except:
+            pass
+
+    # TODO: Put this back to GUILD_OWNER
+    @PermissionLevel.OWNER
+    @app_commands.command()
+    async def clem(self, ctx: discord.Interaction, member: discord.Member):
+        """Sets user's XP and Level to 0, freezes XP, sets warn points to 599
+
+        Args:
+            ctx (discord.ctx): Context
+            member (discord.Member): The user to reset
+        """
+
+        if member.id == ctx.user.id:
+            await send_error(ctx, "You can't call that on yourself.")
+            return
+
+        if member.id == self.bot.user.id:
+            await send_error(ctx, "You can't call that on me :(")
+            return
+
+        results = user_service.get_user(member.id)
+        results.is_clem = True
+        results.is_xp_frozen = True
+        results.warn_points = 9
+        results.save()
+
+        case = Case(
+            _id=guild_service.get_guild().case_id,
+            _type="CLEM",
+            mod_id=ctx.user.id,
+            mod_tag=str(ctx.user),
+            punishment=str(-1),
+            reason="No reason."
+        )
+
+        # incrememnt DB's max case ID for next case
+        guild_service.inc_caseid()
+        # add case to db
+        user_service.add_case(member.id, case)
+
+        await send_success(ctx, f"{member.mention} was put on clem.")
 
