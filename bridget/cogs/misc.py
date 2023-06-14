@@ -5,12 +5,58 @@ import random
 
 from discord import app_commands, Embed
 from discord.ext import commands
+from discord.utils import format_dt
 
 from utils import Cog, send_error, send_success
 from utils.autocomplete import rule_autocomplete
 from utils.enums import PermissionLevel
-from utils.menus import PFPButton, PFPView
+from utils.errors import MissingPermissionsError
+from utils.menus import Menu, PFPButton, PFPView
 from utils.services import guild_service, user_service
+from utils.utils import determine_emoji, pun_map
+
+
+class InfractionFormatter:
+    def __init__(self, user):
+        self.user = user
+
+    def format_infractions_page(self, ctx: discord.Interaction, entries: dict, current_page: int, all_pages: list) -> Embed:
+        page_count = 0
+
+        user = self.user
+        u = user_service.get_user(user.id)
+
+        for page in all_pages:
+            for infraction in page:
+                page_count += 1
+        embed = discord.Embed(
+            title=f'Infractions - {u.warn_points} warn points', color=discord.Color.blurple())
+        embed.set_author(name=user, icon_url=user.display_avatar)
+        for infraction in entries:
+            timestamp = infraction.date
+            formatted = f"{format_dt(timestamp, style='F')} ({format_dt(timestamp, style='R')})"
+            if infraction._type == "WARN" or infraction._type == "LIFTWARN":
+                if infraction.lifted:
+                    embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id} [LIFTED]',
+                                    value=f'**Points**: {infraction.punishment}\n**Reason**: {infraction.reason}\n**Lifted by**: {infraction.lifted_by_tag}\n**Lift reason**: {infraction.lifted_reason}\n**Warned on**: {formatted}', inline=True)
+                elif infraction._type == "LIFTWARN":
+                    embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id} [LIFTED (legacy)]',
+                                    value=f'**Points**: {infraction.punishment}\n**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**Warned on**: {formatted}', inline=True)
+                else:
+                    embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id}',
+                                    value=f'**Points**: {infraction.punishment}\n**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**Warned on**: {formatted}', inline=True)
+            elif infraction._type == "MUTE" or infraction._type == "REMOVEPOINTS":
+                embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id}',
+                                value=f'**{pun_map[infraction._type]}**: {infraction.punishment}\n**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**Time**: {formatted}', inline=True)
+            elif infraction._type in pun_map:
+                embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id}',
+                                value=f'**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**{pun_map[infraction._type]} on**: {formatted}', inline=True)
+            else:
+                embed.add_field(name=f'{determine_emoji(infraction._type)} Infraction #{infraction._id}',
+                                value=f'**Reason**: {infraction.reason}\n**Moderator**: {infraction.mod_tag}\n**Time**: {formatted}', inline=True)
+        embed.set_footer(
+            text=f"Page {current_page} of {len(all_pages)} - newest infractions first ({page_count} total infractions)")
+        return embed
 
 
 class Misc(Cog):
@@ -50,6 +96,7 @@ class Misc(Cog):
                 MissingPermissionsError.throw([f"<@&{guild_service.get_guild().role_moderator}>"])
 
         usr = user_service.get_user(user.id)
+        infractions = user_service.get_infractions(user.id).infractions
 
         embed = Embed(title="User Information")
         embed.set_thumbnail(url=user.avatar.url if user.avatar else None)
@@ -59,7 +106,15 @@ class Misc(Cog):
         embed.add_field(
             name="XP", value=usr.xp if not usr.is_clem else "CLEMMED", inline=True)
         embed.add_field(
-            name="Punishments", value=f"{usr.warn_points} warn point(s)\n{len(user_service.get_cases(user.id).cases)} infraction(s)", inline=True)
+            name="Punishments", value=f"{usr.warn_points} warn point(s)\n{len(infractions)} infraction(s)", inline=True)
+
+        if len(infractions) > 0:
+            text = []
+            for inf in infractions:
+                punishment = inf.punishment if inf._type != "WARN" else f'{inf.punishment} points'
+                text.append(f"**{inf._type}** - {punishment} - {inf.reason} - <t:{int(inf.date.timestamp())}:R>")
+            embed.add_field(
+                name="Infractions", value='\n'.join(text), inline=False)
 
         roles = [r.mention for r in user.roles if r.name != "@everyone"]
         roles.reverse()
@@ -172,3 +227,40 @@ class Misc(Cog):
             question), inline=False)
         embed.add_field(name="Answer", value=response, inline=False)
         await ctx.response.send_message(embed=embed, ephemeral=whisper)
+
+    @app_commands.command()
+    async def infractions(self, ctx: discord.Interaction, user: discord.Member = None) -> None:
+        """Show your or another user's infractions
+
+        Args:
+            ctx (discord.ctx): Context
+            user (discord.Member, optional): User to get infractions of
+        """
+
+        if not user:
+            user = ctx.user
+
+        whisper = False
+        bot_chan = guild_service.get_guild().channel_botspam
+        if not PermissionLevel.MOD == ctx.user and ctx.channel_id != bot_chan:
+            whisper = True
+
+        if not PermissionLevel.MOD == ctx.user and user.id != ctx.user.id:
+            MissingPermissionsError.throw([f"<@&{guild_service.get_guild().role_moderator}>"])
+
+        results = user_service.get_infractions(user.id)
+        if len(results.infractions) == 0:
+            await send_error(ctx, f'{user.mention} has no cases.', delete_after=5)
+            return 
+
+        # filter out unmute infractions because they are irrelevant
+        infractions = [infraction for infraction in results.infractions if infraction._type != "UNMUTE"]
+        # reverse so newest infractions are first
+        infractions.reverse()
+
+        fmt = InfractionFormatter(user)
+
+        menu = Menu(ctx, infractions, per_page=10,
+                    page_formatter=fmt.format_infractions_page, whisper=whisper)
+        await menu.start()
+
