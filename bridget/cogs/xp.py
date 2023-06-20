@@ -6,6 +6,7 @@ from discord import app_commands
 from random import randint
 from typing import List, Union
 
+from utils import Cog
 from utils.services import guild_service
 from utils.services import user_service
 from utils.config import cfg
@@ -52,7 +53,7 @@ def format_xptop_page(ctx: discord.Interaction, entries, current_page: int, all_
     return embed
 
 
-class Xp(commands.Cog):
+class Xp(Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -109,7 +110,7 @@ class Xp(commands.Cog):
                     page_formatter=format_xptop_page, whisper=whisper)
         await menu.start()
 
-    @commands.Cog.listener()
+    @Cog.listener()
     async def on_member_join(self, member: discord.Member) -> None:
         if member.bot:
             return
@@ -127,7 +128,7 @@ class Xp(commands.Cog):
         roles_to_add = self.assess_new_roles(level, db_guild)
         await self.add_new_roles(member, roles_to_add)
 
-    @commands.Cog.listener()
+    @Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         if not message.guild:
             return
@@ -199,3 +200,25 @@ class Xp(commands.Cog):
             level += 1
 
         return xp
+
+
+class StickyRoles(Cog):
+    @Cog.listener()
+    async def on_member_remove(self, member: discord.Member):
+        if member.guild.id != cfg.guild_id:
+            return
+
+        roles = [role.id for role in member.roles if role <
+                 member.guild.me.top_role and role != member.guild.default_role]
+        user_service.set_sticky_roles(member.id, roles)
+
+    @Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        if member.guild.id != cfg.guild_id:
+            return
+
+        possible_roles = user_service.get_user(member.id).sticky_roles
+        roles = [member.guild.get_role(role) for role in possible_roles if member.guild.get_role(
+            role) is not None and member.guild.get_role(role) < member.guild.me.top_role]
+        await member.add_roles(*roles, reason="Sticky roles")
+
