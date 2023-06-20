@@ -1,18 +1,18 @@
 import discord
 import aiohttp
+import os
 
 from discord.ext import commands
 from datetime import datetime
 from discord.utils import format_dt
 from typing import List, Union
 from io import BytesIO, BufferedIOBase
-import os
+from PIL import Image
+from discord.ext.commands.errors import CommandNotFound
 
 from utils.services import guild_service, user_service
 from utils.config import cfg
-
-from PIL import Image
-from discord.ext.commands.errors import CommandNotFound
+from utils.utils import get_warnpoints
 
 
 class Logging(commands.Cog):
@@ -41,7 +41,7 @@ class Logging(commands.Cog):
         embed.add_field(
             name="User", value=f'{member} ({member.mention})', inline=True)
         embed.add_field(name="Warnpoints",
-                        value=db_user.warn_points, inline=True)
+                        value=get_warnpoints(db_user), inline=True)
         embed.add_field(
             name="Join date",
             value=f"{format_dt(member.joined_at, style='F')} ({format_dt(member.joined_at, style='R')})",

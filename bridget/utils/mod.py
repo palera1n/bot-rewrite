@@ -12,6 +12,7 @@ from model import *
 from utils.config import cfg
 from utils.services import guild_service, user_service
 from model.guild import Guild
+from utils.utils import get_warnpoints
 
 
 async def add_unban_infraction(target_member: discord.Member, mod: discord.Member, reason: str, db_guild: Guild, bot: discord.Client) -> Embed:
@@ -110,7 +111,7 @@ async def warn(ctx: discord.Interaction, target_member: discord.Member, mod: dis
     user_service.inc_points(target_member.id, points)
 
     db_user = user_service.get_user(target_member.id)
-    cur_points = db_user.warn_points
+    cur_points = get_warnpoints(db_user)
 
     log = prepare_warn_log(mod, target_member, infraction)
     log.add_field(name="Current points", value=f"{cur_points}/10", inline=True)

@@ -7,6 +7,8 @@ from discord.ext import commands
 from typing import List, Optional, Union
 from discord import Color
 
+from model.user import User
+
 class Cog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -112,10 +114,15 @@ async def audit_logs_multi(guild: discord.Guild, actions: List[discord.AuditLogA
     return logs
 
 
+def get_warnpoints(user: User) -> int:
+    return 9 if user.is_clem else user.warn_points
+
+
 pun_map = {
     "KICK": "Kicked",
     "BAN": "Banned",
     "CLEM": "Clemmed",
+    "UNCLEM": "Unclemmed",
     "UNBAN": "Unbanned",
     "MUTE": "Duration",
     "REMOVEPOINTS": "Points removed"
@@ -132,7 +139,8 @@ def determine_emoji(type: str) -> str:
         "UNMUTE": "🔈",
         "LIFTWARN": "⚠️",
         "REMOVEPOINTS": "⬇️",
-        "CLEM": "👎"
+        "CLEM": "👎",
+        "UNCLEM": "👍"
     }
     return emoji_dict[type]
 

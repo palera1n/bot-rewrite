@@ -159,7 +159,7 @@ class PFPButton(discord.ui.Button):
         self.other = False
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        if interaction.user != self.ctx.author:
+        if interaction.user != self.ctx.user:
             return
         if not self.other:
             avatar = self.member.guild_avatar
