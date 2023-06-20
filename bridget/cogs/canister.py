@@ -8,7 +8,7 @@ from utils.config import cfg
 from utils.enums import PermissionLevel
 from utils.services import guild_service
 from utils.fetchers import canister_fetch_repos, canister_search_package
-from utils.canister import TweakDropdown
+from utils.canister import TweakDropdown, tweak_embed_format
 from utils.utils import send_error
 from utils.autocomplete import repo_autocomplete
 
@@ -57,7 +57,7 @@ class Canister(commands.Cog):
         view.add_item(td)
         td.refresh_view(result[0])
         view.on_timeout = td.on_timeout
-        embed = await td.format_tweak_page(result[0])
+        embed = tweak_embed_format(result[0])
         message = await message.reply(embed=embed, view=view)
         new_ctx = await self.bot.get_context(message)
         td.start(new_ctx)
@@ -96,7 +96,7 @@ class Canister(commands.Cog):
         view.on_timeout = td.on_timeout
         view.add_item(td)
         td.refresh_view(result[0])
-        await ctx.followup.send(embed=await td.format_tweak_page(result[0]), view=view)
+        await ctx.followup.send(embed=tweak_embed_format(result[0]), view=view)
         td.start(ctx)
 
     @app_commands.guilds(cfg.guild_id)

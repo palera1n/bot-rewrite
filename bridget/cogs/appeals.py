@@ -9,6 +9,7 @@ from utils.services import user_service
 from utils.config import cfg
 from utils.enums import PermissionLevel
 from utils import pun_map, determine_emoji
+from utils.utils import get_warnpoints
 
 
 def chunks(lst: list, n: int) -> Generator:
@@ -114,7 +115,7 @@ class Appeals(commands.Cog):
         embed.add_field(
             name="XP", value=results.xp if not results.is_clem else "CLEMMED", inline=True)
         embed.add_field(
-            name="Punishments", value=f"{results.warn_points} warn points\n{len(user_service.get_infractions(appealer.id).infractions)} infractions", inline=True)
+            name="Punishments", value=f"{get_warnpoints(results)} warn points\n{len(user_service.get_infractions(appealer.id).infractions)} infractions", inline=True)
 
         embed.add_field(name="Account creation date",
                         value=f"{format_dt(appealer.created_at, style='F')} ({format_dt(appealer.created_at, style='R')})", inline=True)

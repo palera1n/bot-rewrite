@@ -3,7 +3,7 @@ import discord
 import io
 import random
 
-from discord import app_commands, Embed
+from discord import Color, app_commands, Embed
 from discord.ext import commands
 from discord.utils import format_dt
 
@@ -13,7 +13,7 @@ from utils.enums import PermissionLevel
 from utils.errors import MissingPermissionsError
 from utils.menus import Menu, PFPButton, PFPView
 from utils.services import guild_service, user_service
-from utils.utils import determine_emoji, pun_map
+from utils.utils import determine_emoji, get_warnpoints, pun_map
 
 
 class InfractionFormatter:
@@ -30,7 +30,7 @@ class InfractionFormatter:
             for infraction in page:
                 page_count += 1
         embed = discord.Embed(
-            title=f'Infractions - {u.warn_points} warn points', color=discord.Color.blurple())
+            title=f'Infractions - {get_warnpoints(u)} warn points', color=discord.Color.blurple())
         embed.set_author(name=user, icon_url=user.display_avatar)
         for infraction in entries:
             timestamp = infraction.date
@@ -106,13 +106,17 @@ class Misc(Cog):
         embed.add_field(
             name="XP", value=usr.xp if not usr.is_clem else "CLEMMED", inline=True)
         embed.add_field(
-            name="Punishments", value=f"{usr.warn_points} warn point(s)\n{len(infractions)} infraction(s)", inline=True)
+            name="Punishments", value=f"{get_warnpoints(usr)} warn point(s)\n{len(infractions)} infraction(s)", inline=True)
 
         if len(infractions) > 0:
             text = []
-            for inf in infractions:
+            i = 0
+            for inf in reversed(infractions):
                 punishment = inf.punishment if inf._type != "WARN" else f'{inf.punishment} points'
                 text.append(f"**{inf._type}** - {punishment} - {inf.reason} - <t:{int(inf.date.timestamp())}:R>")
+                i += 1
+                if i >= 3:
+                    break
             embed.add_field(
                 name="Infractions", value='\n'.join(text), inline=False)
 
@@ -263,4 +267,30 @@ class Misc(Cog):
         menu = Menu(ctx, infractions, per_page=10,
                     page_formatter=fmt.format_infractions_page, whisper=whisper)
         await menu.start()
+
+    @app_commands.command()
+    async def warnpoints(self, ctx: discord.Interaction, member: discord.Member = None) -> None:
+        """Show your or another member's warnpoints
+
+        Args:
+            ctx (discord.ctx): Context
+            member (discord.Member, optional): Member to get warnpoints of
+        """
+
+        if not member:
+            member = ctx.user
+
+        if not PermissionLevel.MOD == ctx.user and member.id != ctx.user.id:
+                MissingPermissionsError.throw([f"<@&{guild_service.get_guild().role_moderator}>"])
+
+        usr = user_service.get_user(member.id)
+
+        embed = Embed(title="Warn Points")
+        embed.color = Color.orange()
+        embed.set_thumbnail(url=member.avatar.url if member.avatar else None)
+        embed.add_field(name="Member", value=f"{member.mention}\n{str(member)}\n({member.id})", inline=True)
+        embed.add_field(
+            name="Warn Points", value=f"{get_warnpoints(usr)}", inline=True)
+
+        await ctx.response.send_message(embed=embed)
 
