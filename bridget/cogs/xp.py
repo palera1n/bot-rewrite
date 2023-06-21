@@ -1,7 +1,6 @@
 import discord
 import math
 
-from discord.ext import commands
 from discord import app_commands
 from random import randint
 from typing import List, Union
