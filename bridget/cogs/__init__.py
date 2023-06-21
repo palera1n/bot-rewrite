@@ -17,3 +17,4 @@ from .logparsing import LogParsing
 from .canister import Canister
 from .xp import Xp, StickyRoles
 from .appeals import Appeals
+from .ioscfw import iOSCFW

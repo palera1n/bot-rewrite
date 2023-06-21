@@ -4,10 +4,12 @@ import asyncio
 from binascii import crc32
 from datetime import datetime
 from discord.ext import commands
-from typing import List, Optional, Union
-from discord import Color
+from typing import List, Union
+from discord import Color, app_commands
 
 from model.user import User
+from utils.autocomplete import transform_groups
+from utils.fetchers import get_ios_cfw
 
 class Cog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -144,3 +146,33 @@ def determine_emoji(type: str) -> str:
     }
     return emoji_dict[type]
 
+async def get_device(value: str) -> dict:
+    response = await get_ios_cfw()
+    device_groups = response.get("group")
+
+    transformed_groups = transform_groups(device_groups)
+    devices = [group for group in transformed_groups if group.get(
+        'name').lower() == value.lower() or value.lower() in [x.lower() for x in group.get('devices')]]
+
+    if not devices:
+        raise app_commands.AppCommandError(
+            "No device found with that name.")
+
+    return devices[0]
+
+async def get_version_on_device(version: str, device: dict) -> dict:
+    response = await get_ios_cfw()
+    board = device.get("devices")[0]
+
+    ios = response.get("ios")
+
+    # ios = [i for _, i in ios.items()]
+    for os_version in ["iOS", "tvOS", "watchOS"]:
+        version = version.replace(os_version + " ", "")
+    firmware = [v for v in ios if board in v.get(
+        'devices') and version == v.get('version') or version.lower() == v.get("uniqueBuild").lower()]
+    if not firmware:
+        raise app_commands.AppCommandError(
+            "No firmware found with that version.")
+
+    return firmware[0]
