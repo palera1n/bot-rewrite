@@ -25,6 +25,12 @@ class SocialFix(Cog):
                 quickvids_url = data['quickvids_url']
                 return quickvids_url
 
+    async def vxtwitter(self, twitter_url):
+        return twitter_url.replace("twitter.com", "vxtwitter.com", 1)
+
+    async def ddinstagram(self, insta_url):
+        return insta_url.replace("instagram.com", "ddinstagram.com", 1)
+
     @Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         if message.guild.id != cfg.guild_id:
@@ -32,12 +38,26 @@ class SocialFix(Cog):
         if message.author.bot:
             return
 
-        tiktok = r"(https?://(?:www\.)?tiktok\.com/.*)"
+        fixes = [
+            {
+                "regex": r"(https?://(?:www\.)?tiktok\.com/.*)",
+                "function": self.quickvids
+            },
+            {
+                "regex": r"(https?://twitter\.com/.*)",
+                "function": self.vxtwitter
+            },
+            {
+                "regex": r"(https?://(?:www\.)?instagram\.com/.*)",
+                "function": self.ddinstagram
+            }
+        ]
 
-        tiktok_match = re.search(tiktok, message.content)
-        if tiktok_match:
-            link = tiktok_match.group(1)
-            quickvids_url = await self.quickvids(link)
-            if quickvids_url:
-                await message.edit(suppress=True)
-                await message.reply(quickvids_url)
+        for fix in fixes:
+            fix_match = re.search(fix["regex"], stringy);
+            if fix_match:
+                fixed_url = await fix["function"](fix_match.group(1))
+                if fixed_url:
+                    await message.edit(suppress=True)
+                    await message.reply(fixed_url)
+                    break
