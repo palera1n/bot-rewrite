@@ -167,4 +167,7 @@ dbs
 .DS_Store
 .pdm.toml
 
+# Editor configs
+.vscode/
+
 out
