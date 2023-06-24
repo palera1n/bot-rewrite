@@ -43,7 +43,7 @@ class LogParsing(commands.Cog):
         json = await fetch_remote_json(att.url)
         if json is not None:
             if "panicString" in json:
-                string = json['panicString'].split("\n")[0]
+                string = "\n".join(json['panicString'].split("\n")[:2])
 
             if "build" in json:
                 build = json['build'].split("\n")[0]
