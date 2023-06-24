@@ -22,8 +22,17 @@ class SocialFix(Cog):
             async with session.post(url, json=data) as response:
                 text = await response.text()
                 data = json.loads(text)
-                quickvids_url = data['quickvids_url']
-                return quickvids_url
+                try:
+                    quickvids_url = data['quickvids_url']
+                    return quickvids_url
+                except KeyError:
+                    return None
+
+    async def vxtwitter(self, twitter_url):
+        return twitter_url.replace("twitter.com", "vxtwitter.com", 1)
+
+    async def ddinstagram(self, insta_url):
+        return insta_url.replace("instagram.com", "ddinstagram.com", 1)
 
     @Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
@@ -32,12 +41,30 @@ class SocialFix(Cog):
         if message.author.bot:
             return
 
-        tiktok = r"(https?://(?:www\.)?tiktok\.com/.*)"
+        fixes = [
+            {
+                "regex": r"(https?://(?:www\.)?tiktok\.com/[^ ]*)",
+                "function": self.quickvids
+            },
+            {
+                "regex": r"(https?://twitter\.com/[^ ]*)",
+                "function": self.vxtwitter
+            },
+            {
+                "regex": r"(https?://(?:www\.)?instagram\.com/[^ ]*)",
+                "function": self.ddinstagram
+            }
+        ]
 
-        tiktok_match = re.search(tiktok, message.content)
-        if tiktok_match:
-            link = tiktok_match.group(1)
-            quickvids_url = await self.quickvids(link)
-            if quickvids_url:
-                await message.edit(suppress=True)
-                await message.reply(quickvids_url)
+        for fix in fixes:
+            fix_matches = re.findall(fix["regex"], message.content)
+            fixed_urls = []
+            for fix_match in fix_matches:
+                fixed_url = await fix["function"](fix_match)
+                if fixed_url:
+                    fixed_urls.append(fixed_url)
+            
+            if len(fixed_urls) != 0:
+                    await message.edit(suppress=True)
+                    await message.reply(" ".join(fixed_urls))
+                    break
