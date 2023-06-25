@@ -18,7 +18,7 @@ class SocialFix(Cog):
         }
         async with aiohttp.ClientSession(headers=headers) as session:
             url = 'https://api.quickvids.win/v1/shorturl/create'
-            data = {'tiktok_url': tiktok_url}
+            data = {'input_text': tiktok_url}
             async with session.post(url, json=data) as response:
                 text = await response.text()
                 data = json.loads(text)
