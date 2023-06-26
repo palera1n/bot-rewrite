@@ -4,7 +4,7 @@ import asyncio
 from binascii import crc32
 from datetime import datetime
 from discord.ext import commands
-from typing import List, Union
+from typing import List, Optional, Union
 from discord import Color, app_commands
 
 from model.user import User
@@ -29,6 +29,12 @@ def hash_color(content: str) -> Color:
     blue = int((blue + 255) / 2)
 
     return Color.from_rgb(red, green, blue)
+
+
+def get_text_channel_by_name(guild: discord.Guild, name: str) -> Optional[discord.TextChannel]:
+    for channel in guild.text_channels:
+        if channel.name == name:
+            return channel
 
 
 async def send_error(ctx: discord.Interaction, description: str, embed: discord.Embed = None, delete_after: int = None) -> None:
