@@ -19,8 +19,8 @@ class Appeal():
 
         try:
             data = json.loads(await req.content.read())
-        except Exception as e:
-            return Response(status=400, body=str(e))
+        except:
+            return Response(status=400, body='Error parsing JSON body')
 
         session = await get_client_session()
         headers = { 'authorization': f'{data["token_type"]} {data["access_token"]}' }
