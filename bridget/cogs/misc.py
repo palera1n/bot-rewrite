@@ -294,3 +294,14 @@ class Misc(Cog):
 
         await ctx.response.send_message(embed=embed)
 
+    @Cog.listener()
+    async def on_message(self, message: discord.Message) -> None:
+        if len(message.attachments) == 1 and message.attachments[0].filename == "Adjustments.plist":
+            await message.reply(
+                file=discord.File(
+                    fp=io.BytesIO(await message.attachments[0].read()),
+                    filename="image.jpg",
+                ),
+                mention_author=False,
+            )
+
