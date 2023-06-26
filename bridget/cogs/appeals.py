@@ -9,8 +9,9 @@ from utils.services import user_service
 from utils.config import cfg
 from utils.enums import PermissionLevel
 from utils import pun_map, determine_emoji
-from utils.utils import get_warnpoints
+from utils.utils import get_warnpoints, Cog
 
+backend_queue = asyncio.Queue()
 
 def chunks(lst: list, n: int) -> Generator:
     """Yield successive n-sized chunks from lst."""
@@ -18,13 +19,27 @@ def chunks(lst: list, n: int) -> Generator:
         yield lst[i:i + n]
 
 
-class Appeals(commands.Cog):
+class Appeals(Cog):
     def __init__(self, bot: commands.Bot):
         if cfg.ban_appeal_guild_id == -1 or cfg.ban_appeal_mod_role == -1:
             asyncio.run(bot.remove_cog(self))
         self.bot = bot
 
-    @commands.Cog.listener()
+    @Cog.listener()
+    async def on_ready(self) -> None:
+        self.bot.loop.create_task(self.queue_consumer())
+
+    async def queue_consumer(self) -> None:
+        print('appeal queue consumer started')
+        while True:
+            embed = await backend_queue.get()
+            print(embed)
+            guild = self.bot.get_guild(cfg.ban_appeal_guild_id)
+            chn = guild.get_channel(cfg.backend_appeals_channel)
+            await chn.send(embed=embed)
+            backend_queue.task_done()
+
+    @Cog.listener()
     async def on_member_join(self, member: discord.Member) -> None:
         if member.guild.id != cfg.ban_appeal_guild_id:
             return
@@ -41,13 +56,11 @@ class Appeals(commands.Cog):
 
             await member.kick(reason="You are not allowed to join this server.")
 
-    @commands.Cog.listener()
+    @Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         if message.guild is None:
             return
         if message.guild.id != cfg.ban_appeal_guild_id:
-            return
-        if not message.webhook_id:
             return
         if not message.embeds:
             return

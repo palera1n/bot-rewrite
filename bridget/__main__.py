@@ -8,8 +8,8 @@ import re
 
 from discord import app_commands
 from discord.ext import commands
-
 from os import getenv
+
 
 mongoengine.connect(
     'bridget',
@@ -22,6 +22,7 @@ from utils.startup_checks import checks
 from utils.config import cfg
 from utils.fetchers import init_client_session
 from utils import send_error, send_success
+import backend
 
 for check in checks:
     check()
@@ -131,4 +132,6 @@ async def app_command_error(interaction: discord.Interaction, error: app_command
 
             await send_error(interaction, f"`{error}`\n```{tb_formatted}```")
 
+if cfg.backend_port != -1:
+    backend.run(bot)
 bot.run(getenv("TOKEN"))
