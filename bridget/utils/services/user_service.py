@@ -263,3 +263,8 @@ def fetch_infractions_by_keyword(keyword: str) -> dict:
 def set_sticky_roles(_id: int, roles) -> None:
     get_user(_id)
     User.objects(_id=_id).update_one(set__sticky_roles=roles)
+
+
+def get_appealing_users() -> list[User]:
+    return User.objects(is_appealing=True)
+

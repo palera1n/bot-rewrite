@@ -10,6 +10,7 @@ from utils.config import cfg
 from utils.enums import PermissionLevel
 from utils import pun_map, determine_emoji
 from utils.utils import get_warnpoints, Cog
+from utils.views import AppealView
 
 backend_queue = asyncio.Queue()
 
@@ -24,10 +25,16 @@ class Appeals(Cog):
         if cfg.ban_appeal_guild_id == -1 or cfg.ban_appeal_mod_role == -1:
             asyncio.run(bot.remove_cog(self))
         self.bot = bot
+        self.queue_started = False
 
     @Cog.listener()
     async def on_ready(self) -> None:
-        self.bot.loop.create_task(self.queue_consumer())
+        if not self.queue_started:
+            self.bot.loop.create_task(self.queue_consumer())
+            self.queue_started = True
+        for user in user_service.get_appealing_users():
+            dscuser = await self.bot.fetch_user(user._id)
+            self.bot.add_view(AppealView(self.bot, dscuser), message_id=user.appeal_btn_msg_id)
 
     async def queue_consumer(self) -> None:
         print('appeal queue consumer started')
@@ -106,11 +113,15 @@ class Appeals(Cog):
         else:
             await thread.send(embed=discord.Embed(description=f"Hmm, I couldn't find {unban_username} ({unban_id}) from Discord's API. Maybe this is not a valid user!", color=discord.Color.red()))
 
-        m = await thread.send(mods_to_ping, embed=discord.Embed(description=f"Please vote with whether or not you want to unban this user!", color=discord.Color.orange()), allowed_mentions=discord.AllowedMentions(roles=True))
+        m = await thread.send(mods_to_ping, embed=discord.Embed(description=f"Please vote with whether or not you want to unban this user!", color=discord.Color.orange()), allowed_mentions=discord.AllowedMentions(roles=True), view=AppealView(self.bot, appealer))
         await m.add_reaction("🔺")
         await m.add_reaction("🔻")
         await m.add_reaction("❌")
         await m.pin()
+
+        user = user_service.get_user(appealer.id)
+        user.appeal_btn_msg_id = m.id
+        user.save()
 
         await thread.send(unban_id)
 

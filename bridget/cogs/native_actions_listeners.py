@@ -24,6 +24,12 @@ class NativeActionsListeners(Cog):
 
     @Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, member: discord.Member) -> None:
+        user = user_service.get_user(member.id)
+        user.last_ban_date = datetime.now().date()
+        user.ban_count += 1
+        user.is_banned = True
+        user.save()
+
         audit_logs = [audit async for audit in guild.audit_logs(limit=1, action=discord.AuditLogAction.ban)]
         if audit_logs and audit_logs[0].target == member:
             channel = guild.get_channel(
