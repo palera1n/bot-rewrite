@@ -23,6 +23,13 @@ class User(mongoengine.Document):
     sticky_roles = mongoengine.ListField(default=[])
     command_bans = mongoengine.DictField(default={})
 
+    is_appealing = mongoengine.BooleanField(default=False)
+    is_banned = mongoengine.BooleanField(default=False)
+    last_appeal_date = mongoengine.DateField()
+    last_ban_date = mongoengine.DateField()
+    ban_count = mongoengine.IntField(default=0)
+    appeal_btn_msg_id = mongoengine.IntField()
+
     meta = {
         'db_alias': 'default',
         'collection': 'users'
