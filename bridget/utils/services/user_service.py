@@ -122,7 +122,7 @@ def add_infraction(_id: int, infraction: Infraction) -> None:
     # ensure this user has a infractions document before we try to append the new
     # infraction
     get_infractions(_id)
-    Infractions.objects(_id=_id).update_one(push__infractions=infraction)
+    Infractions.objects(_id=_id).update_one(push__infractions=(infraction).to_mongo())
 
 
 def set_warn_kicked(_id: int) -> None:

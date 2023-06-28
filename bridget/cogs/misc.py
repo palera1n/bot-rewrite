@@ -254,7 +254,7 @@ class Misc(Cog):
 
         results = user_service.get_infractions(user.id)
         if len(results.infractions) == 0:
-            await send_error(ctx, f'{user.mention} has no cases.', delete_after=5)
+            await send_error(ctx, f'{user.mention} has no infractions.', delete_after=5)
             return 
 
         # filter out unmute infractions because they are irrelevant

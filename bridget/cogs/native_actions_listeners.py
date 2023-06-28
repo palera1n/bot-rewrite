@@ -1,16 +1,56 @@
+import argparse
 import discord
 
 from discord.ext import commands
 from datetime import datetime
-from discord.utils import format_dt
+from discord.utils import format_dt, escape_markdown
 from discord.enums import AutoModRuleActionType
+from bridget.model.infraction import Infraction
 
 from utils import Cog
-from utils.mod import add_kick_infraction, add_mute_infraction, add_ban_infraction, add_unban_infraction, add_unmute_infraction
+from utils.mod import add_kick_infraction, add_mute_infraction, add_ban_infraction, add_unban_infraction, add_unmute_infraction, notify_user_warn_noctx, prepare_warn_log, submit_public_log, submit_public_log_noctx
 from utils.services import guild_service, user_service
-from utils.utils import audit_logs_multi
+from utils.utils import audit_logs_multi, get_warnpoints
 from utils.views import AutoModReportView
 
+async def warn(bot: commands.Bot, target_member: discord.Member, mod: discord.Member, points: int, reason: str):
+    db_guild = guild_service.get_guild()
+
+    infraction = Infraction(
+        _id=db_guild.infraction_id,
+        _type="WARN",
+        mod_id=mod.id,
+        mod_tag=str(mod),
+        reason=escape_markdown(reason),
+        punishment=str(points)
+    )
+
+    guild_service.inc_infractionid()
+    user_service.add_infraction(target_member.id, infraction)
+    user_service.inc_points(target_member.id, points)
+
+    db_user = user_service.get_user(target_member.id)
+    cur_points = get_warnpoints(db_user)
+
+    log = prepare_warn_log(mod, target_member, infraction)
+    log.add_field(name="Current points", value=f"{cur_points}/10", inline=True)
+
+    dmed = await notify_user_warn_noctx(target_member, mod, db_user, db_guild, cur_points, log)
+    await submit_public_log_noctx(bot, db_guild, target_member, log, dmed)
+
+class StringWithFlags:
+    def __init__(self, value):
+        self.value = value
+
+def parse_string_with_flags(string):
+    return StringWithFlags(string)
+
+class StringWithFlags:
+    def __init__(self, value: str):
+        self.value: str = value
+
+def parse_string_with_flags(string: str):
+    return StringWithFlags(string)
 
 class NativeActionsListeners(Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -49,7 +89,18 @@ class NativeActionsListeners(Cog):
             # get reason from audit log
             audit_logs = await audit_logs_multi(before.guild, [ discord.AuditLogAction.member_update, discord.AuditLogAction.automod_timeout_member ], limit=1, after=after.joined_at)
             if audit_logs and audit_logs[0].target == after:
-                await channel.send(embed=await add_mute_infraction(after, audit_logs[0].user, "No reason." if audit_logs[0].reason is None else audit_logs[0].reason, guild_service.get_guild(), self.bot))
+                print("hello")
+                parser = argparse.ArgumentParser(exit_on_error=False, usage="")
+                parser.add_argument("-w", "--warn", type=int, default=1)
+                parser.add_argument("message", type=str, nargs='*')
+                try:
+                    strparse = parser.parse_args(audit_logs[0].reason.split())
+                except argparse.ArgumentError as e:
+                    raise commands.BadArgument(f"An error was in your syntax in your message! Specifically ```{e.message}```")
+                print(type(strparse))
+                await channel.send(embed=await add_mute_infraction(after, audit_logs[0].user, "No reason." if not ''.join(strparse.message) else ''.join(strparse.message), guild_service.get_guild(), self.bot))
+                print("before warn")
+                await warn(self.bot, after, audit_logs[0].user, strparse.warn, "Automatic point addition")
         elif before.is_timed_out() and not after.is_timed_out():
             channel = self.bot.get_channel(
                 guild_service.get_guild().channel_public)

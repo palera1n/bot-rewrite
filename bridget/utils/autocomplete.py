@@ -4,6 +4,7 @@ from itertools import groupby
 from typing import List
 from discord import app_commands
 from discord.enums import AutoModRuleTriggerType
+from bridget.model.infraction import Infraction
 
 from utils.enums import PermissionLevel
 from utils.fetchers import canister_fetch_repos, get_ios_cfw

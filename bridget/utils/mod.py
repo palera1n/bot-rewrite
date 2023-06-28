@@ -6,6 +6,7 @@ from typing import Optional, List, Union
 from discord.utils import escape_markdown
 from discord.embeds import Embed
 from discord.interactions import Interaction
+from discord.ext.commands import Bot
 from datetime import timezone
 
 from model import *
@@ -140,6 +141,54 @@ async def notify_user(target_member: discord.Member, text: str, log: discord.Emb
 
     return True
 
+async def notify_user_warn_noctx(target_member: discord.Member, mod: discord.Member, db_user, db_guild: Guild, cur_points: int, log) -> bool:
+    """Notifies a specified user about a warn
+
+    Args:
+        target_member (discord.Member): User to notify
+        mod (discord.Member): User that warned
+        db_user (_type_): User DB
+        db_guild (_type_): Guild DB
+        cur_points (int): Number of points the user currently has
+        log (_type_): Embed to send
+
+    Returns:
+        bool: If notify succeeded
+    """
+
+    log_kickban = None
+    dmed = True
+
+    if cur_points >= 10:
+        # if cfg.ban_appeal_url is None:
+        dmed = await notify_user(target_member, f"You were banned from {target_member.guild.name} for reaching 10 or more points.", log)
+        # else:
+        # dmed = await notify_user(target_member, f"You were banned from
+        # {ctx.guild.name} for reaching 10 or more points.\n\nIf you would like
+        # to appeal your ban, please fill out this form:
+        # <{cfg.ban_appeal_url}>", log)
+
+        log_kickban = await add_ban_infraction(target_member, mod, "10 or more warn points reached.", db_guild, ctx.client)
+        await target_member.ban(reason="10 or more warn points reached.")
+    elif cur_points >= 8 and not db_user.was_warn_kicked and isinstance(target_member, discord.Member):
+        # kick user if >= 8 points and wasn't previously kicked
+        user_service.set_warn_kicked(target_member.id)
+
+        dmed = await notify_user(target_member, f"You were kicked from {target_member.guild.name} for reaching 8 or more points. Please note that you will be banned at 10 points.", log)
+        log_kickban = add_kick_infraction(
+            target_member,
+            mod,
+            "8 or more warn points reached.",
+            db_guild, bot=ctx.client)
+        await target_member.kick(reason="8 or more warn points reached.")
+    else:
+        if isinstance(target_member, discord.Member):
+            dmed = await notify_user(target_member, f"You were warned in {target_member.guild.name}. Please note that you will be kicked at 8 points and banned at 10 points.", log)
+
+    if log_kickban:
+        await submit_public_log(ctx, db_guild, target_member, log_kickban)
+
+    return dmed
 
 async def notify_user_warn(ctx: discord.Interaction, target_member: discord.Member, mod: discord.Member, db_user, db_guild: Guild, cur_points: int, log) -> bool:
     """Notifies a specified user about a warn
@@ -248,6 +297,28 @@ async def submit_public_log(ctx: discord.Interaction, db_guild: Guild, user: Uni
             await public_channel.send(user.mention if not dmed else "", embed=log)
         else:
             await public_channel.send(embed=log)
+
+async def submit_public_log_noctx(bot: Bot, db_guild: Guild, user: Union[discord.Member, discord.User], log: discord.Embed, dmed: bool = None) -> None:
+    """Submits a public log
+
+    Args:
+        bot (Bot): Discord.py bot object
+        db_guild (Guild): Guild DB
+        user (Union[discord.Member, discord.User]): User to notify
+        log (discord.Embed): Embed to send
+        dmed (bool, optional): If was dmed. Defaults to None.
+    """
+
+    public_channel = bot.get_channel(db_guild.channel_public)
+    if public_channel:
+        log.remove_author()
+        log.set_thumbnail(url=user.display_avatar)
+        log.remove_field(1)
+        if dmed is not None:
+            await public_channel.send(user.mention if not dmed else "", embed=log)
+        else:
+            await public_channel.send(embed=log)
+
 
 
 async def add_ban_infraction(target_member: discord.Member, mod: discord.Member, reason, db_guild: Guild, bot: discord.Client) -> Embed:
