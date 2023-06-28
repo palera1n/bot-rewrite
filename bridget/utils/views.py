@@ -1,10 +1,12 @@
 import discord
 import discord.ui as ui
+from utils.enums import PermissionLevel
 
 from utils.mod import warn
 from utils.modals import AutoModWarnButtonModal, ReasonModal
 from utils.services import user_service
 from utils.config import cfg
+from utils.utils import send_error
 
 
 class AutoModReportView(ui.View):
@@ -70,6 +72,11 @@ class AppealView(discord.ui.View):
 
     @discord.ui.button(label='Accept Appeal', style=discord.ButtonStyle.green, custom_id='appealview:accept')
     async def accept_appeal(self, ctx: discord.Interaction, button: discord.ui.Button):
+        guild = self.bot.get_guild(cfg.guild_id)
+        user_main = guild.get_member(ctx.user.id)
+        if not PermissionLevel.ADMIN == user_main:
+            await send_error(ctx, "You're not an admin!")
+            return
         modal = ReasonModal(bot=self.bot, ctx=ctx, author=ctx.user, title=f"Are you sure you want to accept this appeal?")
         await ctx.response.send_modal(modal)
         await modal.wait()
@@ -78,7 +85,6 @@ class AppealView(discord.ui.View):
             user.is_appealing = False
             user.is_banned = False
             user.appeal_btn_msg_id = None
-            guild = self.bot.get_guild(cfg.guild_id)
             await guild.unban(self.appealer, reason=modal.reason)
             try:
                 await self.appealer.send(f"Your ban appeal for {guild.name} was accepted with the following reason: ```{modal.reason}```")
@@ -90,6 +96,12 @@ class AppealView(discord.ui.View):
 
     @discord.ui.button(label='Reject Appeal', style=discord.ButtonStyle.red, custom_id='appealview:reject')
     async def reject_appeal(self, ctx: discord.Interaction, button: discord.ui.Button):
+        guild = self.bot.get_guild(cfg.guild_id)
+        user_main = guild.get_member(ctx.user.id)
+        if not PermissionLevel.ADMIN == user_main:
+            await send_error(ctx, "You're not an admin!")
+            return
+
         modal = ReasonModal(bot=self.bot, ctx=ctx, author=ctx.user, title=f"Are you sure you want to reject this appeal?")
         await ctx.response.send_modal(modal)
         await modal.wait()
@@ -98,7 +110,6 @@ class AppealView(discord.ui.View):
             user = user_service.get_user(self.appealer.id)
             user.is_appealing = False
             user.appeal_btn_msg_id = None
-            guild = self.bot.get_guild(cfg.guild_id)
             try:
                 await self.appealer.send(f"Your ban appeal for {guild.name} was rejected with the following reason: ```{modal.reason}```")
             except:
