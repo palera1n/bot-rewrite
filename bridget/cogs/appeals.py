@@ -9,10 +9,13 @@ from utils.services import user_service
 from utils.config import cfg
 from utils.enums import PermissionLevel
 from utils import pun_map, determine_emoji
-from utils.utils import get_warnpoints, Cog
+from utils.utils import get_warnpoints, Cog, InstantQueueTS
 from utils.views import AppealView
 
-backend_queue = asyncio.Queue()
+
+backend_queue = InstantQueueTS()
+backend_requests = InstantQueueTS()
+
 
 def chunks(lst: list, n: int) -> Generator:
     """Yield successive n-sized chunks from lst."""
@@ -30,21 +33,38 @@ class Appeals(Cog):
     @Cog.listener()
     async def on_ready(self) -> None:
         if not self.queue_started:
-            self.bot.loop.create_task(self.queue_consumer())
+            self.bot.loop.create_task(self.backend_queue_consumer())
+            self.bot.loop.create_task(self.backend_requests_consumer())
             self.queue_started = True
         for user in user_service.get_appealing_users():
             dscuser = await self.bot.fetch_user(user._id)
             self.bot.add_view(AppealView(self.bot, dscuser), message_id=user.appeal_btn_msg_id)
 
-    async def queue_consumer(self) -> None:
+    async def backend_queue_consumer(self) -> None:
         print('appeal queue consumer started')
         while True:
             embed = await backend_queue.get()
-            print(embed)
             guild = self.bot.get_guild(cfg.ban_appeal_guild_id)
             chn = guild.get_channel(cfg.backend_appeals_channel)
             await chn.send(embed=embed)
             backend_queue.task_done()
+
+    async def backend_requests_consumer(self) -> None:
+        print('appeal requests queue consumer started')
+        while True:
+            # get request
+            req = await backend_requests.get()
+            # process request
+            guild = self.bot.get_guild(cfg.guild_id)
+            user = await self.bot.fetch_user(req.id)
+            try:
+                ban = await guild.fetch_ban(user)
+            except:
+                ban = None
+            req.result = ban
+            # notify response
+            req.completion.set()
+            backend_requests.task_done()
 
     @Cog.listener()
     async def on_member_join(self, member: discord.Member) -> None:
@@ -83,8 +103,9 @@ class Appeals(Cog):
             appealer = None
 
         thread = await message.create_thread(name=f"{unban_username} ({unban_id})")
-        mods_to_ping = " ".join(member.mention for member in message.guild.get_role(
-            cfg.ban_appeal_mod_role).members)
+        #mods_to_ping = " ".join(member.mention for member in message.guild.get_role(
+        #    cfg.ban_appeal_mod_role).members)
+        mods_to_ping = "<ping removed>"
 
         embeds_to_send = []
         if appealer is not None:
