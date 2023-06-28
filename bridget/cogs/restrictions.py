@@ -1,6 +1,6 @@
 import discord
 
-from discord import app_commands
+from discord import PermissionOverwrite, app_commands
 
 from utils import Cog, send_error, send_success
 from utils.enums import PermissionLevel, RestrictionType
@@ -52,4 +52,27 @@ class Restrictions(Cog):
             await send_success(ctx, "User unrestricted successfully", ephemeral=True)
         except:
             await send_error(ctx, "Restriction role not found")
+
+    @Cog.listener()
+    async def on_guild_channel_create(self, channel: discord.abc.GuildChannel) -> None:
+        if type(channel) == discord.TextChannel:
+            role_channel = channel.guild.get_role(guild_service.get_guild().role_channelrestriction)
+            role_media = channel.guild.get_role(guild_service.get_guild().role_mediarestriction)
+            role_reaction = channel.guild.get_role(guild_service.get_guild().role_reactionrestriction)
+
+            perm_channel = channel.overwrites_for(role_channel)
+            perm_channel.view_channel = False
+
+            perm_media = channel.overwrites_for(role_media)
+            perm_media.embed_links = False
+            perm_media.attach_files = False
+            perm_media.external_emojis = False
+            perm_media.external_stickers = False
+
+            perm_reaction = channel.overwrites_for(role_reaction)
+            perm_reaction.add_reactions = False
+
+            await channel.set_permissions(role_channel, overwrite=perm_channel)
+            await channel.set_permissions(role_media, overwrite=perm_media)
+            await channel.set_permissions(role_reaction, overwrite=perm_reaction)
 
