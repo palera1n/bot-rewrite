@@ -103,9 +103,8 @@ class Appeals(Cog):
             appealer = None
 
         thread = await message.create_thread(name=f"{unban_username} ({unban_id})")
-        #mods_to_ping = " ".join(member.mention for member in message.guild.get_role(
-        #    cfg.ban_appeal_mod_role).members)
-        mods_to_ping = "<ping removed>"
+        mods_to_ping = " ".join(member.mention for member in message.guild.get_role(
+            cfg.ban_appeal_mod_role).members)
 
         embeds_to_send = []
         if appealer is not None:
