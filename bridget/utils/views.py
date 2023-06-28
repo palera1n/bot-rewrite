@@ -93,6 +93,9 @@ class AppealView(discord.ui.View):
             user.save()
             await ctx.channel.send(f"{ctx.user.mention} accepted the appeal with the following reason: ```{modal.reason}```")
             await ctx.message.edit(embed=ctx.message.embeds[0], view=None)
+            await ctx.channel.edit(locked=True)
+            for user in await ctx.channel.fetch_members():
+                await ctx.channel.remove_user(user)
 
     @discord.ui.button(label='Reject Appeal', style=discord.ButtonStyle.red, custom_id='appealview:reject')
     async def reject_appeal(self, ctx: discord.Interaction, button: discord.ui.Button):
@@ -117,4 +120,7 @@ class AppealView(discord.ui.View):
             user.save()
             await ctx.channel.send(f"{ctx.user.mention} rejected the appeal with the following reason: ```{modal.reason}```")
             await ctx.message.edit(embed=ctx.message.embeds[0], view=None)
+            await ctx.channel.edit(locked=True)
+            for user in await ctx.channel.fetch_members():
+                await ctx.channel.remove_user(user)
 
