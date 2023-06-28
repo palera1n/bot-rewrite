@@ -21,6 +21,10 @@ class Guild(mongoengine.Document):
     role_moderator = mongoengine.IntField()
     role_reportping = mongoengine.IntField()
     role_nicknamelock = mongoengine.IntField()
+    role_mediarestriction = mongoengine.IntField()
+    role_channelrestriction = mongoengine.IntField()
+    role_reactionrestriction = mongoengine.IntField()
+    role_chatgptrestriction = mongoengine.IntField()
 
     channel_botspam = mongoengine.IntField()
     channel_common_issues = mongoengine.IntField()

@@ -19,3 +19,4 @@ from .xp import Xp, StickyRoles
 from .appeals import Appeals
 from .ioscfw import iOSCFW
 from .socialfix import SocialFix
+from .restrictions import Restrictions

@@ -91,6 +91,7 @@ asyncio.run(bot.add_cog(StickyRoles(bot)))
 asyncio.run(bot.add_cog(Appeals(bot)))
 asyncio.run(bot.add_cog(iOSCFW(bot)))
 asyncio.run(bot.add_cog(SocialFix(bot)))
+asyncio.run(bot.add_cog(Restrictions(bot)))
 
 @bot.event
 async def on_ready() -> None:
