@@ -14,7 +14,7 @@ async def setup() -> None:
 
     # If you're re-running this script to update a value, set infraction_id
     # to the last unused infraction ID or else it will start over from 1!
-    guild.infraction_id = 109
+    guild.infraction_id = 124
 
     guild.role_administrator = 1096623117780140072
     guild.role_moderator = 1096623117763354713
@@ -28,6 +28,10 @@ async def setup() -> None:
     guild.role_memberultra = 123
     guild.role_reportping = 1096623117746573374
     guild.role_nicknamelock = 1110986834554667098
+    guild.role_mediarestriction = 1096623117725614219
+    guild.role_channelrestriction = 1096623117725614220
+    guild.role_reactionrestriction = 1096623117725614218
+    guild.role_chatgptrestriction = 1096623117725614217
 
     guild.channel_reports = 1096623118761599051
     guild.channel_mempro_reports = 1096623118761599052

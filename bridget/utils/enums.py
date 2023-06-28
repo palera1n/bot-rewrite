@@ -81,3 +81,23 @@ class PermissionLevel(IntEnum):
     def __hash__(self) -> int:
         return hash(self.value)
 
+
+@unique
+class RestrictionType(IntEnum):
+    """Type of restriction enum"""
+
+    CHANNEL = 0
+    MEDIA = 1
+    REACTION = 2
+    CHATGPT = 3
+
+    def __str__(self) -> str:
+        return {
+                self.CHANNEL: "role_channelrestriction",
+                self.MEDIA: "role_mediarestriction",
+                self.REACTION: "role_reactionrestriction",
+                self.CHATGPT: "role_chatgptrestriction",
+        }[self]
+
+    def __hash__(self) -> int:
+        return hash(self.value)
