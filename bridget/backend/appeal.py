@@ -1,3 +1,4 @@
+import asyncio
 import json
 import discord
 
@@ -5,8 +6,8 @@ from aiohttp.web import Request, Response
 from datetime import datetime, timedelta
 
 from utils.services import user_service
-from .utils import get_client_session
-from cogs.appeals import backend_queue
+from .utils import AppealRequest, get_client_session
+from cogs.appeals import backend_queue, backend_requests
 
 
 class Appeal():
@@ -35,7 +36,15 @@ class Appeal():
 
         user = user_service.get_user(userdat['id'])
         if not user.is_banned:
-            return Response(status=400, body='You are not banned!')
+            # check for non-registered ban
+            areq = AppealRequest(userdat['id'])
+            # put the request
+            await backend_requests.put(areq)
+            # wait for response
+            await areq.completion.wait()
+            areq.completion.clear()
+            if areq.result is None:
+                    return Response(status=400, body='You are not banned!')
 
         if user.ban_count > 3:
             return Response(status=400, body='You have reached the ban appeal limit!')
@@ -56,6 +65,8 @@ class Appeal():
         user.last_appeal_date = datetime.now().date()
         user.is_appealing = True
         user.save()
+
+        print("appeal submitted")
 
         embed = discord.Embed(title="Form Entry", color=discord.Color.green())
         embed.add_field(name="Username", value=userdat['username'], inline=False)

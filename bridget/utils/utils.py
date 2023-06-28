@@ -4,7 +4,7 @@ import asyncio
 from binascii import crc32
 from datetime import datetime
 from discord.ext import commands
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 from discord import Color, app_commands
 
 from model.user import User
@@ -182,3 +182,24 @@ async def get_version_on_device(version: str, device: dict) -> dict:
             "No firmware found with that version.")
 
     return firmware[0]
+
+
+class InstantQueueTS:
+    def __init__(self):
+        self.queue = asyncio.Queue()
+        self.lock = asyncio.Lock()
+        self.event = asyncio.Event()
+
+    async def put(self, item: Any) -> None:
+        async with self.lock:
+            asyncio.get_event_loop().call_soon_threadsafe(self.queue.put_nowait, item)
+            self.event._loop.call_soon_threadsafe(self.event.set)
+
+    async def get(self) -> Any:
+        await self.event.wait()
+        self.event.clear()
+        return self.queue.get_nowait()
+
+    def task_done(self) -> None:
+        self.queue.task_done()
+
