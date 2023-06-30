@@ -74,7 +74,7 @@ class Appeal():
         embed.add_field(name="Ban Reason", value=data['ban_reason'], inline=False)
         embed.add_field(name="Unban Reason", value=data['unban_reason'], inline=False)
         embed.add_field(name="Ban Date", value=data['ban_date'] if data['has_ban_date'] else '<unspecified>', inline=False)
-        embed.add_field(name="Meow", value=data['meow'], inline=False)
+        embed.add_field(name="Justification", value=data['justification'], inline=False)
         embed.add_field(name="Joined Appeals Server", value=data['joined_appeals'], inline=False)
         embed.add_field(name="DMs enabled", value=data['dms_enabled'], inline=False)
         await backend_queue.put(embed)
