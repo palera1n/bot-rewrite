@@ -77,6 +77,8 @@ class Appeal():
         embed.add_field(name="Justification", value=data['justification'], inline=False)
         embed.add_field(name="Joined Appeals Server", value=data['joined_appeals'], inline=False)
         embed.add_field(name="DMs enabled", value=data['dms_enabled'], inline=False)
+        embed.add_field(name="Last Ban Date", value=user.last_ban_date if user.last_ban_date is not None else '<not found>', inline=False)
+        embed.add_field(name="Last Appeal Date", value=user.last_appeal_date if user.last_appeal_date is not None else '<not found>', inline=False)
         await backend_queue.put(embed)
 
         return Response()
