@@ -33,6 +33,8 @@ bot.env_file = ".env"
 setup.cmd = "python bridget/setup.py"
 setup.env_file = ".env"
 lint.cmd = "flake8 --config=.flake8"
+migrate.cmd = "python bridget/migrate.py"
+migrate.env_file = ".env"
 
 [tool.pyright]
 extraPaths = ["__pypackages__/3.11/lib/"]
