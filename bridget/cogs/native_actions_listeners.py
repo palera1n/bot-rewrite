@@ -95,8 +95,10 @@ class NativeActionsListeners(Cog):
                 parser.add_argument("message", type=str, nargs='*')
                 try:
                     strparse = parser.parse_args(audit_logs[0].reason.split())
-                except argparse.ArgumentError as e:
-                    raise commands.BadArgument(f"An error was in your syntax in your message! Specifically ```{e.message}```")
+                except SystemExit as e:
+                    await (await audit_logs[0].user.create_dm()).send("Your mute had an exception! The error was probably an invalid flag. Unmuting the user!")
+                    await after.edit(timed_out_until=None, reason="A SystemExit was triggered by argparse (probably broken flags)")
+                    return
                 print(type(strparse))
                 await channel.send(embed=await add_mute_infraction(after, audit_logs[0].user, "No reason." if not ''.join(strparse.message) else ''.join(strparse.message), guild_service.get_guild(), self.bot))
                 print("before warn")
