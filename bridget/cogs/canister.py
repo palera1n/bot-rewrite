@@ -62,7 +62,6 @@ class Canister(commands.Cog):
         new_ctx = await self.bot.get_context(message)
         td.start(new_ctx)
 
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     async def package(self, ctx: discord.Interaction, query: str) -> None:
         """Search for a jailbreak tweak or package
@@ -99,7 +98,6 @@ class Canister(commands.Cog):
         await ctx.followup.send(embed=tweak_embed_format(result[0]), view=view)
         td.start(ctx)
 
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.command()
     @app_commands.autocomplete(query=repo_autocomplete)
     async def repo(self, ctx: discord.Interaction, query: str) -> None:
