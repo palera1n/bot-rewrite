@@ -5,6 +5,7 @@ import traceback
 import base64
 import hashlib
 import re
+import logging
 
 from discord import app_commands
 from discord.ext import commands
@@ -25,6 +26,8 @@ from utils import send_error, send_success
 
 for check in checks:
     check()
+
+logging.getLogger().setLevel("DEBUG")
 
 bot = commands.Bot(
     command_prefix=cfg.prefix,

@@ -52,7 +52,7 @@ class PermissionLevel(IntEnum):
 
     def __eq__(self, other: Union[int, discord.Member, discord.interactions.Interaction]) -> bool:
         if isinstance(other, discord.interactions.Interaction):
-            other = other.user
+            return other == other.user
 
         if isinstance(other, discord.Member):
             if self == self.EVERYONE:
@@ -70,6 +70,7 @@ class PermissionLevel(IntEnum):
         return self.__class__(self.value + other)
 
     def __call__(self, command: discord.app_commands.Command) -> discord.app_commands.Command:
+        command.extras['PermLevel'] = self
         if self == self.OWNER:
             command.checks.append(lambda ctx: True if self == ctx.user else MissingPermissionsError.throw(perms=[f"Bot Owner"]))
         elif self == self.GUILD_OWNER:
