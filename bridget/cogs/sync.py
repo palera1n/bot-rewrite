@@ -4,6 +4,7 @@ import discord
 import os
 import requests
 import time
+import logging
 
 from discord.ext import commands
 
@@ -18,7 +19,9 @@ class Sync(Cog):
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 'https://discord.com/api/v10/oauth2/token',
-                data=aiohttp.FormData({'grant_type': 'client_credentials', 'scope': 'applications.commands.permissions.update'}),
+                data=aiohttp.FormData(
+                    {'grant_type': 'client_credentials', 'scope': 'applications.commands.permissions.update'}
+                ),
                 auth=aiohttp.BasicAuth(os.environ.get("CLIENT_ID"), os.environ.get("CLIENT_SECRET")),
                 headers={'Content-Type': 'application/x-www-form-urlencoded'},
             ) as resp:
@@ -37,6 +40,10 @@ class Sync(Cog):
             )
             return
 
+        ctx.reply(
+            embed=discord.Embed(color=discord.Color.blurple(), description="Syncing commands, this will take a while")
+        )
+
         async with ctx.typing():
             # await self.bot.tree.sync(guild=discord.Object(id=cfg.guild_id)) # causes the infinte sync sometimes
             # await self.bot.tree.sync() # TODO: uncomment this after testing
@@ -44,7 +51,6 @@ class Sync(Cog):
                 token = await self.get_bearer()
                 bearer = token['access_token']
                 headers = {'Authorization': f'Bearer {bearer}'}
-                print(headers)
                 # async with aiohttp.ClientSession(headers=headers) as session:
                 #     async with session.get(f"https://discord.com/api/v10/applications/{os.environ.get('CLIENT_ID')}/guilds/{os.environ.get('GUILD_ID')}/commands", headers=headers) as resp:
                 #         command_list = await resp.json()
@@ -56,10 +62,13 @@ class Sync(Cog):
                 #                     pass
                 #             except Exception as e:
                 #                 print(e)
-                resp = requests.get(f"https://discord.com/api/v10/applications/{self.bot.application_id}/commands", headers={'Authorization': f'Bot {os.environ.get("TOKEN")}'})
+                resp = requests.get(
+                    f"https://discord.com/api/v10/applications/{self.bot.application_id}/commands",
+                    headers={'Authorization': f'Bot {os.environ.get("TOKEN")}'},
+                )
                 command_list = resp.json()
-                # print(resp.headers)
-                # print(command_list)
+                logging.log(resp.headers, level="DEBUG")
+                logging.log(command_list, level="DEBUG")
                 for command in command_list:
                     while True:
                         try:
@@ -72,20 +81,31 @@ class Sync(Cog):
                             toid = 0
                             if cmdtype == enums.PermissionLevel.EVERYONE:
                                 break
-                            elif cmdtype == enums.PermissionLevel.ADMIN:
-                                payload = [{'id': os.environ.get('GUILD_ID'), 'type': 1, 'permission': False}]
+                            elif cmdtype >= enums.PermissionLevel.ADMIN:
+                                payload = {
+                                    'permissions': [{'id': os.environ.get('GUILD_ID'), 'type': 1, 'permission': False}]
+                                }
                             else:
-                                print(str(cmdtype))
                                 toid = getattr(guild_service.get_guild(), str(cmdtype))
-                                payload = [{'id': toid, 'type': 1, 'permission': True}, {'id': os.environ.get('GUILD_ID'), 'type': 1, 'permission': False}]
-                            
+                                payload = {
+                                    'permissions': [
+                                        {'id': toid, 'type': 1, 'permission': True},
+                                        {'id': os.environ.get('GUILD_ID'), 'type': 1, 'permission': False},
+                                    ]
+                                }
+
                             print(payload)
-                                
-                            r = requests.put(f"https://discord.com/api/v10/applications/{self.bot.application_id}/guilds/{os.environ.get('GUILD_ID')}/commands/{command['id']}/permissions", headers=headers, json=payload)
+
+                            r = requests.put(
+                                f"https://discord.com/api/v10/applications/{self.bot.application_id}/guilds/{os.environ.get('GUILD_ID')}/commands/{command['id']}/permissions",
+                                headers=headers,
+                                json=payload,
+                            )
                             if r.status_code == 429:
+                                logging.log('got ratelimited, sleeping for 10 seconds')
                                 time.sleep(10)
                             elif r.status_code == 400:
-                                time.sleep(30)
+                                raise Exception(f"got 400, response json: {r.json()}")
                             elif not r.ok:
                                 pass
                             else:
@@ -93,7 +113,7 @@ class Sync(Cog):
 
                         except Exception as e:
                             raise e
-                                
+
             except Exception as e:
                 await ctx.reply(
                     embed=discord.Embed(
