@@ -45,8 +45,8 @@ class Sync(Cog):
         )
 
         async with ctx.typing():
-            # await self.bot.tree.sync(guild=discord.Object(id=cfg.guild_id)) # causes the infinte sync sometimes
-            # await self.bot.tree.sync() # TODO: uncomment this after testing
+            await self.bot.tree.sync(guild=discord.Object(id=cfg.guild_id)) # causes the infinte sync sometimes
+            await self.bot.tree.sync() # this too
             try:
                 token = await self.get_bearer()
                 bearer = token['access_token']
