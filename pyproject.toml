@@ -5,7 +5,7 @@ description = "Bot for the palera1n Discord server"
 authors = [
     {name = "Nebula", email = "me@itsnebula.net"},
     {name = "June Park", email = "rjp2030@outlook.com"},
-    {name = "Jan Garcia", email = "me@jancr.dev"},
+    {name = "Ainara Garcia", email = "me@ainara.dev"},
 ]
 dependencies = [
     "mongoengine>=0.27.0",
@@ -19,6 +19,7 @@ dependencies = [
     "aiocache>=0.12.1",
     "aiohttp-cors>=0.7.0",
     "aiohttp>=3.8.4",
+    "psutil>=5.9.5",
 ]
 requires-python = ">=3.10,<4.0"
 license = {text = "BSD-3-Clause"}
@@ -33,7 +34,7 @@ bot.env_file = ".env"
 setup.cmd = "python bridget/setup.py"
 setup.env_file = ".env"
 lint.cmd = "flake8 --config=.flake8"
-migrate.cmd = "python bridget/migrate.py"
+migrate.cmd = "python bridget/migrate"
 migrate.env_file = ".env"
 
 [tool.pyright]
