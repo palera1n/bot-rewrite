@@ -55,6 +55,38 @@ class Memes(Cog):
 
         await ctx.response.send_message(content=title, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag), file=_file)
 
+    @commands.guild_only()
+    @commands.command(name="meme", aliases=["m"])
+    async def _tag(self, ctx: commands.Context, name: str) -> None:
+        """Send a tag
+
+        Args:
+            ctx (commands.Context): Context
+            name (str): Name of the tag
+        """
+
+        name = name.lower()
+        tag = guild_service.get_tag(name)
+
+        if tag is None:
+            raise commands.BadArgument("That tag does not exist.")
+
+        # if the Tag has an image, add it to the embed
+        _file = tag.image.read()
+        if _file is not None:
+            _file = discord.File(
+                BytesIO(_file),
+                filename="image.gif" if tag.image.content_type == "image/gif" else "image.png")
+        else:
+            _file = discord.utils.MISSING
+
+        if ctx.message.reference is not None:
+            title = f"Hey {ctx.message.reference.resolved.author.mention}, have a look at this!"
+            await ctx.send(content=title, embed=prepare_tag_embed(tag), view=prepare_tag_view(tag), file=_file)
+        else:
+            await ctx.message.reply(embed=prepare_tag_embed(tag), view=prepare_tag_view(tag), file=_file, mention_author=False)
+
+
     @app_commands.command()
     async def memelist(self, ctx: discord.Interaction) -> None:
         """List all memes

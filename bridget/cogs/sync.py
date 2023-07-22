@@ -40,8 +40,8 @@ class Sync(Cog):
             )
             return
 
-        ctx.reply(
-            embed=discord.Embed(color=discord.Color.blurple(), description="Syncing commands, this will take a while")
+        await ctx.reply(
+            embed=discord.Embed(color=discord.Color.blurple(), description="Syncing commands, this will take a while"), delete_after=3
         )
 
         async with ctx.typing():
@@ -67,8 +67,6 @@ class Sync(Cog):
                     headers={'Authorization': f'Bot {os.environ.get("TOKEN")}'},
                 )
                 command_list = resp.json()
-                logging.log(resp.headers, level="DEBUG")
-                logging.log(command_list, level="DEBUG")
                 for command in command_list:
                     while True:
                         try:
@@ -102,10 +100,10 @@ class Sync(Cog):
                                 json=payload,
                             )
                             if r.status_code == 429:
-                                logging.log('got ratelimited, sleeping for 10 seconds')
+                                # logging.log(msg='got ratelimited, sleeping for 10 seconds')
                                 time.sleep(10)
                             elif r.status_code == 400:
-                                raise Exception(f"got 400, response json: {r.json()}")
+                                raise Exception(msg=f"got 400, response json: {r.json()}")
                             elif not r.ok:
                                 pass
                             else:
@@ -118,7 +116,7 @@ class Sync(Cog):
                 await ctx.reply(
                     embed=discord.Embed(
                         color=discord.Color.green(),
-                        description="Synced slash commands, but failed to set permissions",
+                        description=f"Synced slash commands, but failed to set permissions {e}",
                     ),
                     delete_after=5,
                 )

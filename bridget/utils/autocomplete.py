@@ -11,6 +11,58 @@ from utils.fetchers import canister_fetch_repos, get_ios_cfw
 from utils.services import guild_service, user_service
 
 
+MONTH_MAPPING = {
+    "January": {
+        "value": 1,
+        "max_days": 31,
+    },
+    "February": {
+        "value": 2,
+        "max_days": 29,
+    },
+    "March": {
+        "value": 3,
+        "max_days": 31,
+    },
+    "April": {
+        "value": 4,
+        "max_days": 30,
+    },
+    "May": {
+        "value": 5,
+        "max_days": 31,
+    },
+    "June": {
+        "value": 6,
+        "max_days": 30,
+    },
+    "July": {
+        "value": 7,
+        "max_days": 31,
+    },
+    "August": {
+        "value": 8,
+        "max_days": 31,
+    },
+    "September": {
+        "value": 9,
+        "max_days": 30,
+    },
+    "October": {
+        "value": 10,
+        "max_days": 31,
+    },
+    "November": {
+        "value": 11,
+        "max_days": 30,
+    },
+    "December": {
+        "value": 12,
+        "max_days": 31,
+    },
+    
+}
+
 def transform_groups(groups):
     final_groups = []
     # groups = [g for _, g in groups.items()]
@@ -275,3 +327,10 @@ async def bypass_autocomplete(_: discord.Interaction, current: str) -> List[app_
     apps.sort(key=lambda x: x.get("name").lower())
     return [app_commands.Choice(name=app.get("name"), value=app.get("bundleId")) for app in apps if current.lower() in app.get("name").lower()][:25]
 
+async def date_autocompleter(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+    """Autocompletes the date parameter for !mybirthday"""
+    month = MONTH_MAPPING.get(interaction.namespace["month"])
+    if month is None:
+        return []
+
+    return [app_commands.Choice(name=i, value=i) for i in range(1, month["max_days"]+1) if str(i).startswith(str(current))][:25]
