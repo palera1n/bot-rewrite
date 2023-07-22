@@ -173,3 +173,5 @@ dbs
 out
 
 ocr.py
+
+mongo_data
