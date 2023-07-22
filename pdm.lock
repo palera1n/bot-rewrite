@@ -121,6 +121,11 @@ requires_python = ">=3.7"
 summary = "En/Decode unicode country flags emoji"
 
 [[package]]
+name = "expiringdict"
+version = "1.2.2"
+summary = "Dictionary with auto-expiring values for caching purposes"
+
+[[package]]
 name = "frozenlist"
 version = "1.3.3"
 requires_python = ">=3.7"
@@ -250,6 +255,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "pytimeparse"
+version = "1.1.8"
+summary = "Time expression parser"
+
+[[package]]
 name = "pytz"
 version = "2023.3"
 summary = "World timezone definitions, modern and historical"
@@ -370,7 +380,7 @@ dependencies = [
 lock_version = "4.2"
 cross_platform = true
 groups = ["default"]
-content_hash = "sha256:a5b84e2e1e90c4e8ecd0a199cad9f146239c3d31507ec5c67b8518e31e2e54b4"
+content_hash = "sha256:cce4d749f02c701a7cfc8202eee4b617c855e172faa65a07308b82990b927caa"
 
 [metadata.files]
 "aiocache 0.12.1" = [
@@ -578,6 +588,10 @@ content_hash = "sha256:a5b84e2e1e90c4e8ecd0a199cad9f146239c3d31507ec5c67b8518e31
 "emoji-country-flag 1.3.2" = [
     {url = "https://files.pythonhosted.org/packages/84/f8/c0fd102fbe5183c3af010fc1ba9eadaed955b2288df0fd41ac9b56234140/emoji_country_flag-1.3.2-py2.py3-none-any.whl", hash = "sha256:6ddcf8f3bc55b2f59b1d7d9dc830e90f9423f555dd37862c4c2e220d42726f73"},
     {url = "https://files.pythonhosted.org/packages/de/ff/5797345a550a98e5b09185669a56e076526d790e1d856e0d080a027ddfe0/emoji-country-flag-1.3.2.tar.gz", hash = "sha256:42d9fc1a8ec27b3ef2c18a39532dcdbf0527afbc95749be02a3afc1f1b165aa3"},
+]
+"expiringdict 1.2.2" = [
+    {url = "https://files.pythonhosted.org/packages/cb/84/a04c59324445f4bcc98dc05b39a1cd07c242dde643c1a3c21e4f7beaf2f2/expiringdict-1.2.2-py3-none-any.whl", hash = "sha256:09a5d20bc361163e6432a874edd3179676e935eb81b925eccef48d409a8a45e8"},
+    {url = "https://files.pythonhosted.org/packages/fc/62/c2af4ebce24c379b949de69d49e3ba97c7e9c9775dc74d18307afa8618b7/expiringdict-1.2.2.tar.gz", hash = "sha256:300fb92a7e98f15b05cf9a856c1415b3bc4f2e132be07daa326da6414c23ee09"},
 ]
 "frozenlist 1.3.3" = [
     {url = "https://files.pythonhosted.org/packages/01/a3/a3c18bfd7bd2a56831b985140f98eb6dda684a2d8b2a54b1077b45c7f9d9/frozenlist-1.3.3-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:23d16d9f477bb55b6154654e0e74557040575d9d19fe78a161bd33d7d76808e8"},
@@ -994,6 +1008,10 @@ content_hash = "sha256:a5b84e2e1e90c4e8ecd0a199cad9f146239c3d31507ec5c67b8518e31
 "pytesseract 0.3.10" = [
     {url = "https://files.pythonhosted.org/packages/c5/54/ec007336f38d2d4ce61f3544af3e6855dacbf04a1ac8294f10cabe81146f/pytesseract-0.3.10-py3-none-any.whl", hash = "sha256:8f22cc98f765bf13517ead0c70effedb46c153540d25783e04014f28b55a5fc6"},
     {url = "https://files.pythonhosted.org/packages/f0/f1/e34221d3b870fb3b6b38a5843ad2b802bdc85c222c7c49555b72e59eb52b/pytesseract-0.3.10.tar.gz", hash = "sha256:f1c3a8b0f07fd01a1085d451f5b8315be6eec1d5577a6796d46dc7a62bd4120f"},
+]
+"pytimeparse 1.1.8" = [
+    {url = "https://files.pythonhosted.org/packages/1b/b4/afd75551a3b910abd1d922dbd45e49e5deeb4d47dc50209ce489ba9844dd/pytimeparse-1.1.8-py2.py3-none-any.whl", hash = "sha256:04b7be6cc8bd9f5647a6325444926c3ac34ee6bc7e69da4367ba282f076036bd"},
+    {url = "https://files.pythonhosted.org/packages/37/5d/231f5f33c81e09682708fb323f9e4041408d8223e2f0fb9742843328778f/pytimeparse-1.1.8.tar.gz", hash = "sha256:e86136477be924d7e670646a98561957e8ca7308d44841e21f5ddea757556a0a"},
 ]
 "pytz 2023.3" = [
     {url = "https://files.pythonhosted.org/packages/5e/32/12032aa8c673ee16707a9b6cdda2b09c0089131f35af55d443b6a9c69c1d/pytz-2023.3.tar.gz", hash = "sha256:1d8ce29db189191fb55338ee6d0387d82ab59f3d00eac103412d64e0ebd0c588"},
