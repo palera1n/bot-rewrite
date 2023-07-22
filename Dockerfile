@@ -19,10 +19,10 @@ FROM python:3.10
 
 # retrieve packages from build stage
 ENV PYTHONPATH=/project/pkgs
-COPY --from=builder /project/__pypackages__/3.8/lib /project/pkgs
+COPY --from=builder /project/__pypackages__/3.10/lib /project/pkgs
 
 # retrieve executables
-COPY --from=builder /project/__pypackages__/3.8/bin/* /bin/
+COPY --from=builder /project/__pypackages__/3.10/bin/* /bin/
 
 # set command/entrypoint, adapt to fit your needs
 CMD ["pdm", "run", "bot"]
