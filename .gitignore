@@ -171,3 +171,5 @@ dbs
 .vscode/
 
 out
+
+ocr.py

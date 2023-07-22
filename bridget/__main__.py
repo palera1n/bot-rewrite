@@ -96,6 +96,7 @@ asyncio.run(bot.add_cog(Appeals(bot)))
 asyncio.run(bot.add_cog(iOSCFW(bot)))
 asyncio.run(bot.add_cog(SocialFix(bot)))
 asyncio.run(bot.add_cog(Restrictions(bot)))
+# asyncio.run(bot.add_cog(OCR(bot))) # Do not enable, or else we'll hate you
 
 @bot.event
 async def on_ready() -> None:
