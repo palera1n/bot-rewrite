@@ -22,3 +22,4 @@ from .socialfix import SocialFix
 from .restrictions import Restrictions
 # from .ocr import OCR
 from .birthday import Birthday
+from .antiraid import AntiRaidMonitor

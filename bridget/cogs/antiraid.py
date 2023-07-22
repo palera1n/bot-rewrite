@@ -28,7 +28,7 @@ class MessageTextBucket(commands.BucketType):
     def __call__(self, msg):
         return self.get_key(msg)
 
-class AntiRaidMonitor(commands.Cog):
+class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
     def __init__(self, bot):
         self.bot = bot
 

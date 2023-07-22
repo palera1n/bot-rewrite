@@ -97,12 +97,12 @@ asyncio.run(bot.add_cog(iOSCFW(bot)))
 asyncio.run(bot.add_cog(SocialFix(bot)))
 asyncio.run(bot.add_cog(Restrictions(bot)))
 # asyncio.run(bot.add_cog(OCR(bot))) # Do not enable, or else we'll hate you
-
+asyncio.run(bot.add_cog(AntiRaidMonitor(bot)))
 
 
 @bot.event
 async def on_ready() -> None:
-    await bot.add_cog(Birthday(bot))
+    await bot.add_cog(Birthday(bot)) # need to start bot before adding this cog
     await init_client_session()
 
 # Error handler
