@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
       # network: host # comment this out if you want to use dockerized mongo
     restart: always
+    ports:
+      - 8096:8096
     # network_mode: host # comment this out if you want to use dockerized mongo
     # also, if you want to use dockerized Mongo you need to change DB_HOST to "mongo" in .env
 

@@ -24,5 +24,9 @@ COPY --from=builder /project/__pypackages__/3.10/lib /project/pkgs
 # retrieve executables
 COPY --from=builder /project/__pypackages__/3.10/bin/* /bin/
 
+# default port
+EXPOSE 8096
+
+
 # set command/entrypoint, adapt to fit your needs
 CMD ["pdm", "run", "bot"]
