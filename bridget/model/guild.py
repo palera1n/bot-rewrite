@@ -56,6 +56,8 @@ class Guild(mongoengine.Document):
     issues = mongoengine.EmbeddedDocumentListField(Issue, default=[])
     issues_list_msg = mongoengine.ListField(default=[])
 
+    automod_antiraid = mongoengine.IntField()
+
     meta = {
         'db_alias': 'default',
         'collection': 'guilds'

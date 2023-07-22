@@ -11,6 +11,7 @@ from bridget import model
 from utils import services
 
 girfilter = []
+girraid = []
 
 class MigrateClient(discord.Client):
     async def on_ready(self):
@@ -32,14 +33,32 @@ class MigrateClient(discord.Client):
             trig.keyword_filter.append(phrase)
 
             # edit the rule trigger
-            await rule.edit(trigger=trig, reason="Filtered word/regex/whitelist has been added")
+            await rule.edit(trigger=trig, reason="Filtered word/regex/whitelist has been added (Migration)")
+
+        print("Migrating AntiRaid!")
+
+        raidrule = []
+
+        for rule in rules:
+            if discord.AutoModRuleActionType.timeout in rule.actions:
+                raidrule = rule
+
+        for filter in girraid:
+            trig = rule.trigger
+
+
+            phrase = filter.word
+            trig.keyword_filter.append(phrase)
+
+            # edit the rule trigger
+            await raidrule.edit(trigger=trig, reason="Filtered word/regex/whitelist has been added (Migration)")
 
         print("Disconnecting!")
         await self.close()
 
 
 async def migrate() -> None:
-    global girfilter
+    global girfilter, girraid
     print("Hello!")
     print("We need you to answer a few questions to start the migration process ")
     setup_did = input("Did you run 'pdm run setup'? (y/n) ")
@@ -73,11 +92,14 @@ async def migrate() -> None:
 
     print("Caching users!")
 
-    girusers = girmodel.User.objects()
+    girusers = girmodel.User.objects(_id=os.getend("GUILD_ID"))
 
     print("Caching filter!")
 
-    girfilter = girmodel.FilterWord.objects()
+    girfilter = girmodel.Guild.objects(_id=os.getenv("GUILD_ID")).first().filter_words
+
+    print("Caching AntiRaid filter!")
+    girraid = girmodel.Guild.objects(_id=os.getenv("GUILD_ID")).first().raid_phrases
 
     mongoengine.disconnect()
     

@@ -52,6 +52,8 @@ async def setup() -> None:
     guild.filter_excluded_channels = []
     guild.filter_excluded_guilds = []
 
+    guild.automod_antiraid = 0
+
     guild.save()
     print("DONE")
 
