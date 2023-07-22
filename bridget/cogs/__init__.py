@@ -20,4 +20,4 @@ from .appeals import Appeals
 from .ioscfw import iOSCFW
 from .socialfix import SocialFix
 from .restrictions import Restrictions
-from .ocr import OCR
+# from .ocr import OCR
