@@ -1,0 +1,6 @@
+.venv
+.pytype
+.github
+.pyre_configuration.local
+__pycache__
+__pypackages__
