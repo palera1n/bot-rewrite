@@ -7,7 +7,7 @@ RUN pip install pdm
 
 # copy files
 COPY pyproject.toml pdm.lock README.md /project/
-COPY src/ /project/src
+COPY bridget /project/bridget
 
 # install dependencies and project into the local packages directory
 WORKDIR /project
