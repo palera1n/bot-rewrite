@@ -1,16 +1,21 @@
 import re
+import discord
+import os
+
 from asyncio import Lock
 from datetime import datetime, timedelta, timezone
-
-import discord
-from bridget.utils.enums import PermissionLevel
-from model import Case
-from utils.services import guild_service, user_service
 from discord.ext import commands
+from discord import app_commands
 from expiringdict import ExpiringDict
+from datasketch import MinHash, MinHashLSH
+
+from bridget.utils.enums import PermissionLevel
+from bridget.utils.pfpcalc import calculate_hash, hamming_distance
+from model import Infraction
+from utils.services import guild_service, user_service
 from utils.config import cfg
 from utils.mod import prepare_ban_log
-from utils.views import report_raid, report_raid_phrase, report_spam
+from utils.reports import report_raid, report_raid_phrase, report_spam
 
 class RaidType:
     PingSpam = 1
@@ -38,6 +43,8 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
         # cooldown to monitor if users are spamming a message (8 within 6 seconds)
         self.message_spam_detection_threshold = commands.CooldownMapping.from_cooldown(
             rate=7, per=6.0, type=commands.BucketType.member)
+        self.message_spam_aggresive_detection_threshold = commands.CooldownMapping.from_cooldown(
+            rate=3, per=5.5, type=commands.BucketType.member)
         # cooldown to monitor if too many accounts created on the same date are joining within a short period of time
         # (5 accounts created on the same date joining within 45 minutes of each other)
         self.join_overtime_raid_detection_threshold = commands.CooldownMapping.from_cooldown(
@@ -67,6 +74,10 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
         self.join_overtime_lock = Lock()
         self.banning_lock = Lock()
 
+        # caches all joined users for profile picture analysis
+        self.last30pfps = []
+        self.last30messagecontents = {}
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member) -> None:
         """Antiraid filter for when members join.
@@ -90,6 +101,24 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
         join_spam_detection_bucket = self.join_raid_detection_threshold.get_bucket(
             member)
         self.join_user_mapping[member.id] = member
+
+        if member.avatar != None:
+            this_hash = calculate_hash((await member.avatar.to_file()).fp)
+
+            for pfphash in self.last30pfps:
+                distance = hamming_distance(pfphash, this_hash)
+                similarity = (distance / 64)
+                if similarity <= 10:
+                    # 90% chance of similar image!
+                    await report_raid(member)
+                    member.ban(reason="Similar profile picture spam raid detected.")
+                    self.last30pfps.append(this_hash)
+                    return
+            
+
+        self.last30pfps.append(this_hash)
+        if len(self.last30pfps) > 30:
+            del self.last30pfps[0]
 
         # if ratelimit is triggered, we should ban all the users that joined in the past 8 seconds
         if join_spam_detection_bucket.update_rate_limit(current):
@@ -176,9 +205,9 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
             return
         if message.guild.id != cfg.guild_id:
             return
-        message.author = message.guild.get_member(message.author.id)
-        if PermissionLevel.MOD == message.guild:
+        if PermissionLevel.MOD == message.author:
             return
+
 
 
         if await self.message_spam(message):
@@ -264,10 +293,19 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
         A report is generated which a mod must review (either unmute or ban the user using a react)
         """
 
-        if PermissionLevel.MEMPLUS == message.author:
-            return False
+        umentioncount, rmentioncount = 4, 2
 
-        if len(set(message.mentions)) > 4 or len(set(message.role_mentions)) > 2:
+        if PermissionLevel.MEMPLUS == message.author:
+            umentioncount, rmentioncount = 6, 2
+        elif PermissionLevel.MEMPRO == message.author:
+            umentioncount, rmentioncount = 8, 3
+
+
+        if (abs(datetime.now().timestamp() - message.author.joined_at.timestamp()) <= 43200 or datetime.now().timestamp() - (((message.author.id << 22) + 1420070400000) / 1000) <= 432000) and not PermissionLevel.MEMPLUS == message.author:
+            # Aggresive raid detection target (joined guild in the last 12 hours or created account within the last 5 days and is not a member plus)
+            umentioncount, rmentioncount = 2, 1
+
+        if len(set(message.mentions)) > umentioncount or len(set(message.role_mentions)) > rmentioncount:
             bucket = self.spam_report_cooldown.get_bucket(message)
             current = message.created_at.replace(
                 tzinfo=timezone.utc).timestamp()
@@ -289,7 +327,11 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
         if PermissionLevel.MEMPLUS == message.author:
             return False
 
-        bucket = self.message_spam_detection_threshold.get_bucket(message)
+        if (abs(datetime.now().timestamp() - message.author.joined_at.timestamp()) <= 43200 or datetime.now().timestamp() - (((message.author.id << 22) + 1420070400000) / 1000) <= 432000) and not PermissionLevel.MEMPLUS == message.author:
+            # Aggresive raid detection target (joined guild in the last 12 hours or created account within the last 5 days and is not a member plus)
+            bucket = self.message_spam_aggresive_detection_threshold.get_bucket(message)
+        else:
+            bucket = self.message_spam_detection_threshold.get_bucket(message)
         current = message.created_at.replace(tzinfo=timezone.utc).timestamp()
 
         if bucket.update_rate_limit(current):
@@ -298,7 +340,6 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
                 tzinfo=timezone.utc).timestamp()
             if not bucket.update_rate_limit(current):
                 user = message.author
-                ctx = await self.bot.get_context(message)
                 # await mute(ctx, user, mod=ctx.guild.me, reason="Message spam")
                 twoweek = datetime.now() + timedelta(days=14)
 
@@ -344,8 +385,8 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
 
             db_guild = guild_service.get_guild()
 
-            case = Case(
-                _id=db_guild.case_id,
+            infraction = Infraction(
+                _id=db_guild.infraction_id,
                 _type="BAN",
                 date=datetime.now(),
                 mod_id=self.bot.user.id,
@@ -354,10 +395,10 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
                 reason=reason
             )
 
-            guild_service.inc_caseid()
-            user_service.add_case(user.id, case)
+            guild_service.inc_infractionid()
+            user_service.add_infraction(user.id, infraction)
 
-            log = prepare_ban_log(self.bot.user, user, case)
+            log = prepare_ban_log(self.bot.user, user, infraction)
 
             if dm_user:
                 try:

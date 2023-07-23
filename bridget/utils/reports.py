@@ -268,11 +268,11 @@ def prepare_embed(target: Union[discord.Message, discord.Member], word: str = No
         name="Roles", value=roles if roles else "None", inline=False)
 
     if len(rd) > 0:
-        embed.add_field(name=f"{len(rd)} most recent cases",
+        embed.add_field(name=f"{len(rd)} most recent infractions",
                         value=rd_text, inline=True)
     else:
-        embed.add_field(name=f"Recent cases",
-                        value="This user has no cases.", inline=True)
+        embed.add_field(name=f"Recent infractions",
+                        value="This user has no infractions.", inline=True)
     return embed
 
 

@@ -25,6 +25,7 @@ dependencies = [
     "opencv-python>=4.8.0.74",
     "expiringdict>=1.2.2",
     "pytimeparse>=1.1.8",
+    "datasketch>=1.5.9",
 ]
 requires-python = ">=3.10,<4.0"
 license = {text = "BSD-3-Clause"}
