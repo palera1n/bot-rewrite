@@ -1,6 +1,6 @@
 import re
 import discord
-import os
+import json
 
 from asyncio import Lock
 from datetime import datetime, timedelta, timezone
@@ -120,6 +120,9 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
         self.last30pfps.append(this_hash)
         if len(self.last30pfps) > 30:
             del self.last30pfps[0]
+        
+        with open("./bot_data/last30pfps.json", "w") as f:
+            json.dump(self.last30pfps, f)
 
         # if ratelimit is triggered, we should ban all the users that joined in the past 8 seconds
         if join_spam_detection_bucket.update_rate_limit(current):
@@ -316,6 +319,7 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
 
                 # await mute(ctx, user, mod=ctx.guild.me, reason="Ping spam")
                 await user.timeout(twoweek, reason="Ping spam")
+                await report_spam(self.bot, message, user, "Ping spam")
                 return True
 
         return False
@@ -345,6 +349,7 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
                 twoweek = datetime.now() + timedelta(days=14)
 
                 await user.timeout(twoweek, reason="Message spam")
+                await report_spam(self.bot, message, user, "Message spam")
                 return True
 
         return False
@@ -378,47 +383,19 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
         """Helper function to ban users"""
 
         async with self.banning_lock:
-            # if self.ban_user_mapping.get(user.id) is not None:
-            if self.bot.ban_cache.is_banned(user.id):
-                return
-            else:
-                self.bot.ban_cache.ban(user.id)
-
-            db_guild = guild_service.get_guild()
-
-            infraction = Infraction(
-                _id=db_guild.infraction_id,
-                _type="BAN",
-                date=datetime.now(),
-                mod_id=self.bot.user.id,
-                mod_tag=str(self.bot.user),
-                punishment="PERMANENT",
-                reason=reason
-            )
-
-            guild_service.inc_infractionid()
-            user_service.add_infraction(user.id, infraction)
-
-            log = prepare_ban_log(self.bot.user, user, infraction)
 
             if dm_user:
                 try:
-                    await user.send(f"You were banned from {user.guild.name}.\n\nThis action was performed automatically. If you think this was a mistake, please send a message here: https://www.reddit.com/message/compose?to=%2Fr%2Fpalera1n", embed=log)
+                    await user.send(f"You were banned from {user.guild.name}.\n\nThis action was performed automatically.")
                 except Exception:
                     pass
 
             if user.guild.get_member(user.id) is not None:
-                await user.ban(reason="Raid")
+                await user.ban(reason=reason)
             else:
-                await user.guild.ban(discord.Object(id=user.id), reason="Raid")
+                await user.guild.ban(discord.Object(id=user.id), reason=reason)
 
-            public_logs = user.guild.get_channel(db_guild.channel_public)
-            if public_logs:
-                log.remove_author()
-                log.set_thumbnail(url=user.display_avatar)
-                await public_logs.send(embed=log)
-
-    async def freeze_server(self, guild):
+    async def freeze_server(self, guild: discord.Guild):
         """Freeze all channels marked as freezeable during a raid, meaning only people with the Member+ role and up
         can talk (temporarily lock out whitenames during a raid)"""
 

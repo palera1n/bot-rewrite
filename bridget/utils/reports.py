@@ -100,32 +100,6 @@ async def manual_report(mod: discord.Member, target: Union[discord.Message, disc
     embed = prepare_embed(target, title="A moderator reported a member")
     await channel.send(ping_string, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(everyone=False, users=True, roles=True))
 
-async def mempro_report(genius: discord.Member, target: Union[discord.Message, discord.Member] = None):
-    """Deals with a report
-
-    Parameters
-    ----------
-    bot : discord.Client
-        "Bot object"
-    message : discord.Message
-        "Filtered message"
-    genius : discord.Member
-        "The genius that started this report
-
-    """
-    db_guild = guild_service.get_guild()
-    channel = target.guild.get_channel(db_guild.channel_mempro_reports)
-
-    ping_string = f"{genius.mention} reported a member"
-    if isinstance(target, discord.Message):
-        view = ReportActions(target.author)
-    else:
-        view = ReportActions(target)
-
-    embed = prepare_embed(target, title="A user reported a member")
-    await channel.send(ping_string, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(everyone=False, users=True, roles=True))
-
-
 async def report_raid_phrase(bot: discord.Client, message: discord.Message, domain: str):
     """Deals with a report
 

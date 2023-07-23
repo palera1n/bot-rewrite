@@ -10,6 +10,8 @@ services:
     restart: always
     ports:
       - 8096:8096
+    volumes:
+      - ./bot_data:/app/bot_data
     # network_mode: host # comment this out if you want to use dockerized mongo
     # also, if you want to use dockerized Mongo you need to change DB_HOST to "mongo" in .env
 
