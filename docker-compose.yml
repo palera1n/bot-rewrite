@@ -1,6 +1,7 @@
 version: '3.4'
 
 services:
+  # IMPORTANT: ONLY HAVE **ONE** OF THE FOLLOWING 3 ENABLED AT ONCE
   palera1n-bot:
     container_name: palera1n-bot
     build:
@@ -14,6 +15,20 @@ services:
       - ./bot_data:/app/bot_data
     # network_mode: host # comment this out if you want to use dockerized mongo
     # also, if you want to use dockerized Mongo you need to change DB_HOST to "mongo" in .env
+
+  migrate:
+    container_name: migrate
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
+    restart: never
+
+  setup:
+    container_name: setup
+    build:
+      context: .
+      dockerfile: Dockerfile.setup
+    restart: never
 
 #####
 ##### uncomment the following to use dockerized mongo
