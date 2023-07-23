@@ -16,6 +16,7 @@ from utils.services import guild_service, user_service
 from utils.config import cfg
 from utils.mod import prepare_ban_log
 from utils.reports import report_raid, report_raid_phrase, report_spam
+from utils import pfpcalc
 
 class RaidType:
     PingSpam = 1
@@ -107,7 +108,7 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
 
             for pfphash in self.last30pfps:
                 distance = hamming_distance(pfphash, this_hash)
-                similarity = (distance / 64)
+                similarity = (distance / (pfpcalc.s ** 2)) * 100
                 if similarity <= 10:
                     # 90% chance of similar image!
                     await report_raid(member)
