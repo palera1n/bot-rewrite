@@ -11,11 +11,11 @@ from datasketch import MinHash, MinHashLSH
 
 from bridget.utils.enums import PermissionLevel
 from bridget.utils.pfpcalc import calculate_hash, hamming_distance
-from model import Infraction
+from model import Infraction, Guild
 from utils.services import guild_service, user_service
 from utils.config import cfg
 from utils.mod import prepare_ban_log
-from utils.reports import report_raid, report_raid_phrase, report_spam
+from utils.reports import report_raid, report_raid_phrase, report_spam, prepare_embed
 from utils import pfpcalc
 
 class RaidType:
@@ -35,7 +35,7 @@ class MessageTextBucket(commands.BucketType):
         return self.get_key(msg)
 
 class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
         # cooldown to monitor if too many users join in a short period of time (more than 10 within 8 seconds)
@@ -78,6 +78,9 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
         # caches all joined users for profile picture analysis
         self.last30pfps = []
         self.last30messagecontents = {}
+
+        self.invite_filter = r'(?:https?://)?discord(?:(?:app)?\.com/invite|\.gg)\/{1,}[a-zA-Z0-9]+/?'
+
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member) -> None:
@@ -220,6 +223,43 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
             await self.handle_raid_detection(message, RaidType.PingSpam)
         elif await self.detect_scam_link(message):
             await self.report_possible_raid_phrase(message)
+        elif await self.do_invite_filter(message, guild_service.get_guild()):
+            db_guild = guild_service.get_guild()
+            reports_channel = message.guild.get_channel(db_guild.channel_reports)
+            await reports_channel.send(f"<@&{db_guild.role_reportping}>", embed=await prepare_embed(message, title="Invite filter"), allowed_mentions=discord.AllowedMentions(roles=True))
+            
+
+    async def do_invite_filter(self, message: discord.Message, db_guild: Guild):
+        invites = re.findall(self.invite_filter, message.content, flags=re.S)
+        if not invites:
+            return
+
+        whitelist = db_guild.filter_excluded_guilds
+        for invite in invites:
+            try:
+                invite = await self.bot.fetch_invite(invite)
+
+                id = None
+                if isinstance(invite, discord.Invite):
+                    if invite.guild is not None:
+                        id = invite.guild.id
+                    else:
+                        id = 123
+                elif isinstance(invite, discord.PartialInviteGuild) or isinstance(invite, discord.PartialInviteChannel):
+                    id = invite.id
+
+                if id not in whitelist:
+                    await message.delete()
+                    return True
+
+            except discord.NotFound:
+                return False
+                # await self.delete(message)
+                # await self.ratelimit(message)
+                # await report_raid(user=message.author, msg=message)
+                # return True
+
+        return False
 
     async def detect_scam_link(self, message: discord.Message):
         # check if message contains @everyone or @here

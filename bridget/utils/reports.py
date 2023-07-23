@@ -174,8 +174,7 @@ def prepare_ping_string(db_guild, message):
             ping_string += f"{member.mention} "
 
     return ping_string"""
-    return "<@&1068359860728643704> "
-
+    return f"<@&{guild_service.get_guild().role_reportping}> "
 
 def prepare_embed(target: Union[discord.Message, discord.Member], word: str = None, title="Word filter"):
     """Prepares embed
@@ -228,6 +227,18 @@ def prepare_embed(target: Union[discord.Message, discord.Member], word: str = No
 
     embed.add_field(name="Warn points",
                     value=user_info.warn_points, inline=True)
+    account_age = (datetime.now() - datetime.fromtimestamp(discord.utils.snowflake_time(member.id))).days
+
+    if member.joined_at != None:
+        guild_age = (datetime.now() - member.joined_at).days
+    else: 
+        guild_age = account_age
+
+    risk_factor = user_service.get_user(member.id).warn_points * 0.5 + min(len(user_service.get_infractions(member.id)), 10) * 0.3 + min((guild_age / 30), 10) * 0.1 + min(account_age / 60, 10) * 0.1
+
+    embed.add_field(name="User risk factor (scale: 1-10)",
+                    value=f"{risk_factor} (warn points * 0.5 + infraction count (max 10) * 0.3 + days since guild join / 30 (max 10) * 0.1 + days since account creation / 60 (max 10) * 0.1)"
+                    )
 
     reversed_roles = member.roles
     reversed_roles.reverse()
@@ -242,13 +253,12 @@ def prepare_embed(target: Union[discord.Message, discord.Member], word: str = No
         name="Roles", value=roles if roles else "None", inline=False)
 
     if len(rd) > 0:
-        embed.add_field(name=f"{len(rd)} most recent infractions",
+        embed.add_field(name=f"{len(rd)} most recent cases",
                         value=rd_text, inline=True)
     else:
-        embed.add_field(name=f"Recent infractions",
-                        value="This user has no infractions.", inline=True)
+        embed.add_field(name=f"Recent cases",
+                        value="This user has no cases.", inline=True)
     return embed
-
 
 class ReportActions(ui.View):
     def __init__(self, target_member: discord.Member):

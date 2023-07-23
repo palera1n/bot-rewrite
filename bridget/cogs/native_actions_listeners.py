@@ -154,6 +154,32 @@ async def automod_fancy_embed(bot: discord.BotIntegration, ctx: discord.AutoModA
         name="Warn points",
         value=user_service.get_user(ctx.user_id).warn_points,
         inline=True)
+    
+    account_age = (datetime.now() - datetime.fromtimestamp(discord.utils.snowflake_time(member.id))).days
+
+
+    if member.joined_at != None:
+        guild_age = (datetime.now() - member.joined_at).days
+    else: 
+        guild_age = account_age
+
+    risk_factor = user_service.get_user(ctx.user_id).warn_points * 0.5 + min(len(user_service.get_infractions(member.id)), 10) * 0.3 + min((guild_age / 30), 10) * 0.1 + min(account_age / 60, 10) * 0.1
+
+    embed.add_field(name="User risk factor (scale: 1-10)",
+                    value=f"{risk_factor} (warn points * 0.5 + infraction count (max 10) * 0.3 + days since guild join / 30 (max 10) * 0.1 + days since account creation / 60 (max 10) * 0.1)"
+                    )
+
+    reversed_roles = member.roles
+    reversed_roles.reverse()
+
+    roles = ""
+    for role in reversed_roles[0:4]:
+        if role != member.guild.default_role:
+            roles += role.mention + " "
+    roles = roles.strip() + "..."
+
+    embed.add_field(
+        name="Roles", value=roles if roles else "None", inline=False)
 
     # buttons
     view = AutoModReportView(member, bot)

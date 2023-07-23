@@ -9,8 +9,9 @@ import girmodel
 
 from bridget import model
 from utils import services
+from typing import *
 
-girfilter = []
+girfilter: List[girmodel.FilterWord] = []
 girraid = []
 
 class MigrateClient(discord.Client):
@@ -19,21 +20,30 @@ class MigrateClient(discord.Client):
 
         rules = await self.get_guild(services.guild_id).fetch_automod_rules()
         for filter in girfilter:
-            rule = self.get_guild(services.guild_id).getrole(filter.bypass)
-            rule = [ x for x in rules if rule.name in x.name ]
-            if len(rule) == 0:
-                return
-            rule = rule[0]
+            try:
+                guild: model.Guild = self.get_guild(int(services.guild_id))
+                if guild == None:
+                    continue
+                rule = self.get_guild(int(services.guild_id)).get_role(filter.bypass)
+                if filter.notify:
+                    rule = [ x for x in rules if rule.name in x.name and rule.name.endswith('🚨') ]
+                else:
+                    rule = [ x for x in rules if rule.name in x.name and not rule.name.endswith('🚨')]
+                if len(rule) == 0:
+                    return
+                rule = rule[0]
 
-            # extract the trigger to modify it
-            trig = rule.trigger
+                # extract the trigger to modify it
+                trig = rule.trigger
 
 
-            phrase = filter.word
-            trig.keyword_filter.append(phrase)
+                phrase = filter.word
+                trig.keyword_filter.append(phrase)
 
-            # edit the rule trigger
-            await rule.edit(trigger=trig, reason="Filtered word/regex/whitelist has been added (Migration)")
+                # edit the rule trigger
+                await rule.edit(trigger=trig, reason="Filtered word/regex/whitelist has been added (Migration)")
+            except:
+                continue
 
         print("Migrating AntiRaid!")
 
