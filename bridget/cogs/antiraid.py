@@ -11,6 +11,7 @@ from datasketch import MinHash, MinHashLSH
 
 from bridget.utils.enums import PermissionLevel
 from bridget.utils.pfpcalc import calculate_hash, hamming_distance
+from bridget.utils.utils import send_success
 from model import Infraction, Guild
 from utils.services import guild_service, user_service
 from utils.config import cfg
@@ -110,22 +111,23 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
             this_hash = calculate_hash((await member.avatar.to_file()).fp)
 
             for pfphash in self.last30pfps:
-                distance = hamming_distance(pfphash, this_hash)
+                distance = hamming_distance(pfphash[0], this_hash)
                 similarity = (distance / (pfpcalc.s ** 2)) * 100
                 if similarity <= 10:
                     # 90% chance of similar image!
-                    await report_raid(member)
-                    member.ban(reason="Similar profile picture spam raid detected.")
-                    self.last30pfps.append(this_hash)
+                    raid_alert_bucket = self.raid_alert_cooldown.get_bucket(member)
+                    if not raid_alert_bucket.update_rate_limit(current):
+                        await report_raid(member)
+                        await self.freeze_server(member.guild)
+                    await member.ban(reason=f"Similar profile picture spam raid detected.")
+                    await self.bot.get_guild(cfg.guild_id).get_member(pfphash[1]).ban(reason=f"Similar profile picture spam raid detected.")
+                    self.last30pfps.append((this_hash, member.id))
                     return
             
 
-        self.last30pfps.append(this_hash)
+        self.last30pfps.append((this_hash, member.id))
         if len(self.last30pfps) > 30:
             del self.last30pfps[0]
-        
-        with open("./bot_data/last30pfps.json", "w") as f:
-            json.dump(self.last30pfps, f)
 
         # if ratelimit is triggered, we should ban all the users that joined in the past 8 seconds
         if join_spam_detection_bucket.update_rate_limit(current):
@@ -331,6 +333,74 @@ class AntiRaidMonitor(commands.Cog): # leaving this at commands.Cog
                         await self.raid_ban(user, reason="Ping spam detected" if raid_type is RaidType.PingSpam else "Message spam detected")
                     except Exception:
                         pass
+
+    async def lock_unlock_channel(self, ctx: discord.Interaction, channel: discord.TextChannel, lock=None):
+        db_guild = guild_service.get_guild()
+
+        default_role = ctx.guild.default_role
+        member_plus = ctx.guild.get_role(db_guild.role_memberplus)
+
+        default_perms = channel.overwrites_for(default_role)
+        memberplus_perms = channel.overwrites_for(member_plus)
+
+        if lock and default_perms.send_messages is None and memberplus_perms.send_messages is None:
+            default_perms.send_messages = False
+            memberplus_perms.send_messages = True
+        elif lock is None and (not default_perms.send_messages) and memberplus_perms.send_messages:
+            default_perms.send_messages = None
+            memberplus_perms.send_messages = None
+        else:
+            return
+
+        try:
+            await channel.set_permissions(default_role, overwrite=default_perms, reason="Locked!" if lock else "Unlocked!")
+            await channel.set_permissions(member_plus, overwrite=memberplus_perms, reason="Locked!" if lock else "Unlocked!")
+            return True
+        except Exception:
+            return
+     
+    @PermissionLevel.ADMIN
+    @app_commands.command()
+    async def freezeable(self,  ctx: discord.Interaction, channel: discord.TextChannel = None):
+        channel = channel or ctx.channel
+        if channel.id in guild_service.get_locked_channels():
+            raise commands.BadArgument("That channel is already lockable.")
+
+        guild_service.add_locked_channels(channel.id)
+        await send_success(ctx, f"Added {channel.mention} as lockable channel!")
+
+
+    @PermissionLevel.ADMIN
+    @app_commands.command()
+    async def unfreezeable(self,  ctx: discord.Interaction, channel: discord.TextChannel = None):
+        channel = channel or ctx.channel
+        if channel.id not in guild_service.get_locked_channels():
+            raise commands.BadArgument("That channel isn't already lockable.")
+
+        guild_service.remove_locked_channels(channel.id)
+        await send_success(ctx, f"Removed {channel.mention} as lockable channel!")
+
+    @PermissionLevel.MOD
+    @app_commands.command()
+    async def unfreeze(self, ctx: discord.Interaction):
+        channels = guild_service.get_locked_channels()
+        if not channels:
+            raise commands.BadArgument(
+                "No unfreezeable channels! Set some using `/freezeable`.")
+
+        unlocked = []
+        await ctx.response.defer()
+        for channel in channels:
+            channel = ctx.guild.get_channel(channel)
+            if channel is not None:
+                if await self.lock_unlock_channel(ctx, channel, lock=None):
+                    unlocked.append(channel)
+
+        if unlocked:
+            await send_success(ctx, f"Unlocked {len(unlocked)} channels!", ephemeral=False)
+        else:
+            raise commands.BadArgument(
+                "Server is already unlocked or my permissions are wrong.")
 
     async def ping_spam(self, message: discord.Message):
         """If a user pings more than 5 people, or pings more than 2 roles, mute them.

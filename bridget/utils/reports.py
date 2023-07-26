@@ -137,7 +137,7 @@ async def report_spam(bot, msg, user, title):
     await channel.send(ping_string, embed=embed, view=view, allowed_mentions=discord.AllowedMentions(everyone=False, users=True, roles=True))
 
 
-async def report_raid(user, msg=None):
+async def report_raid(user: discord.Member, msg=None):
     embed = discord.Embed()
     embed.title = "Possible raid occurring"
     embed.description = "The raid filter has been triggered 5 or more times in the past 10 seconds. I am automatically locking all the channels. Use `/unfreeze` when you're done."
@@ -152,7 +152,7 @@ async def report_raid(user, msg=None):
     await reports_channel.send(f"<@&{db_guild.role_moderator}>", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
 
-def prepare_ping_string(db_guild, message):
+def prepare_ping_string(*_args, **_kwargs):
     """Prepares modping string
 
     Parameters

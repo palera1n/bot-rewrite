@@ -8,8 +8,7 @@ def calculate_hash(image_path: Union[str, bytes, BytesIO]) -> str:
     # Open image using PIL
     image = Image.open(image_path)
     
-    # Resize image to a fixed size (e.g., 8x8 pixels)
-    image = image.resize((s, s), Image.LANCZOS)
+    image = image.resize((s, s), Image.BICUBIC)
     
     # Convert image to grayscale
     image = image.convert('L')
